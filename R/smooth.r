@@ -1691,10 +1691,10 @@ smooth.construct.cp.smooth.spec <- function(object,data,knots)
      k <- seq(x0,x1,length=nk)  
   } else {
     if (length(k)!=nk) 
-    stop(paste("there should be ",nk," supplied knots"))
+    stop(gettextf("there should be %d knots supplied", nk))
   }
 
-  if (length(k)!=nk) stop(paste("there should be",nk,"knots supplied"))
+  if (length(k)!=nk) stop(gettextf("there should be %d knots supplied", nk))
 
   object$X <- cSplineDes(x,k,ord=m[1]+2)  ## model matrix
 
@@ -1761,7 +1761,7 @@ smooth.construct.ps.smooth.spec <- function(object,data,knots)
     k <- seq(xl-dx*(m[1]+1),xu+dx*(m[1]+1),length=nk+2*m[1]+2)   
   } else {
     if (length(k)!=nk+2*m[1]+2) 
-    stop(paste("there should be ",nk+2*m[1]+2," supplied knots"))
+    stop(gettextf("there should be %d knots supplied",nk+2*m[1]+2))
   }
   if (is.null(object$deriv)) object$deriv <- 0 
   object$X <- splines::spline.des(k,x,m[1]+2,x*0+object$deriv)$design # get model matrix
@@ -1884,7 +1884,7 @@ smooth.construct.bs.smooth.spec <- function(object,data,knots) {
     k <- seq(xl-dx*m[1],xu+dx*m[1],length=nk+2*m[1])   
   } else {
     if (length(k)!=nk+2*m[1]) 
-    stop(paste("there should be ",nk+2*m[1]," supplied knots"))
+    stop(gettextf("there should be %d knots supplied", nk+2*m[1]))
   }
   if (is.null(object$deriv)) object$deriv <- 0 
   object$X <- splines::spline.des(k,x,m[1]+1,x*0+object$deriv)$design # get model matrix

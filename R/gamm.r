@@ -210,7 +210,7 @@ corMatrix.pdIdnot <-
     stop("Cannot extract the matrix from an uninitialized pdMat object")
   }
   if (is.null(Ncol <- attr(object, "ncol"))) {
-    stop(paste("Cannot extract the matrix with uninitialized dimensions"))
+    stop("Cannot extract the matrix with uninitialized dimensions")
   }
   val <- diag(Ncol)
 ## REMOVE sqrt() to revert ...
@@ -244,12 +244,10 @@ pdConstruct.pdIdnot <-
     return(value)
   }
   if (length(val) > 1) {
-    stop(paste("An object of length", length(val),
-	       "does not match the required parameter size"))
+    stop(gettextf("An object of length %d does not match the required parameter size", length(val)))
   }
   if (((aux <- length(nlme::Names(val))) == 0) && is.null(formula(val))) {
-    stop(paste("Must give names when initializing pdIdnot from parameter.",
-	       "without a formula"))
+    stop("Must give names when initializing pdIdnot from parameter without a formula")
   } else {
     attr(val, "ncol") <- aux
   }
@@ -271,7 +269,7 @@ pdMatrix.pdIdnot <-
     stop("Cannot extract the matrix from an uninitialized pdMat object")
   }
   if (is.null(Ncol <- attr(object, "ncol"))) {
-    stop(paste("Cannot extract the matrix with uninitialized dimensions"))
+    stop("Cannot extract the matrix with uninitialized dimensions")
   }
   value <- diag(Ncol)
     

@@ -228,7 +228,7 @@ smooth.construct.tr.smooth.spec<-function(object,data,knots) {
     k<-quantile(x[2:(n-1)],seq(0,1,length=nk+2))[2:(nk+1)]
   }
   if (length(k)!=nk) # right number of knots?
-  stop(paste("there should be ",nk," supplied knots"))
+  stop(gettextf("there should be %d supplied knots", nk))
   x <- x - x.shift # basis stabilizing shift
   k <- k - x.shift # knots treated the same!
   X<-matrix(0,length(x),object$bs.dim)

@@ -2,33 +2,29 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.7-28\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-07 10:53+0100\n"
-"PO-Revision-Date: 2014-03-24 17:59+0100\n"
+"POT-Creation-Date: 2024-09-11 16:02+0200\n"
+"PO-Revision-Date: 2024-09-11 16:10+0200\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language: pl_PL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2);\n"
-"X-Poedit-SourceCharset: iso-8859-1\n"
-"X-Generator: Poedit 1.5.4\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 3.4.2\n"
 
 # mgcv/src/magic.c: 440
 # error(_("magic requires smoothing parameter starting values if L supplied"))
-#: magic.c:445
+#: magic.c:447
 msgid "magic requires smoothing parameter starting values if L supplied"
-msgstr ""
-"'magic' wymaga wartości startowych dla parametru wygładzającego jeśli L "
-"zostało dostarczone"
+msgstr "'magic' wymaga wartości startowych dla parametru wygładzającego jeśli L zostało dostarczone"
 
 # mgcv/src/magic.c: 558
 # error(_("magic, the gcv/ubre optimizer, failed to converge after 400 iterations."))
-#: magic.c:563
+#: magic.c:565
 msgid "magic, the gcv/ubre optimizer, failed to converge after 400 iterations."
-msgstr ""
-"'magic', omptymalizator gcv/ubre, nie zdodał uzbieżnić się po 400 iteracjach."
+msgstr "'magic', omptymalizator gcv/ubre, nie zdodał uzbieżnić się po 400 iteracjach."
 
 # mgcv/src/matrix.c: 85
 # (_("Failed to initialize memory for matrix."),1)
@@ -54,7 +50,7 @@ msgstr "PROBLEM SPÓJNOŚCI w istniejącej liście macierzy."
 # (_("You are trying to check matrix integrity without defining RANGECHECK."))
 #: matrix.c:182
 msgid "You are trying to check matrix integrity without defining RANGECHECK."
-msgstr "Próbujesz sprawdzić integralność macierzy bez określania 'RANGECHECK'"
+msgstr "Próbujesz sprawdzić integralność macierzy bez określania 'RANGECHECK'."
 
 # mgcv/src/matrix.c: 248
 # (_("Target matrix too small in mcopy"),1)
@@ -94,7 +90,7 @@ msgstr "BŁĄD w addconQT."
 
 # mgcv/src/qp.c: 466
 # (_("QPCLS - Rank deficiency in model"),1)
-#: qp.c:465
+#: qp.c:463
 msgid "QPCLS - Rank deficiency in model"
 msgstr "QPCLS - Niedobór rang w modelu"
 
@@ -102,7 +98,7 @@ msgstr "QPCLS - Niedobór rang w modelu"
 # (_("You must have 2m>d for a thin plate spline."),1)
 # mgcv/src/tprs.c: 81
 # (_("You must have 2m>d for a thin plate spline."),1)
-#: tprs.c:40
+#: tprs.c:42
 msgid "You must have 2m>d for a thin plate spline."
 msgstr "Musisz mieć 2m>d dla cienkiej płyty splajnu."
 
@@ -113,13 +109,9 @@ msgstr "Musisz mieć 2m>d dla cienkiej płyty splajnu."
 # mgcv/R/smooth.r: 2518
 # stop(
 #    "A term has fewer unique covariate combinations than specified maximum degrees of freedom")
-#: tprs.c:375 tprs.c:383
-msgid ""
-"A term has fewer unique covariate combinations than specified maximum "
-"degrees of freedom"
-msgstr ""
-"Człon posiada mniej unikalnych kombinacji zmiennych niezależnych niż "
-"określona maksymalna liczba stopni swobody"
+#: tprs.c:377 tprs.c:385
+msgid "A term has fewer unique covariate combinations than specified maximum degrees of freedom"
+msgstr "Człon posiada mniej unikalnych kombinacji zmiennych niezależnych niż określona maksymalna liczba stopni swobody"
 
 # mgcv/src/matrix.c: 1327
 # (_("svd() not converged"),1)

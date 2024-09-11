@@ -3454,7 +3454,7 @@ residuals.gam <-function(object, type = "deviance",...)
   }
   type <- match.arg(type,c("deviance", "pearson","scaled.pearson", "working", "response"))
   #if (sum(type %in% c("deviance", "pearson","scaled.pearson", "working", "response") )==0) 
-  #      stop(paste(type," residuals not available"))
+  #      stop(gettextf(%s residuals not available", type))
   ## default computations...
   y <- object$y
   mu <- object$fitted.values
@@ -4128,8 +4128,8 @@ anova.gam <- function (object, ..., dispersion = NULL, test = NULL,  freq=FALSE)
         rep(FALSE, length(dotargs))
     else (names(dotargs) != "")
     if (any(named))
-        warning("The following arguments to anova.glm(..) are invalid and dropped: ",
-            paste(deparse(dotargs[named]), collapse = ", "))
+        warning(gettextf("The following arguments to anova.glm(..) are invalid and dropped: %s",
+            paste(deparse(dotargs[named]), collapse = ", ")))
     dotargs <- dotargs[!named]
     is.glm <- unlist(lapply(dotargs, function(x) inherits(x,
         "glm")))
