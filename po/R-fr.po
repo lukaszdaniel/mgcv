@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.3-10\n"
 "Report-Msgid-Bugs-To: bugs@r-project.org\n"
-"POT-Creation-Date: 2024-09-11 16:12\n"
+"POT-Creation-Date: 2024-09-13 18:39\n"
 "PO-Revision-Date: 2021-04-12 20:02+0200\n"
 "Last-Translator: Philippe Grosjean <phgrosjean@sciviews.org>\n"
 "Language-Team: French <R-core@r-project.org>\n"
@@ -17,6 +17,97 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 2.4.2\n"
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for %s parameter of shashlss")
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for %s parameter of shashlss"
+msgstr "lien non disponible pour le paramètre d'échelle de shash"
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for %s parameter of ziplss",     link[[i]], param.names[i])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for %s parameter of ziplss"
+msgstr "lien non disponible pour le paramètre mu de twlss"
+
+#. R/efam.r: gettextf("\"%s\" link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\"",     linktemp)
+#: R/efam.r:0
+#, fuzzy
+msgid "\"%s\" link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\""
+msgstr "lien non disponible pour la régression bêta ; les liens disponibles sont \"logit\", \"probit\", \"cloglog\" et \"cauchit\""
+
+#. R/coxph.r: gettextf("\"%s\" link not available for coxph family; available link is \"identity\"",     linktemp)
+#: R/coxph.r:0
+#, fuzzy
+msgid "\"%s\" link not available for coxph family; available link is \"identity\""
+msgstr "lien non disponible pour la famille coxph ; le lien disponible est \"identity\""
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for gammals", link[[i]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for gammals"
+msgstr "lien non disponible pour"
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for gevlss", link[[i]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for gevlss"
+msgstr "lien non disponible pour"
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for mu parameter of gammals",     link[[i]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for mu parameter of gammals"
+msgstr "lien non disponible pour le paramètre mu de gammals"
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for mu parameter of gaulss",     link[[1]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for mu parameter of gaulss"
+msgstr "lien non disponible pour le paramètre mu de gaulss"
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for mu parameter of twlss",     link[[i]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for mu parameter of twlss"
+msgstr "lien non disponible pour le paramètre mu de twlss"
+
+#. R/efam.r: gettextf("\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"",     linktemp)
+#. R/efam.r: gettextf("\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"",     linktemp)
+#: R/efam.r:0
+#, fuzzy
+msgid "\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\""
+msgstr "lien %s non disponible pour la famille binomiale négative ; les liens disponibles sont \"identity\", \"log\" et \"sqrt\""
+
+#. R/efam.r: gettextf("\"%s\" link not available for ordered categorical family; available links are \"identity\"",     linktemp)
+#: R/efam.r:0
+#, fuzzy
+msgid "\"%s\" link not available for ordered categorical family; available links are \"identity\""
+msgstr "lien non disponible pour la famille catégorielle ordonnée ; les liens disponibles sont \"identity\""
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for precision parameter of gaulss",     link[[2]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for precision parameter of gaulss"
+msgstr "lien non disponible pour le paramètre precision de gaulss"
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for scale parameter of shash",     link[[2]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for scale parameter of shash"
+msgstr "lien non disponible pour le paramètre d'échelle de shash"
+
+#. R/efam.r: gettextf("\"%s\" link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\"",     linktemp)
+#: R/efam.r:0
+#, fuzzy
+msgid "\"%s\" link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\""
+msgstr "lien non disponible pour la distribution t mise à l’échelle ; les liens disponibles sont \"identity\", \"log\" et \"inverse\""
+
+#. R/efam.r: gettextf("\"%s\" link not available for zero inflated; available link for `lambda' is only  \"loga\"",     linktemp)
+#: R/efam.r:0
+#, fuzzy
+msgid "\"%s\" link not available for zero inflated; available link for `lambda' is only  \"loga\""
+msgstr "lien non disponible pour le modèle à excès de zéros ; le lien disponible pour 'lambda' est seulement \"loga\""
 
 #. R/smooth.r: stop("\"fs\" smooth cannot use a multiply penalized basis (wrong basis in xt)")
 #: R/smooth.r:0
@@ -43,6 +134,13 @@ msgstr "lien %s non disponible pour la famille binomiale négative ; les liens d
 #: R/gamlss.r:0
 msgid "'a' has to be positive"
 msgstr "'a' doit être positif"
+
+#. R/smooth.r: stop("'by' variable must be same dimension as smooth arguments")
+#. R/smooth.r: stop("'by' variable must be same dimension as smooth arguments")
+#: R/smooth.r:0
+#, fuzzy
+msgid "'by' variable must be same dimension as smooth arguments"
+msgstr "la variable 'by' doit avoir la même dimension que les arguments de lissage"
 
 #. R/bam.r: stop("'family' argument seems not to be a valid family object")
 #. R/bam.r: stop("'family' argument seems not to be a valid family object")
@@ -452,7 +550,7 @@ msgstr "Dérivées non finies. Essayez de diminuer la tolérance d'ajustement ! 
 msgid "Non-finite deviance"
 msgstr "Déviance non finie"
 
-#. R/efam.r: stop("Non-integer response variables are not allowed with ziP ")
+#. R/efam.r: stop("Non-integer response variables are not allowed with ziP")
 #: R/efam.r:0
 msgid "Non-integer response variables are not allowed with ziP"
 msgstr "Les variables de réponse non entières ne sont pas autorisées avec ziP"
@@ -613,12 +711,6 @@ msgstr "Les arguments suivants de anova.glm(..) sont incorrects et éliminés :"
 msgid "This family should not have a matrix response"
 msgstr "Cette famille ne devrait pas avoir de réponse matricielle"
 
-#. R/bam.r: warning("Too many cluster nodes to use all efficiently")
-#. R/bam.r: warning("Too many cluster nodes to use all efficiently")
-#: R/bam.r:0
-msgid "Too many cluster nodes to use all efficiently"
-msgstr "Trop de nœuds de clusters pour qu'ils soient tous utilisés efficacement"
-
 #. R/gam.fit3.r: warning("Tweedie density may be unreliable - series not fully converged")
 #: R/gam.fit3.r:0
 msgid "Tweedie density may be unreliable - series not fully converged"
@@ -658,12 +750,6 @@ msgstr "X a perdu ses dimensions dans magic !!"
 #: R/mgcv.r:0
 msgid "You've got no model...."
 msgstr "Vous n'avez aucun modèle..."
-
-#. R/smooth.r: stop("`by' variable must be same dimension as smooth arguments")
-#. R/smooth.r: stop("`by' variable must be same dimension as smooth arguments")
-#: R/smooth.r:0
-msgid "`by' variable must be same dimension as smooth arguments"
-msgstr "la variable 'by' doit avoir la même dimension que les arguments de lissage"
 
 #. R/mgcv.r: stop("`id' linked smooths must have same number of arguments")
 #: R/mgcv.r:0
@@ -1021,9 +1107,10 @@ msgstr "er... pas de méthodes discrètes pour les dérivées supérieures"
 msgid "erroneous call to estimate.theta - no free parameters"
 msgstr "appel erroné à estimate.theta - pas de paramètres libres"
 
-#. R/smooth.r: stop("factor `by' variables can not be used with matrix arguments.")
+#. R/smooth.r: stop("factor 'by' variables can not be used with matrix arguments.")
 #: R/smooth.r:0
-msgid "factor `by' variables can not be used with matrix arguments."
+#, fuzzy
+msgid "factor 'by' variables can not be used with matrix arguments."
 msgstr "les variables 'by' de type facteur ne peuvent pas être utilisées avec des arguments matriciels."
 
 #. R/mgcv.r: warning("failure of Davies method, falling back on Liu et al approximtion")
@@ -1348,11 +1435,6 @@ msgstr "itération %d"
 msgid "iterative weights or data non-finite in gam.fit - regularization may help. See ?gam.control."
 msgstr "pondérations itératives ou données non finies dans gam.fit - une régularisation peut aider. Voyez ?gam.control."
 
-#. R/bam.r: warning("iterms reset to terms")
-#: R/bam.r:0
-msgid "iterms reset to terms"
-msgstr "iterms réinitialisé à 'terms'"
-
 #. R/gam.fit3.r: stop("jackknife and derivatives requested together")
 #. R/gam.fit4.r: stop("jackknife and derivatives requested together")
 #: R/gam.fit3.r:0 R/gam.fit4.r:0
@@ -1441,80 +1523,6 @@ msgstr "libellés de prédiction linéaire hors plage"
 #: R/efam.r:0 R/gam.fit3.r:0
 msgid "link \"%s\" not available for Tweedie family."
 msgstr "lien \"%s\" non disponible pour la famille Tweedie."
-
-#. R/gamlss.r: stop(link[[i]], " link not available for ", param.names[i], " parameter of ziplss")
-#. R/gamlss.r: stop(link[[i]], " link not available for ", param.names[i], " parameter of shashlss")
-#: R/gamlss.r:0
-msgid "link not available for"
-msgstr "lien non disponible pour"
-
-#. R/efam.r: stop(linktemp, " link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\"")
-#: R/efam.r:0
-msgid "link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\""
-msgstr "lien non disponible pour la régression bêta ; les liens disponibles sont \"logit\", \"probit\", \"cloglog\" et \"cauchit\""
-
-#. R/coxph.r: stop(linktemp, " link not available for coxph family; available link is \"identity\" ")
-#: R/coxph.r:0
-msgid "link not available for coxph family; available link is \"identity\""
-msgstr "lien non disponible pour la famille coxph ; le lien disponible est \"identity\""
-
-#. R/gamlss.r: stop(link[[i]], " link not available for gammals")
-#: R/gamlss.r:0
-#, fuzzy
-msgid "link not available for gammals"
-msgstr "lien non disponible pour"
-
-#. R/gamlss.r: stop(link[[i]], " link not available for gevlss")
-#: R/gamlss.r:0
-#, fuzzy
-msgid "link not available for gevlss"
-msgstr "lien non disponible pour"
-
-#. R/gamlss.r: stop(link[[i]], " link not available for mu parameter of gammals")
-#: R/gamlss.r:0
-msgid "link not available for mu parameter of gammals"
-msgstr "lien non disponible pour le paramètre mu de gammals"
-
-#. R/gamlss.r: stop(link[[1]], " link not available for mu parameter of gaulss")
-#: R/gamlss.r:0
-msgid "link not available for mu parameter of gaulss"
-msgstr "lien non disponible pour le paramètre mu de gaulss"
-
-#. R/gamlss.r: stop(link[[i]], " link not available for mu parameter of twlss")
-#: R/gamlss.r:0
-msgid "link not available for mu parameter of twlss"
-msgstr "lien non disponible pour le paramètre mu de twlss"
-
-#. R/efam.r: stop(linktemp, " link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"")
-#. R/efam.r: stop(linktemp, " link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"")
-#: R/efam.r:0
-msgid "link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\""
-msgstr "lien non disponible pour la famille binomiale négative ; les liens disponibles sont \"identity\", \"log\" et \"sqrt\""
-
-#. R/efam.r: stop(linktemp, " link not available for ordered categorical family; available links are \"identity\"")
-#: R/efam.r:0
-msgid "link not available for ordered categorical family; available links are \"identity\""
-msgstr "lien non disponible pour la famille catégorielle ordonnée ; les liens disponibles sont \"identity\""
-
-#. R/gamlss.r: stop(link[[2]], " link not available for precision parameter of gaulss")
-#: R/gamlss.r:0
-msgid "link not available for precision parameter of gaulss"
-msgstr "lien non disponible pour le paramètre precision de gaulss"
-
-#. R/gamlss.r: stop(link[[2]], " link not available for scale parameter of shash")
-#: R/gamlss.r:0
-msgid "link not available for scale parameter of shash"
-msgstr "lien non disponible pour le paramètre d'échelle de shash"
-
-#. R/efam.r: stop(linktemp, " link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\"")
-#: R/efam.r:0
-msgid "link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\""
-msgstr "lien non disponible pour la distribution t mise à l’échelle ; les liens disponibles sont \"identity\", \"log\" et \"inverse\""
-
-#. R/efam.r: stop(linktemp, " link not available for zero inflated; available link for `lambda' is only  \"loga\"")
-#: R/efam.r:0
-msgid "link not available for zero inflated; available link for `lambda' is only  \"loga\""
-msgstr "lien non disponible pour le modèle à excès de zéros ; le lien disponible pour 'lambda' est seulement \"loga\""
 
 #. R/gam.fit3.r: stop("link not implemented for extended families")
 #: R/gam.fit3.r:0
@@ -1740,9 +1748,10 @@ msgstr "pas de bonnes données dans l'itération"
 msgid "no sandwich estimate available for this model"
 msgstr "décalage d’origine pas encore disponible pour cette famille"
 
-#. R/bam.r: warning("no smooths, ignoring `discrete=TRUE'")
+#. R/bam.r: warning("no smooths, ignoring 'discrete=TRUE'")
 #: R/bam.r:0
-msgid "no smooths, ignoring `discrete=TRUE'"
+#, fuzzy
+msgid "no smooths, ignoring 'discrete=TRUE'"
 msgstr "pas de lissage, `discrete=TRUE' est ignoré"
 
 #. R/smooth.r: stop("no spatial information provided!")
@@ -1896,8 +1905,13 @@ msgstr "un ou plusieurs k spécifiés trop petits - réinitialisation aux valeur
 msgid "only deals with 2D case"
 msgstr "ne traite que le cas 2D"
 
-#. R/smooth.r: warning("only first element of `id' used")
-#. R/smooth.r: warning("only first element of `id' used")
+#. R/smooth.r: warning("only first element of 'id' used")
+#. R/smooth.r: warning("only first element of 'id' used")
+#: R/smooth.r:0
+#, fuzzy
+msgid "only first element of 'id' used"
+msgstr "seul le premier élément de `id' est utilisé"
+
 #. R/smooth.r: warning("only first element of `id' used")
 #: R/smooth.r:0
 msgid "only first element of `id' used"
@@ -1958,16 +1972,6 @@ msgstr "les p-valeurs pour tous les termes qui peuvent être pénalisés à zér
 #: R/mgcv.r:0
 msgid "paraPen not supported for multi-formula models"
 msgstr "paraPen non supporté pour les modèles multi-formules"
-
-#. R/gamlss.r: stop(link[[i]], " link not available for ", param.names[i], " parameter of shashlss")
-#: R/gamlss.r:0
-msgid "parameter of shashlss"
-msgstr "paramètre de shashlss"
-
-#. R/gamlss.r: stop(link[[i]], " link not available for ", param.names[i], " parameter of ziplss")
-#: R/gamlss.r:0
-msgid "parameter of ziplss"
-msgstr "paramètre de ziplss"
 
 #. R/gam.fit3.r: gettextf("penalized deviance = %s", pdev, domain = "R-mgcv")
 #: R/gam.fit3.r:0
@@ -2246,9 +2250,10 @@ msgstr ""
 msgid "step failure in theta estimation"
 msgstr "échec de l'étape dans l'estimation de thêta"
 
-#. R/smooth.r: stop("supplied S matrices are wrong diminsion")
+#. R/smooth.r: stop("supplied S matrices are wrong dimension")
 #: R/smooth.r:0
-msgid "supplied S matrices are wrong diminsion"
+#, fuzzy
+msgid "supplied S matrices are wrong dimension"
 msgstr "les matrices S fournies ont de mauvaises dimensions"
 
 #. R/plots.r: stop("supplied dist negative")
@@ -2299,20 +2304,24 @@ msgstr "la classe adaptative de lissage est limitée à 1 ou 2 covariables."
 msgid "there is *no* information about some basis coefficients"
 msgstr "il n'y a *aucune* information sur certains coefficients de base"
 
-#. R/smooth.r: gettextf("there should be %d knots supplied", nk)
-#. R/smooth.r: gettextf("there should be %d knots supplied", nk)
-#. R/smooth.r: gettextf("there should be %d knots supplied", nk + 2 * m[1] +     2)
-#. R/smooth.r: gettextf("there should be %d knots supplied", nk + 2 * m[1])
-#: R/smooth.r:0
-#, fuzzy
-msgid "there should be %d knots supplied"
-msgstr "il devrait y avoir"
-
 #. R/smooth.r: stop("too few knots")
 #. R/smooth.r: stop("too few knots")
 #: R/smooth.r:0
 msgid "too few knots"
 msgstr "trop peu de nœuds"
+
+#. R/bam.r: warning("too many cluster nodes to use all efficiently")
+#. R/bam.r: warning("too many cluster nodes to use all efficiently")
+#: R/bam.r:0
+#, fuzzy
+msgid "too many cluster nodes to use all efficiently"
+msgstr "Trop de nœuds de clusters pour qu'ils soient tous utilisés efficacement"
+
+#. R/bam.r: warning("type 'iterms' reset to type 'terms'")
+#: R/bam.r:0
+#, fuzzy
+msgid "type 'iterms' reset to type 'terms'"
+msgstr "iterms réinitialisé à 'terms'"
 
 #. R/mgcv.r: warning("type iterms not available for multiple predictor cases")
 #: R/mgcv.r:0
@@ -2323,11 +2332,6 @@ msgstr "type iterms non disponible pour les cas de prédicteurs multiples"
 #: R/plots.r:0
 msgid "type must be \"link\" or \"response\""
 msgstr "type doit être \"link\" ou \"response\""
-
-#. R/bam.r: stop("un-supported smoothness selection method")
-#: R/bam.r:0
-msgid "un-supported smoothness selection method"
-msgstr "méthode de sélection du lissage non prise en charge"
 
 #. R/mgcv.r: stop("un-supported test")
 #: R/mgcv.r:0
@@ -2389,6 +2393,12 @@ msgstr "link non reconnu (vecteur ?)"
 #: R/gam.fit3.r:0
 msgid "unsupported order of differentiation requested of gam.fit3"
 msgstr "ordre de différenciation non supporté demandé de gam.fit3"
+
+#. R/bam.r: stop("unsupported smoothness selection method")
+#: R/bam.r:0
+#, fuzzy
+msgid "unsupported smoothness selection method"
+msgstr "méthode de sélection du lissage non prise en charge"
 
 #. R/misc.r: stop("update not positive definite")
 #: R/misc.r:0
@@ -2485,6 +2495,29 @@ msgstr "y doit être univarié à moins d'être binomial"
 #: R/gamlss.r:0
 msgid "ziplss requires 2 links specified as character strings"
 msgstr "ziplss requiert 2 liens spécifiés comme chaînes de caractères"
+
+#. R/smooth.r: ngettext(nk, "there should be %d knot supplied", "there should be %d knots supplied")
+#. R/smooth.r: ngettext(nk, "there should be %d knot supplied", "there should be %d knots supplied")
+#. R/smooth.r: ngettext(nk + 2 * m[1] + 2, "there should be %d knot supplied",     "there should be %d knots supplied")
+#. R/smooth.r: ngettext(nk + 2 * m[1], "there should be %d knot supplied", "there should be %d knots supplied")
+#: R/smooth.r:0
+#, fuzzy
+msgid "there should be %d knot supplied"
+msgid_plural "there should be %d knots supplied"
+msgstr[0] "il devrait y avoir"
+msgstr[1] "il devrait y avoir"
+
+#~ msgid "link not available for"
+#~ msgstr "lien non disponible pour"
+
+#~ msgid "link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\""
+#~ msgstr "lien non disponible pour la famille binomiale négative ; les liens disponibles sont \"identity\", \"log\" et \"sqrt\""
+
+#~ msgid "parameter of shashlss"
+#~ msgstr "paramètre de shashlss"
+
+#~ msgid "parameter of ziplss"
+#~ msgstr "paramètre de ziplss"
 
 #~ msgid ","
 #~ msgstr ","

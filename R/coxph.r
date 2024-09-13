@@ -15,7 +15,7 @@ cox.ph <- function (link = "identity") {
             if (!is.null(stats$name))
                 linktemp <- stats$name
         }
-        else stop(linktemp, " link not available for coxph family; available link is \"identity\" ")
+        else stop(gettextf("\"%s\" link not available for coxph family; available link is \"identity\"", linktemp))
   }
   env <- new.env(parent = .GlobalEnv)
   validmu <- function(mu) all(is.finite(mu))

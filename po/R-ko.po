@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.1.3\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2024-09-11 16:12\n"
+"POT-Creation-Date: 2024-09-13 18:39\n"
 "PO-Revision-Date: 2015-02-21 16:01-0600\n"
 "Last-Translator:Chel Hee Lee  <chl948@mail.usask.ca>\n"
 "Language-Team: Chel Hee Lee  <chl948@mail.usask.ca>\n"
@@ -23,6 +23,97 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for %s parameter of shashlss")
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for %s parameter of shashlss"
+msgstr "gaulss 모형의 모수 mu에 사용가능한 링크(link)가 아닙니다."
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for %s parameter of ziplss",     link[[i]], param.names[i])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for %s parameter of ziplss"
+msgstr "gaulss 모형의 모수 mu에 사용가능한 링크(link)가 아닙니다."
+
+#. R/efam.r: gettextf("\"%s\" link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\"",     linktemp)
+#: R/efam.r:0
+#, fuzzy
+msgid "\"%s\" link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\""
+msgstr "베타회귀(beta regression)에 사용할 수 있는 링크(link)가 아닙니다.  사용가능한 링크(link)에는 \"logit\", \"probit\", \"cloglog\" 그리고 \"cauchit\"가 있습니다. "
+
+#. R/coxph.r: gettextf("\"%s\" link not available for coxph family; available link is \"identity\"",     linktemp)
+#: R/coxph.r:0
+#, fuzzy
+msgid "\"%s\" link not available for coxph family; available link is \"identity\""
+msgstr "coxph 페밀리(family)에 사용할 수 있는 링크(link)가 아닙니다.  사용가능한 링크(link)는 \"identity\"입니다."
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for gammals", link[[i]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for gammals"
+msgstr "링크는"
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for gevlss", link[[i]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for gevlss"
+msgstr "링크는"
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for mu parameter of gammals",     link[[i]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for mu parameter of gammals"
+msgstr "gaulss 모형의 모수 mu에 사용가능한 링크(link)가 아닙니다."
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for mu parameter of gaulss",     link[[1]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for mu parameter of gaulss"
+msgstr "gaulss 모형의 모수 mu에 사용가능한 링크(link)가 아닙니다."
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for mu parameter of twlss",     link[[i]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for mu parameter of twlss"
+msgstr "gaulss 모형의 모수 mu에 사용가능한 링크(link)가 아닙니다."
+
+#. R/efam.r: gettextf("\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"",     linktemp)
+#. R/efam.r: gettextf("\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"",     linktemp)
+#: R/efam.r:0
+#, fuzzy
+msgid "\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\""
+msgstr "%s는 음이항분포 페밀리(negative binomial family)에 사용할 수 있는 링크(link)가 아닙니다.  사용가능한 링크들에는 \"identity\", \"log\" 그리고 \"sqrt\"가 있습니다."
+
+#. R/efam.r: gettextf("\"%s\" link not available for ordered categorical family; available links are \"identity\"",     linktemp)
+#: R/efam.r:0
+#, fuzzy
+msgid "\"%s\" link not available for ordered categorical family; available links are \"identity\""
+msgstr "순서범주형 페밀리(ordered categorical family)에 사용할 수 있는 링크(link)가 아닙니다.  사용가능한 링크(link)는  \"identity\"입니다."
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for precision parameter of gaulss",     link[[2]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for precision parameter of gaulss"
+msgstr "gaulss 모형의 모수 precision에 사용가능한 링크(link)가 아닙니다."
+
+#. R/gamlss.r: gettextf("\"%s\" link not available for scale parameter of shash",     link[[2]])
+#: R/gamlss.r:0
+#, fuzzy
+msgid "\"%s\" link not available for scale parameter of shash"
+msgstr "gaulss 모형의 모수 mu에 사용가능한 링크(link)가 아닙니다."
+
+#. R/efam.r: gettextf("\"%s\" link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\"",     linktemp)
+#: R/efam.r:0
+#, fuzzy
+msgid "\"%s\" link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\""
+msgstr "스케일드 t 분포(scaled t distribution)에 사용할 수 있는 링크(link)가 아닙니다.  사용가능한 링크(link)에는 \"identity\", \"log\", 그리고 \"inverse\"가 있습니다."
+
+#. R/efam.r: gettextf("\"%s\" link not available for zero inflated; available link for `lambda' is only  \"loga\"",     linktemp)
+#: R/efam.r:0
+#, fuzzy
+msgid "\"%s\" link not available for zero inflated; available link for `lambda' is only  \"loga\""
+msgstr "영과잉(zero inflated)모형에 사용할 수 있는 링크(link)가 아닙니다.  `lambda'에 사용할 수 있는 링크(link)는 오로지 \"loga\"입니다."
 
 #. R/smooth.r: stop("\"fs\" smooth cannot use a multiply penalized basis (wrong basis in xt)")
 #: R/smooth.r:0
@@ -49,6 +140,12 @@ msgstr "%s는 음이항분포 페밀리(negative binomial family)에 사용할 �
 #, fuzzy
 msgid "'a' has to be positive"
 msgstr "인자 k는 반드시 양수(positive)이어야 합니다."
+
+#. R/smooth.r: stop("'by' variable must be same dimension as smooth arguments")
+#. R/smooth.r: stop("'by' variable must be same dimension as smooth arguments")
+#: R/smooth.r:0
+msgid "'by' variable must be same dimension as smooth arguments"
+msgstr ""
 
 #. R/bam.r: stop("'family' argument seems not to be a valid family object")
 #. R/bam.r: stop("'family' argument seems not to be a valid family object")
@@ -458,7 +555,7 @@ msgstr ""
 msgid "Non-finite deviance"
 msgstr "편차(deviance)가 유한(finite)한 값을 가지지 않습니다."
 
-#. R/efam.r: stop("Non-integer response variables are not allowed with ziP ")
+#. R/efam.r: stop("Non-integer response variables are not allowed with ziP")
 #: R/efam.r:0
 msgid "Non-integer response variables are not allowed with ziP"
 msgstr ""
@@ -619,12 +716,6 @@ msgstr "다음의 인자들은 anova.glm(..)에 유효하지 않으므로 사용
 msgid "This family should not have a matrix response"
 msgstr ""
 
-#. R/bam.r: warning("Too many cluster nodes to use all efficiently")
-#. R/bam.r: warning("Too many cluster nodes to use all efficiently")
-#: R/bam.r:0
-msgid "Too many cluster nodes to use all efficiently"
-msgstr ""
-
 #. R/gam.fit3.r: warning("Tweedie density may be unreliable - series not fully converged")
 #: R/gam.fit3.r:0
 msgid "Tweedie density may be unreliable - series not fully converged"
@@ -663,12 +754,6 @@ msgstr ""
 #. R/mgcv.r: stop("You've got no model....")
 #: R/mgcv.r:0
 msgid "You've got no model...."
-msgstr ""
-
-#. R/smooth.r: stop("`by' variable must be same dimension as smooth arguments")
-#. R/smooth.r: stop("`by' variable must be same dimension as smooth arguments")
-#: R/smooth.r:0
-msgid "`by' variable must be same dimension as smooth arguments"
 msgstr ""
 
 #. R/mgcv.r: stop("`id' linked smooths must have same number of arguments")
@@ -1030,9 +1115,9 @@ msgstr ""
 msgid "erroneous call to estimate.theta - no free parameters"
 msgstr ""
 
-#. R/smooth.r: stop("factor `by' variables can not be used with matrix arguments.")
+#. R/smooth.r: stop("factor 'by' variables can not be used with matrix arguments.")
 #: R/smooth.r:0
-msgid "factor `by' variables can not be used with matrix arguments."
+msgid "factor 'by' variables can not be used with matrix arguments."
 msgstr ""
 
 #. R/mgcv.r: warning("failure of Davies method, falling back on Liu et al approximtion")
@@ -1361,11 +1446,6 @@ msgstr "%d번째 반복입니다."
 msgid "iterative weights or data non-finite in gam.fit - regularization may help. See ?gam.control."
 msgstr ""
 
-#. R/bam.r: warning("iterms reset to terms")
-#: R/bam.r:0
-msgid "iterms reset to terms"
-msgstr ""
-
 #. R/gam.fit3.r: stop("jackknife and derivatives requested together")
 #. R/gam.fit4.r: stop("jackknife and derivatives requested together")
 #: R/gam.fit3.r:0 R/gam.fit4.r:0
@@ -1456,83 +1536,6 @@ msgstr "범위 외의 값을 가집니다."
 #: R/efam.r:0 R/gam.fit3.r:0
 msgid "link \"%s\" not available for Tweedie family."
 msgstr "트위디 페밀리(tweedie family)에 링크(link) \"%s\"는 사용할 수 없습니다."
-
-#. R/gamlss.r: stop(link[[i]], " link not available for ", param.names[i], " parameter of ziplss")
-#. R/gamlss.r: stop(link[[i]], " link not available for ", param.names[i], " parameter of shashlss")
-#: R/gamlss.r:0
-msgid "link not available for"
-msgstr "링크는"
-
-#. R/efam.r: stop(linktemp, " link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\"")
-#: R/efam.r:0
-msgid "link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\""
-msgstr "베타회귀(beta regression)에 사용할 수 있는 링크(link)가 아닙니다.  사용가능한 링크(link)에는 \"logit\", \"probit\", \"cloglog\" 그리고 \"cauchit\"가 있습니다. "
-
-#. R/coxph.r: stop(linktemp, " link not available for coxph family; available link is \"identity\" ")
-#: R/coxph.r:0
-msgid "link not available for coxph family; available link is \"identity\""
-msgstr "coxph 페밀리(family)에 사용할 수 있는 링크(link)가 아닙니다.  사용가능한 링크(link)는 \"identity\"입니다."
-
-#. R/gamlss.r: stop(link[[i]], " link not available for gammals")
-#: R/gamlss.r:0
-#, fuzzy
-msgid "link not available for gammals"
-msgstr "링크는"
-
-#. R/gamlss.r: stop(link[[i]], " link not available for gevlss")
-#: R/gamlss.r:0
-#, fuzzy
-msgid "link not available for gevlss"
-msgstr "링크는"
-
-#. R/gamlss.r: stop(link[[i]], " link not available for mu parameter of gammals")
-#: R/gamlss.r:0
-#, fuzzy
-msgid "link not available for mu parameter of gammals"
-msgstr "gaulss 모형의 모수 mu에 사용가능한 링크(link)가 아닙니다."
-
-#. R/gamlss.r: stop(link[[1]], " link not available for mu parameter of gaulss")
-#: R/gamlss.r:0
-msgid "link not available for mu parameter of gaulss"
-msgstr "gaulss 모형의 모수 mu에 사용가능한 링크(link)가 아닙니다."
-
-#. R/gamlss.r: stop(link[[i]], " link not available for mu parameter of twlss")
-#: R/gamlss.r:0
-#, fuzzy
-msgid "link not available for mu parameter of twlss"
-msgstr "gaulss 모형의 모수 mu에 사용가능한 링크(link)가 아닙니다."
-
-#. R/efam.r: stop(linktemp, " link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"")
-#. R/efam.r: stop(linktemp, " link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"")
-#: R/efam.r:0
-msgid "link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\""
-msgstr "음이항분포 페밀리(negative binomial family)에 사용할 수 없는 링크(link)입니다.  사용가능한 링크(link)에는 \"identity\", \"log\" 그리고 \"sqrt\"가 있습니다."
-
-#. R/efam.r: stop(linktemp, " link not available for ordered categorical family; available links are \"identity\"")
-#: R/efam.r:0
-msgid "link not available for ordered categorical family; available links are \"identity\""
-msgstr "순서범주형 페밀리(ordered categorical family)에 사용할 수 있는 링크(link)가 아닙니다.  사용가능한 링크(link)는  \"identity\"입니다."
-
-#. R/gamlss.r: stop(link[[2]], " link not available for precision parameter of gaulss")
-#: R/gamlss.r:0
-msgid "link not available for precision parameter of gaulss"
-msgstr "gaulss 모형의 모수 precision에 사용가능한 링크(link)가 아닙니다."
-
-#. R/gamlss.r: stop(link[[2]], " link not available for scale parameter of shash")
-#: R/gamlss.r:0
-#, fuzzy
-msgid "link not available for scale parameter of shash"
-msgstr "gaulss 모형의 모수 mu에 사용가능한 링크(link)가 아닙니다."
-
-#. R/efam.r: stop(linktemp, " link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\"")
-#: R/efam.r:0
-msgid "link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\""
-msgstr "스케일드 t 분포(scaled t distribution)에 사용할 수 있는 링크(link)가 아닙니다.  사용가능한 링크(link)에는 \"identity\", \"log\", 그리고 \"inverse\"가 있습니다."
-
-#. R/efam.r: stop(linktemp, " link not available for zero inflated; available link for `lambda' is only  \"loga\"")
-#: R/efam.r:0
-msgid "link not available for zero inflated; available link for `lambda' is only  \"loga\""
-msgstr "영과잉(zero inflated)모형에 사용할 수 있는 링크(link)가 아닙니다.  `lambda'에 사용할 수 있는 링크(link)는 오로지 \"loga\"입니다."
 
 #. R/gam.fit3.r: stop("link not implemented for extended families")
 #: R/gam.fit3.r:0
@@ -1760,9 +1763,9 @@ msgstr ""
 msgid "no sandwich estimate available for this model"
 msgstr "트위디 페밀리(tweedie family)에 링크(link) \"%s\"는 사용할 수 없습니다."
 
-#. R/bam.r: warning("no smooths, ignoring `discrete=TRUE'")
+#. R/bam.r: warning("no smooths, ignoring 'discrete=TRUE'")
 #: R/bam.r:0
-msgid "no smooths, ignoring `discrete=TRUE'"
+msgid "no smooths, ignoring 'discrete=TRUE'"
 msgstr ""
 
 #. R/smooth.r: stop("no spatial information provided!")
@@ -1919,8 +1922,13 @@ msgstr ""
 msgid "only deals with 2D case"
 msgstr "2차원(2D)인 경우만을 다룰 수 있습니다."
 
-#. R/smooth.r: warning("only first element of `id' used")
-#. R/smooth.r: warning("only first element of `id' used")
+#. R/smooth.r: warning("only first element of 'id' used")
+#. R/smooth.r: warning("only first element of 'id' used")
+#: R/smooth.r:0
+#, fuzzy
+msgid "only first element of 'id' used"
+msgstr "`id'의 첫번째 요소만이 사용되었습니다."
+
 #. R/smooth.r: warning("only first element of `id' used")
 #: R/smooth.r:0
 msgid "only first element of `id' used"
@@ -1981,17 +1989,6 @@ msgstr ""
 #: R/mgcv.r:0
 msgid "paraPen not supported for multi-formula models"
 msgstr "여러개의 모델식(multi-formula models)을 사용하는 경우에는 paraPen을 사용할 수 없습니다."
-
-#. R/gamlss.r: stop(link[[i]], " link not available for ", param.names[i], " parameter of shashlss")
-#: R/gamlss.r:0
-#, fuzzy
-msgid "parameter of shashlss"
-msgstr "(ziplss의 모수)에 사용할 수 없습니다."
-
-#. R/gamlss.r: stop(link[[i]], " link not available for ", param.names[i], " parameter of ziplss")
-#: R/gamlss.r:0
-msgid "parameter of ziplss"
-msgstr "(ziplss의 모수)에 사용할 수 없습니다."
 
 #. R/gam.fit3.r: gettextf("penalized deviance = %s", pdev, domain = "R-mgcv")
 #: R/gam.fit3.r:0
@@ -2276,10 +2273,10 @@ msgstr ""
 msgid "step failure in theta estimation"
 msgstr ""
 
-#. R/smooth.r: stop("supplied S matrices are wrong diminsion")
+#. R/smooth.r: stop("supplied S matrices are wrong dimension")
 #: R/smooth.r:0
 #, fuzzy
-msgid "supplied S matrices are wrong diminsion"
+msgid "supplied S matrices are wrong dimension"
 msgstr "H의 열과 행의 길이가 같아야 합니다."
 
 #. R/plots.r: stop("supplied dist negative")
@@ -2330,19 +2327,22 @@ msgstr ""
 msgid "there is *no* information about some basis coefficients"
 msgstr ""
 
-#. R/smooth.r: gettextf("there should be %d knots supplied", nk)
-#. R/smooth.r: gettextf("there should be %d knots supplied", nk)
-#. R/smooth.r: gettextf("there should be %d knots supplied", nk + 2 * m[1] +     2)
-#. R/smooth.r: gettextf("there should be %d knots supplied", nk + 2 * m[1])
-#: R/smooth.r:0
-msgid "there should be %d knots supplied"
-msgstr ""
-
 #. R/smooth.r: stop("too few knots")
 #. R/smooth.r: stop("too few knots")
 #: R/smooth.r:0
 msgid "too few knots"
 msgstr "노트(knots)의 개수 nk가 너무 작은 값을 가집니다."
+
+#. R/bam.r: warning("too many cluster nodes to use all efficiently")
+#. R/bam.r: warning("too many cluster nodes to use all efficiently")
+#: R/bam.r:0
+msgid "too many cluster nodes to use all efficiently"
+msgstr ""
+
+#. R/bam.r: warning("type 'iterms' reset to type 'terms'")
+#: R/bam.r:0
+msgid "type 'iterms' reset to type 'terms'"
+msgstr ""
 
 #. R/mgcv.r: warning("type iterms not available for multiple predictor cases")
 #: R/mgcv.r:0
@@ -2353,11 +2353,6 @@ msgstr ""
 #: R/plots.r:0
 msgid "type must be \"link\" or \"response\""
 msgstr "type은 반드시 \"link\" 또는 \"response\"이어야 합니다."
-
-#. R/bam.r: stop("un-supported smoothness selection method")
-#: R/bam.r:0
-msgid "un-supported smoothness selection method"
-msgstr "지원되지 않는 평활화 선택법(smoothness selection method)입니다."
 
 #. R/mgcv.r: stop("un-supported test")
 #: R/mgcv.r:0
@@ -2421,6 +2416,12 @@ msgstr "알 수 없는 (벡터 또는) 링크입니다."
 #: R/gam.fit3.r:0
 msgid "unsupported order of differentiation requested of gam.fit3"
 msgstr ""
+
+#. R/bam.r: stop("unsupported smoothness selection method")
+#: R/bam.r:0
+#, fuzzy
+msgid "unsupported smoothness selection method"
+msgstr "지원되지 않는 평활화 선택법(smoothness selection method)입니다."
 
 #. R/misc.r: stop("update not positive definite")
 #: R/misc.r:0
@@ -2517,6 +2518,28 @@ msgstr ""
 #: R/gamlss.r:0
 msgid "ziplss requires 2 links specified as character strings"
 msgstr "ziplss 모형은 문자열로 표현된 2개의 링크(link)를 필요로 합니다."
+
+#. R/smooth.r: ngettext(nk, "there should be %d knot supplied", "there should be %d knots supplied")
+#. R/smooth.r: ngettext(nk, "there should be %d knot supplied", "there should be %d knots supplied")
+#. R/smooth.r: ngettext(nk + 2 * m[1] + 2, "there should be %d knot supplied",     "there should be %d knots supplied")
+#. R/smooth.r: ngettext(nk + 2 * m[1], "there should be %d knot supplied", "there should be %d knots supplied")
+#: R/smooth.r:0
+msgid "there should be %d knot supplied"
+msgid_plural "there should be %d knots supplied"
+msgstr[0] ""
+
+#~ msgid "link not available for"
+#~ msgstr "링크는"
+
+#~ msgid "link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\""
+#~ msgstr "음이항분포 페밀리(negative binomial family)에 사용할 수 없는 링크(link)입니다.  사용가능한 링크(link)에는 \"identity\", \"log\" 그리고 \"sqrt\"가 있습니다."
+
+#, fuzzy
+#~ msgid "parameter of shashlss"
+#~ msgstr "(ziplss의 모수)에 사용할 수 없습니다."
+
+#~ msgid "parameter of ziplss"
+#~ msgstr "(ziplss의 모수)에 사용할 수 없습니다."
 
 #~ msgid ","
 #~ msgstr ","

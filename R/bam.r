@@ -868,7 +868,7 @@ bgam.fit <- function (G, mf, chunk.size, gp ,scale ,gamma,method, coef=NULL,etas
       n.threads <- length(cl)
       while(nobs/n.threads < ncol(G$X)) n.threads <- n.threads - 1
       if (n.threads < length(cl)) { 
-        warning("Too many cluster nodes to use all efficiently")
+        warning("too many cluster nodes to use all efficiently")
       }
     } else n.threads <- 1
 
@@ -1392,7 +1392,7 @@ bam.fit <- function(G,mf,chunk.size,gp,scale,gamma,method,rho=0,
        n.threads <- length(cl)
        while(n/n.threads < ncol(G$X)) n.threads <- n.threads - 1
        if (n.threads < length(cl)) { 
-         warning("Too many cluster nodes to use all efficiently")
+         warning("too many cluster nodes to use all efficiently")
        }
      } else n.threads <- 1
 
@@ -1663,7 +1663,7 @@ predict.bamd <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,excl
 
   if (type=="iterms") {
     type <- "terms"
-    warning("iterms reset to terms")
+    warning("type 'iterms' reset to type 'terms'")
   }
 
   lpi <- attr(object$formula,"lpi") ## lpi[[i]] indexes coefs for ith linear predoctor
@@ -2065,7 +2065,7 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
     if (family$family=="gaussian"&&family$link=="identity") am <- TRUE else am <- FALSE
     if (scale==0) { if (family$family %in% c("poisson","binomial")) scale <- 1 else scale <- -1} 
     if (!method%in%c("fREML","GACV.Cp","GCV.Cp","REML",
-                    "ML","P-REML","P-ML")) stop("un-supported smoothness selection method")
+                    "ML","P-REML","P-ML")) stop("unsupported smoothness selection method")
     if (is.logical(discrete)) {
       discretize <- discrete
       discrete <- NULL ## use default discretization, if any
@@ -2096,7 +2096,7 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
       ## check it's not a list formula
       if (!is.null(gp$nlp)) for (i in 1:gp$nlp) if (length(gp[[i]]$smooth.spec)>0) ok <- FALSE
       if (ok) {
-        warning("no smooths, ignoring `discrete=TRUE'")
+        warning("no smooths, ignoring 'discrete=TRUE'")
         discretize <- FALSE
       }	
     }

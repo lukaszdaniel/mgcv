@@ -173,7 +173,7 @@ nb <- function (theta = NULL, link = "log") {
             if (!is.null(stats$name))
                 linktemp <- stats$name
         }
-        else stop(linktemp, " link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"")
+        else stop(gettextf("\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp)) 
   }
   ## Theta <-  NULL;
   n.theta <- 1
@@ -325,7 +325,7 @@ cnorm <- function (theta = NULL, link = "identity") {
             if (!is.null(stats$name))
                 linktemp <- stats$name
         }
-        else stop(linktemp, " link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"")
+        else stop(gettextf("\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
   }
   ## Theta <-  NULL;
   n.theta <- 1
@@ -645,7 +645,7 @@ ocat <- function(theta=NULL,link="identity",R=NULL) {
       stats <- link
       if (!is.null(stats$name))
             linktemp <- stats$name
-    } else stop(linktemp, " link not available for ordered categorical family; available links are \"identity\"")
+    } else stop(gettextf("\"%s\" link not available for ordered categorical family; available links are \"identity\"", linktemp))
   }
   if (is.null(theta)&&is.null(R)) stop("Must supply theta or R to ocat")
   if (!is.null(theta)) R <- length(theta) + 2 ## number of catergories
@@ -1293,7 +1293,7 @@ betar <- function (theta = NULL, link = "logit",eps=.Machine$double.eps*100) {
             if (!is.null(stats$name))
                 linktemp <- stats$name
         }
-        else stop(linktemp, " link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\"")
+        else stop(gettextf("\"%s\" link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\"", linktemp))
     }
    
     n.theta <- 1
@@ -1583,7 +1583,7 @@ scat <- function (theta = NULL, link = "identity",min.df = 3) {
             if (!is.null(stats$name))
                 linktemp <- stats$name
         }
-        else stop(linktemp, " link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\"")
+        else stop(gettextf("\"%s\" link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\"", linktemp))
     }
     ## Theta <-  NULL;
     n.theta <- 2
@@ -1868,7 +1868,7 @@ ziP <- function (theta = NULL, link = "identity",b=0) {
   if (!is.character(linktemp)) linktemp <- deparse(linktemp)
   if (linktemp %in% c("identity")) { 
     stats <- make.link(linktemp)
-  } else  stop(linktemp, " link not available for zero inflated; available link for `lambda' is only  \"loga\"")
+  } else  stop(gettextf("\"%s\" link not available for zero inflated; available link for `lambda' is only  \"loga\"", linktemp))
   ## Theta <-  NULL;
   n.theta <- 2
   if (!is.null(theta)) {
@@ -1983,7 +1983,7 @@ ziP <- function (theta = NULL, link = "identity",b=0) {
     initialize <- expression({
         if (any(y < 0)) stop("negative values not allowed for the zero inflated Poisson family")
         if (all.equal(y,round(y))!=TRUE) {
-          stop("Non-integer response variables are not allowed with ziP ")
+          stop("Non-integer response variables are not allowed with ziP")
         }
         if ((min(y)==0&&max(y)==1)) stop("Using ziP for binary data makes no sense")
         ##n <- rep(1, nobs)

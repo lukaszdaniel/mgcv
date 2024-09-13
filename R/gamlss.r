@@ -863,7 +863,7 @@ gaulss <- function(link=list("identity","logb"),b=0.01) {
   okLinks <- list(c("inverse", "log", "identity","sqrt"),"logb")
   stats <- list()
   if (link[[1]] %in% okLinks[[1]]) stats[[1]] <- make.link(link[[1]]) else 
-  stop(link[[1]]," link not available for mu parameter of gaulss")
+  stop(gettextf("\"%s\" link not available for mu parameter of gaulss", link[[1]]))
   fam <- structure(list(link=link[[1]],canonical="none",linkfun=stats[[1]]$linkfun,
            mu.eta=stats[[1]]$mu.eta),
            class="family")
@@ -885,7 +885,7 @@ gaulss <- function(link=list("identity","logb"),b=0.01) {
     paste("function(mu) { mub <-  pmax(1 - mu *",b,",.Machine$double.eps);((1-mub)*mub*6-2)/(mub*mu)^3}" )))
     stats[[2]]$d4link <-  eval(parse(text=
     paste("function(mu) { mub <- pmax(1 - mu *",b,",.Machine$double.eps);(((24*mub-36)*mub+24)*mub-6)/(mub*mu)^4}")))
-  } else stop(link[[2]]," link not available for precision parameter of gaulss")
+  } else stop(gettextf("\"%s\" link not available for precision parameter of gaulss", link[[2]]))
   
   residuals <- function(object,type=c("deviance","pearson","response")) { 
       type <- match.arg(type)
@@ -1637,7 +1637,7 @@ ziplss <-  function(link=list("identity","identity")) {
   param.names <- c("Poisson mean","binary probability")
   for (i in 1:2) {
     if (link[[i]] %in% okLinks[[i]]) stats[[i]] <- make.link(link[[i]]) else 
-    stop(link[[i]]," link not available for ",param.names[i]," parameter of ziplss")
+    stop(gettextf("\"%s\" link not available for %s parameter of ziplss", link[[i]], param.names[i]))
     fam <- structure(list(link=link[[i]],canonical="none",linkfun=stats[[i]]$linkfun,
            mu.eta=stats[[i]]$mu.eta),
            class="family")
@@ -1943,7 +1943,7 @@ gevlss <- function(link=list("identity","identity","logit")) {
   stats <- list()
   for (i in 1:3) {
     if (link[[i]] %in% okLinks[[i]]) stats[[i]] <- make.link(link[[i]]) else 
-    stop(link[[i]]," link not available for gevlss")
+    stop(gettextf("\"%s\" link not available for gevlss", link[[i]]))
     fam <- structure(list(link=link[[i]],canonical="none",linkfun=stats[[i]]$linkfun,
            mu.eta=stats[[i]]$mu.eta),
            class="family")
@@ -2458,7 +2458,7 @@ twlss <- function(link=list("log","identity","identity"),a=1.01,b=1.99) {
   stats <- list()
   for (i in 1:3) {
     if (link[[i]] %in% okLinks[[i]]) stats[[i]] <- make.link(link[[i]]) else 
-    stop(link[[i]]," link not available for mu parameter of twlss")
+    stop(gettextf("\"%s\" link not available for mu parameter of twlss", link[[i]]))
     fam <- structure(list(link=link[[i]],canonical="none",linkfun=stats[[i]]$linkfun,
            mu.eta=stats[[i]]$mu.eta),
            class="family")
@@ -2640,7 +2640,7 @@ gammals <- function(link=list("identity","log"),b=-7) {
   stats <- list()
   for (i in 1:2) {
     if (link[[i]] %in% okLinks[[i]]) stats[[i]] <- make.link(link[[i]]) else 
-    stop(link[[i]]," link not available for gammals")
+    stop(gettextf("\"%s\" link not available for gammals", link[[i]]))
     fam <- structure(list(link=link[[i]],canonical="none",linkfun=stats[[i]]$linkfun,
            mu.eta=stats[[i]]$mu.eta),
            class="family")
@@ -2969,7 +2969,7 @@ gumbls <- function(link=list("identity","log"),b=-7) {
   stats <- list()
   for (i in 1:2) {
     if (link[[i]] %in% okLinks[[i]]) stats[[i]] <- make.link(link[[i]]) else 
-    stop(link[[i]]," link not available for mu parameter of gammals")
+    stop(gettextf("\"%s\" link not available for mu parameter of gammals", link[[i]]))
     fam <- structure(list(link=link[[i]],canonical="none",linkfun=stats[[i]]$linkfun,
            mu.eta=stats[[i]]$mu.eta),
            class="family")
@@ -3304,7 +3304,7 @@ shash <- function(link = list("identity", "logeb", "identity", "identity"), b = 
   param.names <- c("mu", "tau", "eps", "phi")
   for (i in c(1, 3, 4)) { # Links for mu, eps and phi
     if (link[[i]] %in% okLinks[[i]]) stats[[i]] <- make.link(link[[i]]) else 
-      stop(link[[i]]," link not available for ", param.names[i]," parameter of shashlss")
+      stop(gettextf("\"%s\" link not available for %s parameter of shashlss"), link[[i]], param.names[i])
     fam <- structure(list(link=link[[i]],canonical="none",linkfun=stats[[i]]$linkfun,
                           mu.eta=stats[[i]]$mu.eta),
                      class="family")
@@ -3329,7 +3329,7 @@ shash <- function(link = list("identity", "logeb", "identity", "identity"), b = 
                                        paste("function(mu) { em<-exp(mu); fr<-em/(em-",b,"); oo<-fr*(1-fr); oo-2*oo*fr }",sep='')))
     stats[[2]]$d4link <-  eval(parse(text=
                                        paste("function(mu) { em<-exp(mu); b<-",b,"; -b*em*(b^2+4*b*em+em^2)/(em-b)^4 }",sep='')))
-  } else stop(link[[2]]," link not available for scale parameter of shash")
+  } else stop(gettextf("\"%s\" link not available for scale parameter of shash", link[[2]]))
   
   # variance <- function(mu) exp(get(".Theta"))  ##### XXX ##### Necessary?
   

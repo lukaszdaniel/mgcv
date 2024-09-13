@@ -470,7 +470,7 @@ te <- function(..., k=NA,bs="cr",m=NA,d=NA,by=NA,fx=FALSE,np=TRUE,xt=NULL,id=NUL
   if (!is.null(id)) { 
     if (length(id)>1) { 
       id <- id[1]
-      warning("only first element of `id' used")
+      warning("only first element of 'id' used")
     } 
     id <- as.character(id)
   }
@@ -642,7 +642,7 @@ s <- function (..., k=-1,fx=FALSE,bs="tp",m=NA,by=NA,xt=NULL,id=NULL,sp=NULL,pc=
   if (!is.null(id))  {
     if (length(id)>1) { 
       id <- id[1]
-      warning("only first element of `id' used")
+      warning("only first element of 'id' used")
     } 
    id <- as.character(id)
   }
@@ -1691,10 +1691,12 @@ smooth.construct.cp.smooth.spec <- function(object,data,knots)
      k <- seq(x0,x1,length=nk)  
   } else {
     if (length(k)!=nk) 
-    stop(gettextf("there should be %d knots supplied", nk))
+    stop(sprintf(ngettext(nk, "there should be %d knot supplied",
+        "there should be %d knots supplied"), nk))
   }
 
-  if (length(k)!=nk) stop(gettextf("there should be %d knots supplied", nk))
+  if (length(k)!=nk) stop(sprintf(ngettext(nk, "there should be %d knot supplied",
+        "there should be %d knots supplied"), nk))
 
   object$X <- cSplineDes(x,k,ord=m[1]+2)  ## model matrix
 
@@ -1761,7 +1763,8 @@ smooth.construct.ps.smooth.spec <- function(object,data,knots)
     k <- seq(xl-dx*(m[1]+1),xu+dx*(m[1]+1),length=nk+2*m[1]+2)   
   } else {
     if (length(k)!=nk+2*m[1]+2) 
-    stop(gettextf("there should be %d knots supplied",nk+2*m[1]+2))
+    stop(sprintf(ngettext(nk+2*m[1]+2, "there should be %d knot supplied",
+        "there should be %d knots supplied"), nk+2*m[1]+2))
   }
   if (is.null(object$deriv)) object$deriv <- 0 
   object$X <- splines::spline.des(k,x,m[1]+2,x*0+object$deriv)$design # get model matrix
@@ -1884,7 +1887,8 @@ smooth.construct.bs.smooth.spec <- function(object,data,knots) {
     k <- seq(xl-dx*m[1],xu+dx*m[1],length=nk+2*m[1])   
   } else {
     if (length(k)!=nk+2*m[1]) 
-    stop(gettextf("there should be %d knots supplied", nk+2*m[1]))
+    stop(sprintf(ngettext(nk+2*m[1], "there should be %d knot supplied",
+        "there should be %d knots supplied"), nk+2*m[1]))
   }
   if (is.null(object$deriv)) object$deriv <- 0 
   object$X <- splines::spline.des(k,x,m[1]+1,x*0+object$deriv)$design # get model matrix
@@ -2596,7 +2600,7 @@ smooth.construct.re.smooth.spec <- function(object,data,knots)
   } else {
     object$S <- if (is.list(object$xt$S)) object$xt$S else list(object$xt$S)
     for (i in 1:length(object$S)) { 
-      if (ncol(object$S[[i]])!=object$bs.dim||nrow(object$S[[i]])!=object$bs.dim) stop("supplied S matrices are wrong diminsion")
+      if (ncol(object$S[[i]])!=object$bs.dim||nrow(object$S[[i]])!=object$bs.dim) stop("supplied S matrices are wrong dimension")
     }
     object$rank <- object$xt$rank
   }
@@ -3919,7 +3923,7 @@ smoothCon <- function(object,data,knots=NULL,absorb.cons=FALSE,scale.penalty=TRU
 
   if (matrixArg||(object$by!="NA"&&is.null(sm$by.done))) { ## apply by variables
     if (is.factor(by)) { ## generates smooth for each level of by
-      if (matrixArg) stop("factor `by' variables can not be used with matrix arguments.")
+      if (matrixArg) stop("factor 'by' variables can not be used with matrix arguments.")
       sml <- list()
       lev <- levels(by)
       ## if by variable is an ordered factor then first level is taken as a 
@@ -3944,7 +3948,7 @@ smoothCon <- function(object,data,knots=NULL,absorb.cons=FALSE,scale.penalty=TRU
     } else { ## not a factor by variable
       sml <- list(sm)
       if ((is.null(sm$ind)&&length(by)!=nrow(sm$X))||
-          (!is.null(sm$ind)&&length(by)!=length(sm$ind))) stop("`by' variable must be same dimension as smooth arguments")
+          (!is.null(sm$ind)&&length(by)!=length(sm$ind))) stop("'by' variable must be same dimension as smooth arguments")
      
       if (matrixArg) { ## arguments are matrices => summation convention used
         #if (!apply.by) warning("apply.by==FALSE unsupported in matrix case")
@@ -4274,7 +4278,7 @@ PredictMat <- function(object,data,n=nrow(data))
           X <- by.dum*X
           if (!is.null(offset)) offset <- by.dum*offset
         } else { 
-          if (length(by)!=nrow(X)) stop("`by' variable must be same dimension as smooth arguments")
+          if (length(by)!=nrow(X)) stop("'by' variable must be same dimension as smooth arguments")
           X <- as.numeric(by)*X
           if (!is.null(offset)) offset <- as.numeric(by)*offset
         }
