@@ -24,6 +24,7 @@ USA.*/
 #include "matrix.h"
 #include "general.h"
 #include "tprs.h"
+#include "localization.h"
 
 /* Code for thin plate regression splines */
 

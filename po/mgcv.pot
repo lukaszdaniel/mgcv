@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.9-1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-11 16:02+0200\n"
+"POT-Creation-Date: 2024-09-13 19:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,11 +65,11 @@ msgstr ""
 msgid "QPCLS - Rank deficiency in model"
 msgstr ""
 
-#: tprs.c:42
+#: tprs.c:43
 msgid "You must have 2m>d for a thin plate spline."
 msgstr ""
 
-#: tprs.c:377 tprs.c:385
+#: tprs.c:378 tprs.c:386
 msgid ""
 "A term has fewer unique covariate combinations than specified maximum "
 "degrees of freedom"
