@@ -1665,12 +1665,13 @@ void sspl_apply(double *y,double *x,double *w,double *U,double *V,int *n,int *nf
   int i,k,ok;
   double *Wy,*U0s,*U0c,*U1s,*U1c,
     *V0s,*V0c,*V1s,*V1c,*p,*p1,*p2,w2,*xx;
+  w2 = 0.0;
   if (*nf > *n) { /* deal with duplicates */
    xx = (double *)CALLOC((size_t)*nf,sizeof(double));
    for (p=x,p1=x + *nf,p2=xx;p<p1;p++,p2++) *p2 = *p;
    k=0;ok=1;
    for (i=1;i<*nf;i++) if (xx[k] + *tol < xx[i]) { 
-     if (!ok) { w[k] = sqrt(w2);y[k] /= w2;}
+     if (!ok && w2 != 0.0) { w[k] = sqrt(w2);y[k] /= w2;}
      k++;
      xx[k] = xx[i];y[k] = y[i];
      w[k] = w[i];ok=1;

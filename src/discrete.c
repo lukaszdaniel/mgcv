@@ -697,7 +697,7 @@ SEXP CXWyd(SEXP XWyr, SEXP yr, SEXP Xr, SEXP wr, SEXP kr, SEXP ksr, SEXP mr, SEX
   ncs and nrs are length of cs/rs.
 */
   double *XWy,*X,*v,*w,*ar_weights,*y;
-  int n,*k,*ks,*m,*p,*ts,*dt,*qc,*nthreads,*cs,*rs,nx,nt,ncs,nrs,*ar_stop,*ar_row,*cy;
+  int n,*k,*ks,*m,*p,*ts,*dt,*qc,*cs,nx,nt,ncs,*ar_stop,*ar_row,*cy;
   n = nrows(kr); XWy = REAL(XWyr);
   X = REAL(Xr);w = REAL(wr);y = REAL(yr);
   k = INTEGER(kr); ks = INTEGER(ksr);
