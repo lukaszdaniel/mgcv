@@ -23,12 +23,13 @@ USA. */
 #include <Rmath.h>
 #include <Rinternals.h>
 #include <Rconfig.h>
+#include "localization.h"
 #include "mgcv.h"
 
 void *R_chk_calloc1(size_t nmemb,size_t size) {
   /* checks for zero or negative memory allocation calls...*/
   if (nmemb<=0) {
-    Rprintf("adjusting %d memory allocation\n",(int) nmemb);
+    Rprintf(_("adjusting %d memory allocation\n"), (int) nmemb);
     nmemb++;
   }  
   return(R_chk_calloc(nmemb,size));

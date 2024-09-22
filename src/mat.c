@@ -58,7 +58,7 @@
 
 #include "mgcv.h"
 #include <R.h>
-
+#include "localization.h"
 /*#include <dmalloc.h>*/
 
 void mgcv_omp(int *a) {
@@ -84,7 +84,7 @@ void dump_mat(double *M,int *r,int*c,const char *path) {
   FILE *mf;
   mf = fopen(path,"wb");
   if (mf == NULL) { 
-    Rprintf("\nFailed to open file\n");
+    Rprintf(_("\nFailed to open file\n"));
     return;
   }
   fwrite(r,sizeof(int),1,mf); fwrite(c,sizeof(int),1,mf);
@@ -106,7 +106,7 @@ void read_mat(double *M,int *r,int*c,char *path) {
  FILE *mf;
  mf = fopen("/home/sw283/tmp/badmat.dat","rb"); 
  if (mf == NULL) { 
-    Rprintf("\nFailed to open file\n");
+    Rprintf(_("\nFailed to open file\n"));
     return;
  }
  if (*r < 1) { /* dimension query */
@@ -114,7 +114,7 @@ void read_mat(double *M,int *r,int*c,char *path) {
  } else {
    j=fread(r,sizeof(int),1,mf); j=fread(c,sizeof(int),1,mf);
    j=fread(M,sizeof(double),*r * *c,mf);
-   if (j!= *r * *c)  Rprintf("\nfile dim problem\n");
+   if (j != *r * *c)  Rprintf(_("\nfile dim problem\n"));
  }
  fclose(mf);
 }
@@ -3342,12 +3342,12 @@ void mgcv_symeig(double *A,double *ev,int *n,int *use_dsyevd,int *get_vectors,
     }
     Rprintf("**\n");
     j=k;
-    if (k) Rprintf("Non orthogonal eigenvectors %d %g\n",k,x/k);
+    if (k) Rprintf(_("Non orthogonal eigenvectors %d %g\n"),k,x/k);
     x=0.0;k=0;
     for (i=0;i<*n;i++) if (fabs(p[i + *n * i]-1)>1e-14) { 
 	x += fabs(p[i + *n * i]-1);k++;
     }
-    if (k) Rprintf("Eigenvectors not normalized %d %g\n",k,x/k);
+    if (k) Rprintf(_("Eigenvectors not normalized %d %g\n"),k,x/k);
     if (k+j>0) dump_mat(Acopy,n,n,"/home/sw283/tmp/badmat.dat");
     FREE(p);FREE(Acopy);
   }
