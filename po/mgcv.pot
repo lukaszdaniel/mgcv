@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.9-1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-13 19:57+0200\n"
+"POT-Creation-Date: 2024-10-05 20:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,6 +23,28 @@ msgstr ""
 
 #: magic.c:565
 msgid "magic, the gcv/ubre optimizer, failed to converge after 400 iterations."
+msgstr ""
+
+#: mat.c:87 mat.c:109
+msgid ""
+"\n"
+"Failed to open file\n"
+msgstr ""
+
+#: mat.c:117
+msgid ""
+"\n"
+"file dim problem\n"
+msgstr ""
+
+#: mat.c:3345
+#, c-format
+msgid "Non orthogonal eigenvectors %d %g\n"
+msgstr ""
+
+#: mat.c:3350
+#, c-format
+msgid "Eigenvectors not normalized %d %g\n"
 msgstr ""
 
 #: matrix.c:82
@@ -57,12 +79,43 @@ msgstr ""
 msgid "Singular Matrix passed to invert()"
 msgstr ""
 
+#: misc.c:32
+#, c-format
+msgid "adjusting %d memory allocation\n"
+msgstr ""
+
 #: qp.c:59
 msgid "ERROR in addconQT."
 msgstr ""
 
 #: qp.c:463
 msgid "QPCLS - Rank deficiency in model"
+msgstr ""
+
+#: sparse-smooth.c:158
+msgid "More than 2 points in a box!!\n"
+msgstr ""
+
+#: sparse-smooth.c:163
+#, c-format
+msgid "point %d in %d boxes!\n"
+msgstr ""
+
+#: sparse-smooth.c:165
+msgid "kd tree sanity checks\n"
+msgstr ""
+
+#: sparse-smooth.c:325 sparse-smooth.c:341
+msgid "too many boxes!!"
+msgstr ""
+
+#: sparse-smooth.c:357
+#, c-format
+msgid "bi not equal to nb-1 %d %d\n"
+msgstr ""
+
+#: sparse-smooth.c:667
+msgid "indexing error in p_area!\n"
 msgstr ""
 
 #: tprs.c:43
