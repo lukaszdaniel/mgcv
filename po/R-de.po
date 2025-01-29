@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 4.1.0 / mgcv 1.8-35\n"
 "Report-Msgid-Bugs-To: bugs@r-project.org\n"
-"POT-Creation-Date: 2024-09-13 18:39\n"
+"POT-Creation-Date: 2024-12-14 12:08\n"
 "PO-Revision-Date: 2021-05-04 16:01+0200\n"
 "Last-Translator: Detlef Steuer <steuer@hsu-hh.de>\n"
 "Language-Team: R-Core <r-core@r-project.org>\n"
@@ -1457,6 +1457,12 @@ msgstr "jagam verlangt eine Datei für die JAGS Modellspezifikation"
 #: R/soap.r:0
 msgid "k and bnd lengths are inconsistent"
 msgstr "Längen von k und bnd sind inkonsistent"
+
+#. R/soap.r: gettextf("knot %d is on or outside boundary", k)
+#: R/soap.r:0
+#, fuzzy
+msgid "knot %d is on or outside boundary"
+msgstr "Daten außerhalb der soap Grenze"
 
 #. R/smooth.r: stop("knot range does not include data")
 #. R/smooth.r: stop("knot range does not include data")

@@ -160,7 +160,7 @@ crunch.knots <- function(G,knots,x0,y0,dx,dy)
     if (i>1&&i<=nx&&j>1&&j<=ny) {
       ki[k] <- G[j,i]
       if (ki[k] <= 0) {
-        str <- paste("knot",k,"is on or outside boundary")
+        str <- gettextf("knot %d is on or outside boundary", k)
         stop(str)
       }
     }

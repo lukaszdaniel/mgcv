@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.9-1\n"
-"POT-Creation-Date: 2024-09-13 18:39\n"
+"POT-Creation-Date: 2024-12-14 12:08\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1967,6 +1967,13 @@ msgstr ""
 #. R/soap.r: stop("k and bnd lengths are inconsistent")
 
 msgid "k and bnd lengths are inconsistent"
+msgstr ""
+
+
+#: R/soap.r: 0
+#. R/soap.r: gettextf("knot %d is on or outside boundary", k)
+
+msgid "knot %d is on or outside boundary"
 msgstr ""
 
 

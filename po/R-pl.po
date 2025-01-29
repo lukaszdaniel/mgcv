@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.7-28\n"
 "Report-Msgid-Bugs-To: bugs@r-project.org\n"
-"POT-Creation-Date: 2024-09-13 18:39\n"
-"PO-Revision-Date: 2024-09-13 18:31+0200\n"
+"POT-Creation-Date: 2024-12-14 12:08\n"
+"PO-Revision-Date: 2024-12-14 12:13+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language: pl_PL\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.5\n"
 
 # mgcv/R/gam.fit3.r: 2300
 # stop(gettextf("link \"%s\" is not available for Tweedie family.", linktemp), domain = "R-mgcv")
@@ -2051,6 +2051,18 @@ msgstr ""
 #: R/soap.r:0
 msgid "k and bnd lengths are inconsistent"
 msgstr "długości 'k' oraz 'bnd' są niezgodne"
+
+# mgcv/R/soap.r: 456
+# stop("data outside soap boundary")
+# mgcv/R/soap.r: 559
+# stop("data outside soap boundary")
+# mgcv/R/soap.r: 665
+# stop("data outside soap boundary")
+#. R/soap.r: gettextf("knot %d is on or outside boundary", k)
+#: R/soap.r:0
+#, fuzzy
+msgid "knot %d is on or outside boundary"
+msgstr "dane poza granicami 'soap'"
 
 # mgcv/R/smooth.r: 1449
 # stop("knot range does not include data")
