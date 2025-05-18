@@ -642,21 +642,21 @@ gam.fit4 <- function(x, y, sp, Eb,UrS=list(),
 
    Vg <- NCV <- NCV1 <- REML <- REML1 <- REML2 <- NULL
    if (scoreType=="NCV") {
-     eta.cv <- rep(0.0,length(nei$i))
-     deta.cv <- if (deriv) matrix(0.0,length(nei$i),ntot) else matrix(0.0,1,ntot)
+     eta.cv <- rep(0.0,length(nei$d))
+     deta.cv <- if (deriv) matrix(0.0,length(nei$d),ntot) else matrix(0.0,1,ntot)
      w1 <- -dd$Deta/2; w2 <- dd$Deta2/2; dth <- dd$Detath/2 ## !?
      R <- try(chol(crossprod(x,w*x)+St),silent=TRUE)
      if (nei$jackknife > 2) { ## return NCV coef changes for each fold 
        if (deriv>0) stop("jackknife and derivatives requested together")
-       dth <- matrix(0,ncol(x),length(nei$m))
+       dth <- matrix(0,ncol(x),length(nei$ma))
        deriv1 <- -1 ## signal to return coef changes
      } else deriv1 <- deriv
      if (inherits(R,"try-error")) { ## use CG approach...
 	Hi <- tcrossprod(rV) ## inverse of penalized Expected Hessian - inverse actual Hessian probably better
-        cg.iter <- .Call(C_ncv,x,Hi,w1,w2,db.drho,dw.drho,rS,nei$i-1,nei$mi,nei$m,nei$k-1,oo$beta,exp(sp),eta.cv, deta.cv, dth, deriv1);
+        cg.iter <- .Call(C_ncv,x,Hi,w1,w2,db.drho,dw.drho,rS,nei$d-1,nei$md,nei$ma,nei$a-1,oo$beta,exp(sp),eta.cv, deta.cv, dth, deriv1);
 	warn[[length(warn)+1]] <- "NCV positive definite update check not possible"
      } else { ## use Cholesky update approach
-	pdef.fails <- .Call(C_Rncv,x,R,w1,w2,db.drho,dw.drho,rS,nei$i-1,nei$mi,nei$m,nei$k-1,oo$beta,exp(sp),eta.cv,
+	pdef.fails <- .Call(C_Rncv,x,R,w1,w2,db.drho,dw.drho,rS,nei$d-1,nei$md,nei$ma,nei$a-1,oo$beta,exp(sp),eta.cv,
 	                    deta.cv, dth, deriv1,.Machine$double.eps,control$ncv.threads);
 	if (pdef.fails) warn[[length(warn)+1]] <- "some NCV updates not positive definite"
      }   
@@ -665,20 +665,20 @@ gam.fit4 <- function(x, y, sp, Eb,UrS=list(),
      ## if some elements of theta are fixed, figure out which derivatives will be needed...
      if (deriv) keep <- if (length(theta)>nt) (length(theta)+1):(ncol(db.drho)+!scale.known) else 1:(ncol(db.drho)+!scale.known)
    
-     dev0 <- dev.resids(y[nei$i], mu[nei$i], weights[nei$i],theta)
-     ls0 <- family$ls(y[nei$i],weights[nei$i],theta,scale)
+     dev0 <- dev.resids(y[nei$d], mu[nei$d], weights[nei$d],theta)
+     ls0 <- family$ls(y[nei$d],weights[nei$d],theta,scale)
      if (family$qapprox) { ## quadratic approximation to NCV
-       qdev <- dev0 + gamma*dd$Deta[nei$i]*(eta.cv-eta[nei$i]) + 0.5*gamma*dd$Deta2[nei$i]*(eta.cv-eta[nei$i])^2
+       qdev <- dev0 + gamma*dd$Deta[nei$d]*(eta.cv-eta[nei$d]) + 0.5*gamma*dd$Deta2[nei$d]*(eta.cv-eta[nei$d])^2
        NCV <- sum(qdev)/(2*scale) - ls0$ls
        if (deriv) {
          deta <- x %*% db.drho
-	 ncv1 <- (dd$Deta[nei$i]*((1-gamma)*deta[nei$i,,drop=FALSE]+gamma*deta.cv) +
-	          gamma*dd$Deta2[nei$i]*deta.cv*(eta.cv-eta[nei$i]) +
-	          0.5*gamma*as.numeric(dd$Deta3[nei$i])*deta[nei$i,,drop=FALSE]*(eta.cv-eta[nei$i])^2)/(2*scale)
+	 ncv1 <- (dd$Deta[nei$d]*((1-gamma)*deta[nei$d,,drop=FALSE]+gamma*deta.cv) +
+	          gamma*dd$Deta2[nei$d]*deta.cv*(eta.cv-eta[nei$d]) +
+	          0.5*gamma*as.numeric(dd$Deta3[nei$d])*deta[nei$d,,drop=FALSE]*(eta.cv-eta[nei$d])^2)/(2*scale)
 	 if (nt>0) { ## deal with direct dependence on the theta parameters
            ncv1[,1:nt] <- ncv1[,1:nt]- ls0$LSTH1[,1:nt] +
-	      if (nt==1) (dd$Dth[nei$i] + gamma*dd$Detath[nei$i]*(eta.cv-eta[nei$i]) + 0.5*gamma*dd$Deta2th[nei$i]*(eta.cv-eta[nei$i])^2)/(2*scale)
-	      else (dd$Dth[nei$i,] + gamma*dd$Detath[nei$i,]*(eta.cv-eta[nei$i]) + 0.5*gamma*dd$Deta2th[nei$i,]*(eta.cv-eta[nei$i])^2)/(2*scale)
+	      if (nt==1) (dd$Dth[nei$d] + gamma*dd$Detath[nei$d]*(eta.cv-eta[nei$d]) + 0.5*gamma*dd$Deta2th[nei$d]*(eta.cv-eta[nei$d])^2)/(2*scale)
+	      else (dd$Dth[nei$d,] + gamma*dd$Detath[nei$d,]*(eta.cv-eta[nei$d]) + 0.5*gamma*dd$Deta2th[nei$d,]*(eta.cv-eta[nei$d])^2)/(2*scale)
          }
 	 if (!scale.known) {
 	   ncv1 <- cbind(ncv1,-qdev/(2*scale) - ls0$LSTH1[,1+nt])
@@ -690,12 +690,12 @@ gam.fit4 <- function(x, y, sp, Eb,UrS=list(),
        DEV <- sum(dev0)/(2*scale) - ls0$ls 
        if (gamma!=1) NCV <- gamma*NCV - (gamma-1)*DEV
        if (deriv) {
-         dd.cv <- dDeta(y[nei$i],mu.cv,weights[nei$i],theta,family,1) 
+         dd.cv <- dDeta(y[nei$d],mu.cv,weights[nei$d],theta,family,1) 
 	 ncv1 <- dd.cv$Deta*deta.cv/(2*scale)
-	 if (gamma!=1) dev1 <- (dd$Deta*(x%*%db.drho))[nei$i,,drop=FALSE]/(2*scale)
+	 if (gamma!=1) dev1 <- (dd$Deta*(x%*%db.drho))[nei$d,,drop=FALSE]/(2*scale)
          if (nt>0) {
        	   ncv1[,1:nt] <- ncv1[,1:nt] + as.matrix(dd.cv$Dth/(2*scale)) - ls0$LSTH1[,1:nt]
-	   if (gamma!=1) dev1[,1:nt] <- dev1[,1:nt] + as.matrix(dd$Dth/(2*scale))[nei$i,,drop=FALSE] - ls0$LSTH1[,1:nt]
+	   if (gamma!=1) dev1[,1:nt] <- dev1[,1:nt] + as.matrix(dd$Dth/(2*scale))[nei$d,,drop=FALSE] - ls0$LSTH1[,1:nt]
          }
          if (!scale.known) { ## deal with log scale parameter derivative
 	   ncv1 <- cbind(ncv1,-dev.cv/(2*scale) - ls0$LSTH1[,1+nt])
@@ -706,7 +706,7 @@ gam.fit4 <- function(x, y, sp, Eb,UrS=list(),
      } ## exact NCV
      
      if (nei$jackknife>2) { 
-       nk <- c(nei$m[1],diff(nei$m)) ## dropped fold sizes
+       nk <- c(nei$ma[1],diff(nei$ma)) ## dropped fold sizes
        jkw <- sqrt((nobs-nk)/(nobs*nk)) ## jackknife weights
        dth <-jkw*t(dth)%*%t(T)
        #Vj <- crossprod(dd) ## jackknife cov matrix for coefs (beta)
@@ -963,13 +963,12 @@ gam.fit5 <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,deriv=2,family,scoreTyp
   nobs <- length(y)
   
   if (penalized) {
-    Eb <- attr(Sl,"E") ## balanced penalty sqrt
- 
+    Sb <- attr(Sl,"S") ## balanced penalty 
     ## the stability reparameterization + log|S|_+ and derivs... 
-    rp <- ldetS(Sl,rho=lsp,fixed=rep(FALSE,length(lsp)),np=q,root=TRUE) 
+    rp <- ldetS(Sl,rho=lsp,fixed=rep(FALSE,length(lsp)),np=q,root=TRUE,Stot=TRUE) 
     x <- Sl.repara(rp$rp,x) ## apply re-parameterization to x
-    Eb <- Sl.repara(rp$rp,Eb) ## root balanced penalty
-    St <- crossprod(rp$E) ## total penalty matrix
+    Sb <- Sl.repa(rp$rp,Sb,l=-2,r=-1) ## balanced penalty
+    St <- rp$S ## total penalty matrix
     E <- rp$E ## root total penalty
     attr(E,"use.unscaled") <- TRUE ## signal initialization code that E not to be further scaled   
     if (!is.null(start)) start  <- Sl.repara(rp$rp,start) ## re-para start
@@ -1097,6 +1096,7 @@ gam.fit5 <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,deriv=2,family,scoreTyp
     ## with ll1 < ll0 in place of ll1 <= ll0 in next line than we can repeatedly accept
     ## miniscule steps that do not actually improve anything.
     llold <- ll ## avoid losing lbb slot on stp failure
+    no.change <- 0
     while ((!is.finite(ll1)||ll1 <= ll0) && khalf < 25) { ## step halve until it succeeds...
       step <- step/fac;coef1 <- coef + step
       ll <- llf(y,x,coef1,weights,family,offset=offset,deriv=0)
@@ -1104,8 +1104,9 @@ gam.fit5 <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,deriv=2,family,scoreTyp
       if (is.finite(ll1)&&ll1>=ll0) { ## improvement, or at least no worse.
         ll <- llf(y,x,coef1,weights,family,offset=offset,deriv=1)
       }
-      ## abort if step has made no difference...
-      if (max(abs(coef-coef1))<max(abs(coef))*.Machine$double.eps) khalf <- 100
+      if (ll1 == ll0) no.change <- no.change + 1 
+      ## abort if step has made no difference (e.g. 2 iteractions of exactly no improvement)...
+      if (max(abs(coef-coef1))<max(abs(coef))*.Machine$double.eps||no.change>1) khalf <- 100
       khalf <- khalf + 1
       if (khalf>5) fac <- 5
     } ## end step halve
@@ -1124,6 +1125,7 @@ gam.fit5 <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,deriv=2,family,scoreTyp
       khalf <- 0
     }
 
+    no.change <- 0
     while ((!is.finite(ll1)||(ll1 <= ll0 && !iconv)) && khalf < 25) { ## step cut until it succeeds...
       step <- step/10;coef1 <- coef + step
       ll <- llf(y,x,coef1,weights,family,offset=offset,deriv=0)
@@ -1131,12 +1133,13 @@ gam.fit5 <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,deriv=2,family,scoreTyp
       if (is.finite(ll1)&&ll1>=ll0) { ## improvement, or no worse
         ll <- llf(y,x,coef1,weights,family,offset=offset,deriv=1)
       }
+      if (ll1 == ll0) no.change <- no.change + 1
       ## abort if step has made no difference...
-      if (max(abs(coef-coef1))<max(abs(coef))*.Machine$double.eps) khalf <- 100 ## step gone nowhere
+      if (max(abs(coef-coef1))<max(abs(coef))*.Machine$double.eps||no.change>1) khalf <- 100 ## step gone nowhere
       khalf <- khalf + 1
     }
 
-    if ((is.finite(ll1)&&ll1 >= ll0&&khalf<25)||iter==control$maxit) { ## step ok. Accept and test
+    if ((is.finite(ll1)&&ll1 >= ll0&&(khalf<25||indefinite))||iter==control$maxit) { ## step ok. Accept and test
       coef <- coef + step
       grad <- ll$lb - St%*%coef
       Hp <- -ll$lbb+St
@@ -1151,10 +1154,12 @@ gam.fit5 <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,deriv=2,family,scoreTyp
                     (rep_len(c(0,1),length(coef)) - 0.5 ) * mean(abs(coef))*1e-5*perturbed 
             ll <- llf(y,x,coef,weights,family,offset=offset,deriv=1) 
             ll0 <- ll$l - (t(coef)%*%St%*%coef)/2
+	    grad <- ll$lb - St%*%coef
+            Hp <- -ll$lbb+St
           } else {        
             rank.checked <- TRUE
             if (penalized) {
-              Sb <- crossprod(Eb) ## balanced penalty
+              #Sb <- crossprod(Eb) ## balanced penalty
               Hb <- -ll$lbb/norm(ll$lbb,"F")+Sb/norm(Sb,"F") ## balanced penalized hessian
             } else Hb <- -ll$lbb/norm(ll$lbb,"F")
             ## apply pre-conditioning, otherwise badly scaled problems can result in
@@ -1253,7 +1258,7 @@ gam.fit5 <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,deriv=2,family,scoreTyp
 
     ## Now call the family again to get first derivative of Hessian w.r.t
     ## smoothing parameters, in list d1H. Alternatively, if deriv==1 and !ncv
-    ## then tr(Hi d1H) returne as a vector in 'd1H'.
+    ## then tr(Hi d1H) return as a vector in 'd1H'.
 
     ll <- if (ncv) llf(y,x,coef,weights,family,offset=offset,deriv=3,d1b=d1b,ncv=TRUE) else
                    llf(y,x,coef,weights,family,offset=offset,deriv=2+(deriv>1),d1b=d1b,fh=D*t(D*chol2inv(L)[ipiv,ipiv]))
@@ -1297,9 +1302,9 @@ gam.fit5 <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,deriv=2,family,scoreTyp
     ncv <- family$ncv ## helps debugging!
     deriv1 <-  if (nei$jackknife>2) -1 else if (deriv==0) 0 else  1
     ## create nei if null - now in estimate.gam
-    #if (is.null(nei)||is.null(nei$k)||is.null(nei$m)) nei <- list(i=1:nobs,mi=1:nobs,m=1:nobs,k=1:nobs) ## LOOCV
-    #if (is.null(nei$i)) if (length(nei$m)==nobs) nei$mi <- nei$i <- 1:nobs else stop("unclear which points NCV neighbourhoods belong to")
-    #if (length(nei$mi)!=length(nei$m)) stop("for NCV number of dropped and predicted neighbourhoods must match")
+    #if (is.null(nei)||is.null(nei$a)||is.null(nei$ma)) nei <- list(d=1:nobs,md=1:nobs,ma=1:nobs,a=1:nobs) ## LOOCV
+    #if (is.null(nei$d)) if (length(nei$ma)==nobs) nei$md <- nei$d <- 1:nobs else stop("unclear which points NCV neighbourhoods belong to")
+    #if (length(nei$md)!=length(nei$ma)) stop("for NCV number of dropped and predicted neighbourhoods must match")
     ## complete dH
     if (deriv>0) {
       for (i in 1:length(ll$d1H)) ll$d1H[[i]] <- ll$d1H[[i]] - Sl.mult(rp$Sl,diag(q),i)[!bdrop,!bdrop] 
@@ -1324,7 +1329,7 @@ gam.fit5 <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,deriv=2,family,scoreTyp
     NCV1 <- ret$NCV1
     Vg <- ret$Vg
     if (deriv1<0) { ## Jackknife cov matrix...
-      nk <- c(nei$m[1],diff(nei$m)) ## dropped fold sizes
+      nk <- c(nei$ma[1],diff(nei$ma)) ## dropped fold sizes
       jkw <- sqrt((nobs-nk)/(nobs*nk)) ## jackknife weights
       dd <- attr(ret$NCV,"deta.cv")
       #dd <-jkw*t(dd)%*%t(T)
@@ -1468,7 +1473,7 @@ gam.fit5 <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,deriv=2,family,scoreTyp
     #  ret$ghost1 <- ll$ghost1; ret$ghost2 <- ret$ghost2
     #} 
     ret
-} ## end of gam.fit5
+} ## end of gam.fit5 
 
 efsud <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,family,
                      control=gam.control(),Mp=-1,start=NULL) {
@@ -1490,7 +1495,8 @@ efsud <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,family,
     ipiv <- piv <- attr(fit$L,"pivot")
     p <- length(piv)
     ipiv[piv] <- 1:p
-    Vb <- crossprod(forwardsolve(t(fit$L),diag(fit$D,nrow=p)[piv,,drop=FALSE])[ipiv,,drop=FALSE])
+    # Vb <- crossprod(forwardsolve(t(fit$L),diag(fit$D,nrow=p)[piv,,drop=FALSE])[ipiv,,drop=FALSE])
+    Vb <- crossprod(forwardsolve(fit$L,diag(fit$D,nrow=p)[piv,,drop=FALSE],upper.tri=TRUE,transpose=TRUE)[ipiv,,drop=FALSE])
     if (sum(fit$bdrop)) { ## some coefficients were dropped...
       q <- length(fit$bdrop)
       ibd <- !fit$bdrop
@@ -1748,6 +1754,7 @@ deriv.check5 <- function(x, y, sp,
    M <- length(sp) ## number of smoothing parameters
    fd.br <- matrix(0,p,M)
    REML1 <- rep(0,M)
+   REML2 <- b$REML2
    fd.dH <- list()
    if (!is.null(b$b2)) fd.br2 <- b$b2*0
    k <- 0
@@ -1765,6 +1772,7 @@ deriv.check5 <- function(x, y, sp,
        }	
      }  
      REML1[i] <- (b1$REML-b0$REML)/spe
+     REML2[,i] <- (b1$REML1-b0$REML1)/spe
      fd.dH[[i]] <- (b1$lbb - b0$lbb)/spe
    }
    ## plot db.drho against fd versions...

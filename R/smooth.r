@@ -175,7 +175,7 @@ uniquecombs <- function(x,ordered=FALSE) {
     #x <- data.matrix(xo) ## ensure all data are numeric
   } else xo <- NULL
   if (ncol(x)==1) { ## faster to use R 
-     xu <- if (ordered) sort(unique(x[,1])) else unique(x[,1])
+     xu <- if (ordered) sort(unique(x[,1]),na.last=TRUE) else unique(x[,1])
      ind <- match(x[,1],xu)
      if (is.null(xo)) x <- matrix(xu,ncol=1,nrow=length(xu)) else {
         x <-  data.frame(xu)
@@ -396,8 +396,8 @@ te <- function(..., k=NA,bs="cr",m=NA,d=NA,by=NA,fx=FALSE,np=TRUE,xt=NULL,id=NUL
   
   # check d - the number of covariates per basis
   if (sum(is.na(d))||is.null(d)) { n.bases<-dim;d<-rep(1,dim)} # one basis for each dimension
-  else  # array d supplied, the dimension of each term in the tensor product 
-  { d<-round(d)
+  else { # array d supplied, the dimension of each term in the tensor product 
+    d<-round(d)
     ok<-TRUE
     if (sum(d<=0)) ok<-FALSE 
     if (sum(d)!=dim) ok<-FALSE
@@ -411,8 +411,8 @@ te <- function(..., k=NA,bs="cr",m=NA,d=NA,by=NA,fx=FALSE,np=TRUE,xt=NULL,id=NUL
   
   # now evaluate k 
   if (sum(is.na(k))||is.null(k)) k<-5^d 
-  else 
-  { k<-round(k);ok<-TRUE
+  else {
+    k<-round(k);ok<-TRUE
     if (sum(k<3)) { ok<-FALSE;warning("one or more supplied k too small - reset to default")}
     if (length(k)==1&&ok) k<-rep(k,n.bases)
     else if (length(k)!=n.bases) ok<-FALSE
@@ -422,8 +422,8 @@ te <- function(..., k=NA,bs="cr",m=NA,d=NA,by=NA,fx=FALSE,np=TRUE,xt=NULL,id=NUL
   # evaluate fx
   if (sum(is.na(fx))||is.null(fx)) fx<-rep(FALSE,n.bases)
   else if (length(fx)==1) fx<-rep(fx,n.bases)
-  else if (length(fx)!=n.bases)
-  { warning("dimension of fx is wrong") 
+  else if (length(fx)!=n.bases) {
+    warning("dimension of fx is wrong") 
     fx<-rep(FALSE,n.bases)
   }
 
@@ -477,9 +477,11 @@ te <- function(..., k=NA,bs="cr",m=NA,d=NA,by=NA,fx=FALSE,np=TRUE,xt=NULL,id=NUL
   ret<-list(margin=margin,term=term,by=by.var,fx=fx,label=label,dim=dim,#mp=mp,
             np=np,id=id,sp=sp,inter=FALSE)
   if (!is.null(pc)) {
-    if (length(pc)<d) stop("supply a value for each variable for a point constraint")
-    if (!is.list(pc)) pc <- as.list(pc)
-    if (is.null(names(pc))) names(pc) <- unlist(lapply(vars,all.vars))
+    if (!is.list(pc)||!is.list(pc[[1]])) { ## a list of lists specifies general constraint, otherwise...  
+      if (length(pc) < dim) stop("supply a value for each variable for a point constraint")
+      if (!is.list(pc)) pc <- as.list(pc)
+      if (is.null(names(pc))) names(pc) <- unlist(lapply(vars,all.vars))
+    }  
     ret$point.con <- pc
   }
   class(ret) <- "tensor.smooth.spec"
@@ -595,9 +597,11 @@ t2 <- function(..., k=NA,bs="cr",m=NA,d=NA,by=NA,xt=NULL,id=NULL,sp=NULL,full=FA
   ret<-list(margin=margin,term=term,by=by.var,fx=fx,label=label,dim=dim,
             id=id,sp=sp,full=full,ord=ord)
   if (!is.null(pc)) {
-    if (length(pc)<d) stop("supply a value for each variable for a point constraint")
-    if (!is.list(pc)) pc <- as.list(pc)
-    if (is.null(names(pc))) names(pc) <- unlist(lapply(vars,all.vars))
+    if (!is.list(pc)||!is.list(pc[[1]])) { ## a list of lists specifies general constraint, otherwise... 
+      if (length(pc)<d) stop("supply a value for each variable for a point constraint")
+      if (!is.list(pc)) pc <- as.list(pc)
+      if (is.null(names(pc))) names(pc) <- unlist(lapply(vars,all.vars))
+    }
     ret$point.con <- pc
   }
   class(ret) <- "t2.smooth.spec" 
@@ -649,9 +653,11 @@ s <- function (..., k=-1,fx=FALSE,bs="tp",m=NA,by=NA,xt=NULL,id=NULL,sp=NULL,pc=
   ret <- list(term=term,bs.dim=k,fixed=fx,dim=d,p.order=m,by=by.var,label=label,xt=xt,
             id=id,sp=sp)
   if (!is.null(pc)) {
-    if (length(pc)<d) stop("supply a value for each variable for a point constraint")
-    if (!is.list(pc)) pc <- as.list(pc)
-    if (is.null(names(pc))) names(pc) <- unlist(lapply(vars,all.vars))
+    if (!is.list(pc)||!is.list(pc[[1]])) { ## a list of lists specifies general constraint, otherwise... 
+      if (length(pc)<d) stop("supply a value for each variable for a point constraint")
+      if (!is.list(pc)) pc <- as.list(pc)
+      if (is.null(names(pc))) names(pc) <- unlist(lapply(vars,all.vars))
+    }
     ret$point.con <- pc
   }
   class(ret)<-paste(bs,".smooth.spec",sep="")
@@ -728,9 +734,7 @@ tensor.prod.penalties <- function(S)
     TS[[i]] <- if (ncol(M0)==nrow(M0)) (M0+t(M0))/2 else M0 # ensure exactly symmetric 
   }
   TS
-}## end tensor.prod.penalties
-
-
+} ## end tensor.prod.penalties
 
 
 smooth.construct.tensor.smooth.spec <- function(object,data,knots) {
@@ -827,8 +831,25 @@ smooth.construct.tensor.smooth.spec <- function(object,data,knots) {
       r <- r[-i]   # remove corresponding rank from list
   }
 
+  ## code to handle any marginal inequality constraints (only for te terms, not ti)...
+  if (!inter && any(sapply(object$margin,function(x) !is.null(x$Ain)))) {
+    Ain <- matrix(0,0,prod(d));bin0 <- bin <- numeric(0)
+    for (i in 1:m) if (!is.null(object$margin[[i]]$Ain)) {
+      I0 <- if (i>1) diag(1,nrow=prod(d[1:(i-1)])) else 1
+      I1 <- if (i<m) diag(1,nrow=prod(d[(i+1):m])) else 1
+      Ain <- if (i>length(XP)||is.null(XP[[i]])) rbind(Ain,I0 %x% object$margin[[i]]$Ain %x% I1) else
+             rbind(Ain,I0 %x% (object$margin[[i]]$Ain%*%XP[[i]]) %x% I1)
+      I0 <- if (i>1) rep(1,prod(d[1:(i-1)])) else 1
+      I1 <- if (i<m) rep(1,prod(d[(i+1):m])) else 1
+      bin <- c(bin,I0 %x% object$margin[[i]]$bin %x% I1)
+      bin0 <- c(bin0,I0 %x% object$margin[[i]]$bin0 %x% I1)
+    }
+    object$Ain <- Ain; object$bin <- bin; object$bin0 <- bin0
+  }
+
   ## code for dropping unused basis functions from X and adjusting penalties appropriately
-  if (!is.null(object$margin[[1]]$xt$dropu)&&object$margin[[1]]$xt$dropu) {
+  if (is.list(object$margin[[1]]$xt)&&!is.null(object$margin[[1]]$xt$dropu)
+      &&object$margin[[1]]$xt$dropu) {
     ind <- which(colSums(abs(X))!=0)
     X <- X[,ind]
     if (!is.null(object$g.index)) object$g.index <- object$g.index[ind]
@@ -3475,20 +3496,10 @@ smooth.construct.gp.smooth.spec <- function(object,data,knots)
     if (n > xtra$max.knots) { ## then there *may* be too many data      
       if (nu > xtra$max.knots) { ## then there is really a problem 
         rngs <- temp.seed(xtra$seed)
-        #seed <- try(get(".Random.seed",envir=.GlobalEnv),silent=TRUE) ## store RNG seed
-        #if (inherits(seed,"try-error")) {
-        #  runif(1)
-        #  seed <- get(".Random.seed",envir=.GlobalEnv)
-        #}
-        #kind <- RNGkind(NULL)
-        #RNGkind("default","default")
-        #set.seed(xtra$seed) ## ensure repeatability
         nk <- xtra$max.knots ## going to create nk knots
         ind <- sample(1:nu,nk,replace=FALSE)  ## by sampling these rows from xu
         knt <- as.numeric(xu[ind,])  ## ... like this
 	temp.seed(rngs)
-        #RNGkind(kind[1],kind[2])
-        #assign(".Random.seed",seed,envir=.GlobalEnv) ## RNG behaves as if it had not been used
       } else { 
         knt <- xu; nk <- nu
       } ## end of large data set handling
@@ -3628,15 +3639,47 @@ smooth.construct3 <- function(object,data,knots) {
 ## In contrast to smooth.constuct2 it returns an object in which
 ## `X' contains the rows required to make the full model matrix,
 ## and ind[i] tells you which row of `X' is the ith row of the
-## full model matrix. If `ind' is NULL then `X' is the full model matrix. 
+## full model matrix. If `ind' is NULL then `X' is the full model matrix.
+## object$point.con, if present, defines constraints. If it's a list
+## of variables it defines a simple pass through zero point constraint.
+## A list of lists defines C %*% beta = d and Ain %*% beta >= bin.
+## The first list contains named matrices of evaluation points an
+## un-named weight matrix (W, say) of the same dimension and an
+## un-named vector defining d. The constraints have the form
+## sum_j s(X_{ij},Z_{ij},...) W_{ij} = d_i. The second list has the
+## same format, but defines inequality constraints, if present.
+## Either list can be NULL for no constraint, and the second can
+## also simply be missing. 
   dk <- ExtractData(object,data,knots) 
   object <- smooth.construct(object,dk$data,dk$knots)
   ind <- attr(dk$data,"index") ## repeats index 
   object$ind <- ind
   class(object) <- c(class(object),"mgcv.smooth")
-  if (!is.null(object$point.con)) { ## 's' etc has requested a point constraint
-    object$C <- Predict.matrix3(object,object$point.con)$X ## handled by 's'
-    attr(object$C,"always.apply") <- TRUE ## if constraint requested then always apply it!
+  if (!is.null(object$point.con)) { ## 's' etc has requested a constraint
+    if (is.list(object$point.con[[1]])) { ## general constraint...
+      for (j in length(object$point.con):1) { ## 1st element defines equality, 2nd inequality
+        a <- object$point.con[[j]] 
+        if (length(a)) { ## in/equality constraint defined
+          Wb <- a[which(names(a)=="")]
+	  if (is.matrix(Wb[[1]])) {
+	  W <- Wb[[1]]; d <- Wb[[2]]
+	  } else { W <- Wb[[2]]; d <- Wb[[1]] }
+	  X <- Predict.matrix3(object,a)$X
+	  ii <- 1:nrow(W)
+	  C <- X[ii,,drop=FALSE] * W[,1]
+	  if (ncol(W)>1) for (i in 2:ncol(W)) {
+	    ii <- ii + nrow(W)
+	    C <- C + X[ii,,drop=FALSE] * W[,i] 
+	  }
+	} else C <- d <- NULL
+	if (j==2) { object$Ain <- C; object$bin <- d }
+      } ## j loop
+      object$C <- C; object$d <- d
+      if (!is.null(object$C)) attr(object$C,"always.apply") <- TRUE
+    } else { ## simple point constraint
+      object$C <- Predict.matrix3(object,object$point.con)$X ## handled by 's'
+      attr(object$C,"always.apply") <- TRUE ## if constraint requested then always apply it!
+    }  
   }
   object
 } ## smooth.construct3
@@ -3663,7 +3706,6 @@ Predict.matrix3 <- function(object,data) {
    ind <- attr(dk$data,"index") ## repeats index
    list(X=X,ind=ind)
 } ## Predict.matrix3
-
 
 
 ExtractData <- function(object,data,knots) {
@@ -3697,8 +3739,8 @@ ExtractData <- function(object,data,knots) {
    }    
    if (object$by!="NA") {
      by <- get.var(object$by,data) 
-     if (!is.null(by))
-     { dat[[m+1]] <- by 
+     if (!is.null(by)) {
+       dat[[m+1]] <- by 
        names(dat)[m+1] <- object$by
      }
    }
@@ -3730,7 +3772,7 @@ XZKr <- function(X,m) {
 
 smoothCon <- function(object,data,knots=NULL,absorb.cons=FALSE,scale.penalty=TRUE,n=nrow(data),
                       dataX = NULL,null.space.penalty = FALSE,sparse.cons=0,diagonal.penalty=FALSE,
-                      apply.by=TRUE,modCon=0)
+                      apply.by=TRUE,modCon=0) {
 ## wrapper function which calls smooth.construct methods, but can then modify
 ## the parameterization used. If absorb.cons==TRUE then a constraint free
 ## parameterization is used. 
@@ -3747,7 +3789,8 @@ smoothCon <- function(object,data,knots=NULL,absorb.cons=FALSE,scale.penalty=TRU
 ## basis set up using data (but n same for both).
 ## modCon: 0 (do nothing); 1 (delete supplied con); 2 (set fit and predict to predict)
 ##         3 (set fit and predict to fit)
-{ sm <- smooth.construct3(object,data,knots)
+
+  sm <- smooth.construct3(object,data,knots)
   if (!is.null(attr(sm,"qrc"))) warning("smooth objects should not have a qrc attribute.")
   if (modCon==1) sm$C <- sm$Cp <- NULL ## drop any supplied constraints in favour of auto-cons
   ## add plotting indicator if not present.
@@ -3836,8 +3879,8 @@ smoothCon <- function(object,data,knots=NULL,absorb.cons=FALSE,scale.penalty=TRU
 
   sm$S.scale <- rep(1,length(sm$S))
 
-  if (scale.penalty && length(sm$S)>0 && is.null(sm$no.rescale)) # then the penalty coefficient matrix is rescaled
-  {  maXX <- norm(sm$X,type="I")^2 ##mean(abs(t(sm$X)%*%sm$X)) # `size' of X'X
+  if (scale.penalty && length(sm$S)>0 && is.null(sm$no.rescale)) { # then the penalty coefficient matrix is rescaled
+    maXX <- norm(sm$X,type="I")^2 ##mean(abs(t(sm$X)%*%sm$X)) # `size' of X'X
       for (i in 1:length(sm$S)) {
         maS <- norm(sm$S[[i]])/maXX  ## mean(abs(sm$S[[i]])) / maXX
         sm$S[[i]] <- sm$S[[i]] / maS
@@ -3921,6 +3964,10 @@ smoothCon <- function(object,data,knots=NULL,absorb.cons=FALSE,scale.penalty=TRU
      sm$null.space.dim <- max(0,sm$null.space.dim-1)
   }
 
+  ########################################
+  ## by variables and summation convention
+  ########################################
+  check.rank <- FALSE
   if (matrixArg||(object$by!="NA"&&is.null(sm$by.done))) { ## apply by variables
     if (is.factor(by)) { ## generates smooth for each level of by
       if (matrixArg) stop("factor 'by' variables can not be used with matrix arguments.")
@@ -3986,7 +4033,10 @@ smoothCon <- function(object,data,knots=NULL,absorb.cons=FALSE,scale.penalty=TRU
             }      
           } ## finished all rows
           attr(sml[[1]]$X,"offset") <- offX
-        } 
+        }
+	## will need to establish rank as summation can lead to loss of identifiability...
+	check.rank <- TRUE
+
       } else {  ## arguments not matrices => not in packed form + no summation needed
         sml[[1]]$X <- as.numeric(by)*sm$X
         if (!is.null(offs)) attr(sml[[1]]$X,"offset") <- if (apply.by) offs*as.numeric(by) else offs
@@ -4224,6 +4274,30 @@ smoothCon <- function(object,data,knots=NULL,absorb.cons=FALSE,scale.penalty=TRU
       sml[[i]]$X0 <- PredictMat(sml[[i]],data)
       sml[[i]]$by <- by.name
     }
+  }
+  if (check.rank) {
+    XX <- crossprod(sml[[1]]$X); XX <- XX/norm(XX); m <- length(sml[[1]]$S)
+    St <- sml[[1]]$S[[1]]/norm(sml[[1]]$S[[1]])
+    if (m>1) for (i in 2:m) St <- St + sml[[1]]$S[[i]]/norm(sml[[1]]$S[[i]])
+    suppressWarnings(R <- chol(XX+St,pivot=TRUE))
+    r <- attr(R,"rank");p <- ncol(XX)
+    if (r<p) {
+      idrop <- (r+1):p ## index redundant/unidentifiable coefficients
+      sml[[1]]$X <- sml[[1]]$X[,-idrop,drop=FALSE]
+      for (i in 1:m) {
+        sml[[1]]$S[[i]] <- sml[[1]]$S[[i]][-idrop,-idrop,drop=FALSE]
+        suppressWarnings(R <- chol(sml[[1]]$S[[i]],pivot=TRUE))
+        sml[[1]]$rank[i] <- attr(R,"rank")
+      }
+      if (!is.null(sml[[1]]$Sp)) for (i in 1:m) sml[[1]]$Sp[[i]] <- sml[[1]]$Sp[[i]][-idrop,-idrop,drop=FALSE]
+      if (!is.null(sml[[1]]$Xp)) sml[[1]]$Xp <- sml[[1]]$Xp[,-idrop,drop=FALSE]
+      suppressWarnings(R <- chol(St[-idrop,-idrop,drop=FALSE],pivot=TRUE))
+      sml[[1]]$null.space.dim <- ncol(R) - attr(R,"rank")
+      sml[[1]]$df <- ncol(R)
+      if (!is.null(sml[[1]]$C)&&is.matrix(sml[[1]]$C)) sml[[1]]$C <- sml[[1]]$C[,-idrop,drop=FALSE]
+      if (!is.null(sml[[1]]$Ain)) sml[[1]]$Ain <- sml[[1]]$Ain[,-idrop,drop=FALSE]
+      attr(sml[[1]],"del.index") <- idrop
+    }  
   }
   sml
 } ## end of smoothCon

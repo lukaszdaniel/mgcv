@@ -664,16 +664,16 @@ gam.fit3 <- function (x, y, sp, Eb,UrS=list(),
  
         } else if (scoreType %in% "NCV") { ## neighbourhood cross validation
 	   ## requires that neighbours are supplied in nei (if NULL) each point is its own
-	   ## neighbour recovering LOOCV. nei$k[nei$m[i-1]+1):nei$m[i]] are the indices of
-	   ## neighbours of point i, where nei$m[0]=0 by convention.
+	   ## neighbour recovering LOOCV. nei$a[nei$ma[i-1]+1):nei$ma[i]] are the indices of
+	   ## neighbours of point i, where nei$ma[0]=0 by convention.
 	 
 	   ww <- w1 <- rep(0,nobs)
 	   ww[good] <- weg*(yg - mug)*mevg/var.mug
 	   w1[good] <- w
-	   eta.cv <- rep(0.0,length(nei$i))
-	   deta.cv <- if (deriv) matrix(0.0,length(nei$i),length(rS)) else matrix(0.0,1,length(rS))
+	   eta.cv <- rep(0.0,length(nei$d))
+	   deta.cv <- if (deriv) matrix(0.0,length(nei$d),length(rS)) else matrix(0.0,1,length(rS))
            if (nei$jackknife>2) { ## need coef changes for each NCV drop fold.
-             dd <- matrix(0,ncol(x),length(nei$m))
+             dd <- matrix(0,ncol(x),length(nei$ma))
 	     if (deriv>0) stop("jackknife and derivatives requested together")
 	     deriv1 <- -1 ## signal that coef changes to be returned
            } else { ## dd unused
@@ -683,39 +683,39 @@ gam.fit3 <- function (x, y, sp, Eb,UrS=list(),
 	   R <- try(chol(crossprod(x,w1*x)+St),silent=TRUE)
 	   if (inherits(R,"try-error")) { ## use CG approach...
 	     Hi <- tcrossprod(rV) ## inverse of penalized Expected Hessian - inverse actual Hessian probably better
-             cg.iter <- .Call(C_ncv,x,Hi,ww,w1,db.drho,dw.drho,rS,nei$i-1,nei$mi,nei$m,nei$k-1,coef,exp(sp),eta.cv, deta.cv, dd, deriv1);
+             cg.iter <- .Call(C_ncv,x,Hi,ww,w1,db.drho,dw.drho,rS,nei$d-1,nei$md,nei$ma,nei$a-1,coef,exp(sp),eta.cv, deta.cv, dd, deriv1);
 	     warn[[length(warn)+1]] <- "NCV positive definite update check not possible"
            } else { ## use Cholesky update approach
-	     pdef.fails <- .Call(C_Rncv,x,R,ww,w1,db.drho,dw.drho,rS,nei$i-1,nei$mi,nei$m,nei$k-1,coef,exp(sp),eta.cv, deta.cv,
+	     pdef.fails <- .Call(C_Rncv,x,R,ww,w1,db.drho,dw.drho,rS,nei$d-1,nei$md,nei$ma,nei$a-1,coef,exp(sp),eta.cv, deta.cv,
 	                         dd, deriv1,.Machine$double.eps,control$ncv.threads);
 	     if (pdef.fails) warn[[length(warn)+1]] <- "some NCV updates not positive definite"
 	   }
 	  
 	   if (family$qapprox) {
-             NCV <- sum(wdr[nei$i]) + gamma*sum(-2*ww[nei$i]*(eta.cv-eta[nei$i]) + w1[nei$i]*(eta.cv-eta[nei$i])^2)
+             NCV <- sum(wdr[nei$d]) + gamma*sum(-2*ww[nei$d]*(eta.cv-eta[nei$d]) + w1[nei$d]*(eta.cv-eta[nei$d])^2)
              if (deriv) {
 	       deta <- x%*%db.drho
 	       alpha1 <- if (fisher) 0 else (-(V1+g2) + (y-mu)*(V2-V1^2+g3-g2^2))/alpha
 	       w3 <- w1/g1*(alpha1 - V1 - 2 * g2)
-               ncv1 <- -2*ww[nei$i]*((1-gamma)*deta[nei$i,] + gamma*deta.cv) + 2*gamma*w1[nei$i]*(deta.cv*(eta.cv-eta[nei$i])) +
-	                gamma*w3[nei$i]* deta[nei$i,]*(eta.cv-eta[nei$i])^2
+               ncv1 <- -2*ww[nei$d]*((1-gamma)*deta[nei$d,] + gamma*deta.cv) + 2*gamma*w1[nei$d]*(deta.cv*(eta.cv-eta[nei$d])) +
+	                gamma*w3[nei$d]* deta[nei$d,]*(eta.cv-eta[nei$d])^2
              }
            } else { ## exact version
              if (TRUE) {
 	       ## version that doesn't just drop neighbourhood, but tries equivalent (gamma==2) perturbation beyond dropping
-               eta.cv <- gamma*(eta.cv) - (gamma-1)*eta[nei$i]
-	       if (deriv && gamma!=1) deta.cv <- gamma*(deta.cv) - (gamma-1)*(x%*%db.drho)[nei$i,,drop=FALSE]
+               eta.cv <- gamma*(eta.cv) - (gamma-1)*eta[nei$d]
+	       if (deriv && gamma!=1) deta.cv <- gamma*(deta.cv) - (gamma-1)*(x%*%db.drho)[nei$d,,drop=FALSE]
 	       gamma <- 1
              }
      	     mu.cv <- linkinv(eta.cv)
-	     NCV <- gamma*sum(dev.resids(y[nei$i],mu.cv,weights[nei$i])) - (gamma-1)*sum(wdr[nei$i]) ## the NCV score - simply LOOCV if nei(i) = i for all i
+	     NCV <- gamma*sum(dev.resids(y[nei$d],mu.cv,weights[nei$d])) - (gamma-1)*sum(wdr[nei$d]) ## the NCV score - simply LOOCV if nei(i) = i for all i
 	    
              if (deriv) {
-               dev1 <- if (gamma==1) 0 else -2*(ww*(x%*%db.drho))[nei$i,,drop=FALSE]
+               dev1 <- if (gamma==1) 0 else -2*(ww*(x%*%db.drho))[nei$d,,drop=FALSE]
                var.mug <- variance(mu.cv)
                mevg <- mu.eta(eta.cv)
 	       mug <- mu.cv
-	       ww1 <- weights[nei$i]*(y[nei$i]-mug)*mevg/var.mug
+	       ww1 <- weights[nei$d]*(y[nei$d]-mug)*mevg/var.mug
 	       ww1[!is.finite(ww1)] <- 0
 	       ncv1 <- -2*ww1*deta.cv*gamma - (gamma-1)*dev1
              } ## if deriv
@@ -728,7 +728,7 @@ gam.fit3 <- function (x, y, sp, Eb,UrS=list(),
            }
 
 	   if (nei$jackknife>2) {
-             nk <- c(nei$m[1],diff(nei$m)) ## dropped fold sizes
+             nk <- c(nei$ma[1],diff(nei$ma)) ## dropped fold sizes
              jkw <- ((nobs-nk)/(nobs))^.4/sqrt(nk) ## jackknife weights
 	     dd <-jkw*t(dd)%*%t(T)
 	     #Vj <- crossprod(dd) ## jackknife cov matrix
@@ -1752,8 +1752,10 @@ bfgs <-  function(lsp,X,y,Eb,UrS,L,lsp0,offset,U1,Mp,family,weights,
       lsp <- ilsp + step * trial$alpha
       b <- gam.fit3(x=X, y=y, sp=L%*%lsp+lsp0,Eb=Eb,UrS=UrS,
            offset = offset,U1=U1,Mp=Mp,family = family,weights=weights,deriv=0,
-           control=control,gamma=gamma,scale=scale,printWarn=FALSE,start=lo$start,
-           mustart=lo$mustart,scoreType=scoreType,null.coef=null.coef,
+           control=control,gamma=gamma,scale=scale,printWarn=FALSE,
+	   ## repeatedly changing the start values can occasionally cause step failure close to optimum...
+	   start=initial$start,mustart=initial$mustart, #lo$start,mustart=lo$mustart,
+	   scoreType=scoreType,null.coef=null.coef,
            pearson.extra=pearson.extra,dev.extra=dev.extra,n.true=n.true,Sl=Sl,nei=nei,...)
 
       trial$mustart <- fitted(b)
@@ -1769,7 +1771,7 @@ bfgs <-  function(lsp,X,y,Eb,UrS,L,lsp0,offset,U1,Mp,family,weights,
         b <- gam.fit3(x=X, y=y, sp=L%*%lsp+lsp0,Eb=Eb,UrS=UrS,
            offset = offset,U1=U1,Mp=Mp,family = family,weights=weights,deriv=1,
            control=control,gamma=gamma,scale=scale,printWarn=FALSE,
-           start=trial$start,mustart=trial$mustart,
+           start=initial$start,mustart=initial$mustart, #start=trial$start,mustart=trial$mustart,
            scoreType=scoreType,null.coef=null.coef,pearson.extra=pearson.extra,
            dev.extra=dev.extra,n.true=n.true,Sl=Sl,nei=nei,...)
 
@@ -2568,14 +2570,15 @@ negbin <- function (theta = stop("'theta' must be specified"), link = "log") {
 ##       during initialization (only).
   linktemp <- substitute(link)
   if (!is.character(linktemp)) linktemp <- deparse(linktemp)
-  if (linktemp %in% c("log", "identity", "sqrt")) stats <- make.link(linktemp)
-  else if (is.character(link)) {
+  okLinks <- c("log", "identity", "sqrt")
+  if (linktemp %in% okLinks) stats <- make.link(linktemp) else 
+  if (is.character(link)) {
     stats <- make.link(link)
     linktemp <- link
   } else {
     if (inherits(link, "link-glm")) {
        stats <- link
-            if (!is.null(stats$name))
+           if (!is.null(stats$name))
                 linktemp <- stats$name
         }
         else stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"",linktemp))
@@ -3030,12 +3033,12 @@ if (FALSE) { ## DEBUG disconnection of density terms
 Tweedie <- function(p=1,link=power(0)) {
 ## a restricted Tweedie family
   if (p<=1||p>2) stop("Only 1<p<=2 supported")
-  
+ 
   linktemp <- substitute(link)
   if (!is.character(linktemp)) linktemp <- deparse(linktemp)
   okLinks <- c("log", "identity", "sqrt","inverse")
   if (linktemp %in% okLinks)
-    stats <- make.link(linktemp) else 
+    stats <- make.link(linktemp) else
   if (is.character(link)) {
     stats <- make.link(link)
     linktemp <- link
@@ -3107,9 +3110,9 @@ Tweedie <- function(p=1,link=power(0)) {
 rTweedie <- function(mu,p=1.5,phi=1) {
 ## generate Tweedie random variables, with 1<p<2, 
 ## adapted from rtweedie in the tweedie package
-  if (p<=1||p>=2) stop("p must be in (1,2)")
+  if (any(p<=1|p>=2)) stop("p must be in (1,2)")
   if (sum(mu<0)) stop("mean, mu, must be non negative")
-  if (phi<=0) stop("scale parameter must be positive")
+  if (sum(phi<=0)) stop("scale parameter must be positive")
   
   lambda <- mu^(2-p)/((2-p)*phi)
   shape <- (2-p)/(p-1)

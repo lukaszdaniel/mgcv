@@ -3,6 +3,7 @@
 \alias{XWyd}
 \alias{Xbd}
 \alias{diagXVXd}
+\alias{ijXVXd}
 %- Also NEED an `\alias' for EACH other topic documented here.
 \title{Internal functions for discretized model matrix handling}
 \description{Routines for computing with discretized model matrices as described in Wood et al. (2017) and Li and Wood (2019).
@@ -13,6 +14,7 @@ XWXd(X,w,k,ks,ts,dt,v,qc,nthreads=1,drop=NULL,ar.stop=-1,ar.row=-1,ar.w=-1,
 XWyd(X,w,y,k,ks,ts,dt,v,qc,drop=NULL,ar.stop=-1,ar.row=-1,ar.w=-1,lt=NULL)
 Xbd(X,beta,k,ks,ts,dt,v,qc,drop=NULL,lt=NULL)
 diagXVXd(X,V,k,ks,ts,dt,v,qc,drop=NULL,nthreads=1,lt=NULL,rt=NULL)
+ijXVXd(i,j,X,V,k,ks,ts,dt,v,qc,drop=NULL,nthreads=1,lt=NULL,rt=NULL)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
@@ -36,9 +38,11 @@ diagXVXd(X,V,k,ks,ts,dt,v,qc,drop=NULL,nthreads=1,lt=NULL,rt=NULL)
 \item{lt}{use only columns of X corresponding to these model matrix terms (for left hand \code{X} in \code{XWXd}). If \code{NULL} set to \code{rt}.}
 \item{rt}{as \code{lt} for right hand \code{X}. If \code{NULL} set to \code{lt}. If \code{lt} and \code{rt} are \code{NULL} use all columns.}
 \item{V}{Coefficient covariance matrix.}
+\item{i}{vector of rows of \eqn{XVX^T}{XVX'} at which to evaluate.}
+\item{j}{vector of corresponding columns.}
 }
 
-\details{These functions are really intended to be internal, but are exported so that they can be used in the initialization code of families without problem. They are primarily used by \code{\link{bam}} to implement the methods given in the references. \code{XWXd} produces \eqn{X^TWX}{X'WX}, \code{XWy} produces \eqn{X^TWy}{X'Wy}, \code{Xbd} produces \eqn{X\beta}{Xb} and \eqn{diagXVXd} produces the diagonal of \eqn{XVX^T}{XVX'}.
+\details{These functions are really intended to be internal, but are exported so that they can be used in the initialization code of families without problem. They are primarily used by \code{\link{bam}} to implement the methods given in the references. \code{XWXd} produces \eqn{X^TWX}{X'WX}, \code{XWy} produces \eqn{X^TWy}{X'Wy}, \code{Xbd} produces \eqn{X\beta}{Xb} and \code{diagXVXd} produces the diagonal of \eqn{XVX^T}{XVX'}, while \code{ijXVXd} evaluates the scattered \eqn{i,j}{i,j} elements indexed in \code{i} and \code{j}. 
 
 The \code{"lpip"} attribute of \code{X} is a list of the coefficient indices for each term. Required if subsetting via \code{lt} and \code{rt}.
 
@@ -89,7 +93,10 @@ Li, Z & S.N. Wood (2019) Faster model matrix crossproducts for large generalized
   Xb0 <- Xbd(G$Xd,bb,G$kd,G$ks,G$ts,G$dt,G$v,G$qc)
   Xb1 <- Xbd(Xs,bb,G$kd,G$ks,G$ts,G$dt,G$v,G$qc)
   range(Xb0-Xb1);plot(Xb0,Xb1,pch=".")
-  
+
+  p <- length(beta) ## extract full model matrix...
+  X <- matrix(Xbd(G$Xd,diag(p),G$kd,G$ks,G$ts,G$dt,G$v,G$qc),ncol=p)
+
   w <- runif(n)
   XWy0 <- XWyd(G$Xd,w,y=dat$y,G$kd,G$ks,G$ts,G$dt,G$v,G$qc) 
   XWy1 <- XWyd(Xs,w,y=dat$y,G$kd,G$ks,G$ts,G$dt,G$v,G$qc)
@@ -102,7 +109,12 @@ Li, Z & S.N. Wood (2019) Faster model matrix crossproducts for large generalized
 
   A <- XWXd(G$Xd,w,G$kd,G$ks,G$ts,G$dt,G$v,G$qc)
   B <- XWXd(Xs,w,G$kd,G$ks,G$ts,G$dt,G$v,G$qc)
+  D <- crossprod(X,w*X) ## direct computation
+  range(A-D)
   range(A-B);plot(A,B,pch=".")
+  ## compute some cross product terms only...
+  A <- XWXd(G$Xd,w,G$kd,G$ks,G$ts,G$dt,G$v,G$qc,lt=1:3,rt=4:5)
+  range(A-D[1:nrow(A),(nrow(A)+1):ncol(D)])
 
   V <- crossprod(matrix(runif(p*p),p,p))
   ii <- c(20:30,100:200)

@@ -214,7 +214,6 @@ mean(res);var(res)
 res <- colSums(log(abs(Xp \%*\% t(br))))
 
 
-
 ##################################################################
 ## The following shows how to use use an "lpmatrix" as a lookup 
 ## table for approximate prediction. The idea is to create 
@@ -244,6 +243,27 @@ se <- sqrt(x0\%*\%b$Vp\%*\%t(x0));se ## get standard error
 ## compare to normal prediction
 predict(b,newdata=data.frame(x0=xn[1],x1=xn[2],
         x2=xn[3],x3=xn[4]),se=TRUE)
+
+##############################################################
+## Example of producing a prediction interval for non Gaussian
+## data...
+##############################################################
+
+f <- function(x) 0.2 * x^11 * (10 * (1 - x))^6 + 10 * 
+            (10 * x)^3 * (1 - x)^10
+set.seed(6);n <- 100;x <- sort(runif(n))
+Ey <- exp(f(x)/4);scale <- .5
+y <- rgamma(n,shape=1/scale,scale=Ey*scale) ## sim gamma dataexit
+b <- gam(y~s(x,k=20),family=Gamma(link=log),method="REML")
+Xp <- predict(b,type="lpmatrix")
+br <- rmvn(10000,coef(b),vcov(b)) ## 1000 replicate param. vectors
+fr <- Xp %*% t(br) ## replicate mean curve estimates
+yr <- apply(fr,2,function(x) rgamma(length(x),shape=1/b$scale,
+            scale=exp(x)*b$scale)) ## replicate data 
+pi <- apply(yr,1,quantile,probs=c(.1,.9),type=9) ## 80% PI
+plot(x,y);lines(x,fitted(b));lines(x,pi[1,]);lines(x,pi[2,])
+mean(y>pi[1,]&y<pi[2,]) ## check it
+
 
 ##################################################################
 # illustration of unsafe scale dependent transforms in smooths....

@@ -24,9 +24,6 @@ USA. */
 #include <omp.h>
 #endif
 
-//#include <Rmath.h>
-//#include <Rinternals.h>
-//#include <Rconfig.h>
 #include "mgcv.h"
 #include <R.h>
 
@@ -214,17 +211,18 @@ int CG(double *A,double *Mi,double *b, double *x,int n,double tol,double *cgwork
 } /* CG */
 
 
-SEXP nei_cov(SEXP v,SEXP d, SEXP M, SEXP K) {
+SEXP nei_cov(SEXP v,SEXP d, SEXP d1, SEXP M, SEXP K) {
 /* Computes a direct estimate of the parameter covariance matrix V, given neighbourhood structure 
-   encoded in m and k, and parameters under leave one out perturbation in D. 
+   encoded in m and k, and parameters under leave one out perturbation in D, and D1. Otherwise 
+   computing correction terms in similar way, but with D being the lett term and D1 the right.   
 */
   int *m,*k,n,p,i,j,i0,i1=0,ii,q;
-  double *D,*V,*Ds;
+  double *D,*D1,*V,*Ds;
   M = PROTECT(coerceVector(M,INTSXP));
   K = PROTECT(coerceVector(K,INTSXP)); /* otherwise R might be storing as double on entry */
   m = INTEGER(M); k = INTEGER(K);
   V = REAL(v);
-  D = REAL(d);
+  D = REAL(d);D1 = REAL(d1);
   n = length(M);
   p = ncols(d);
   for (ii=0;ii<p*p;ii++) V[ii]=0.0;
@@ -232,10 +230,10 @@ SEXP nei_cov(SEXP v,SEXP d, SEXP M, SEXP K) {
   for (i=0;i<n;i++) { /* neibourhood loop */
     i0 = i1;i1 = m[i]; /* k[i0:(i1-1)] are neighbours of i */
     j=k[i0]; 
-    for (q=0;q<p;q++) Ds[q] = D[j+q*n]; /* first neighbour term to accumulate */  
+    for (q=0;q<p;q++) Ds[q] = D1[j+q*n]; /* first neighbour term to accumulate */  
     for (ii=i0+1;ii<i1;ii++) { /* remainder */ 
       j = k[ii];
-      for (q=0;q<p;q++) Ds[q] += D[j+q*n];
+      for (q=0;q<p;q++) Ds[q] += D1[j+q*n];
     }
     /* now add contribution to V */
     for (ii=0,j=0;j<p;j++) for (q=0;q<p;q++,ii++) V[ii] += D[i+j*n]*Ds[q]; 

@@ -20,14 +20,15 @@ The following families (class \code{extended.family}) are for regression type mo
 which is a sum of independent terms, each corresponding to a single response observation. Usable with \code{\link{gam}}, with smoothing parameter estimation by \code{"NCV"}, \code{"REML"} or \code{"ML"} (the latter does not integrate the unpenalized and parameteric effects out of the marginal likelihood optimized for the smoothing parameters). Also usable with \code{\link{bam}}.
 \itemize{
 \item \code{\link{betar}} for proportions data on (0,1) when the binomial is not appropriate.
-\item \code{\link{cnorm}} censored normal distribution, for log normal accelerated failure time models, Tobit regression and rounded data, for example. 
+\item \code{\link{cnorm}} censored normal distribution, for log normal accelerated failure time models, Tobit regression and rounded data, for example.
+\item \code{\link{clog}} censored logistic distribution, for accelerated failure time models.
+\item \code{\link{cpois}} censored Poisson distribution. 
 \item \code{\link{nb}} for negative binomial data when the \code{theta} parameter is to be estimated.
 \item \code{\link{ocat}} for ordered categorical data.
 \item \code{\link{scat}} scaled t for heavy tailed data that would otherwise be modelled as Gaussian.
 \item \code{\link{tw}} for Tweedie distributed data, when the power parameter relating the variance to the mean is to be estimated.
 \item \code{\link{ziP}} for zero inflated Poisson data, when the zero inflation rate depends simply on the Poisson mean.
 } %% end itemize
-
 The above families of class \code{family} and \code{extended.family} can be combined to model data where different response observations come from different distributions. For example, when modelling the combination of presence-absence and abundance data, \code{binomial} and \code{nb} families might be used.  
 \itemize{
 \item \code{\link{gfam}} creates a 'grouped family' (or 'family group') from a list of families. The response is supplied as a two column matrix, the first containing the response observations, and the second an index of the family to which each observation relates.
@@ -37,7 +38,7 @@ The above families of class \code{family} and \code{extended.family} can be comb
 The following families (class \code{general.family}) implement more general model classes. Usable only with \code{\link{gam}} and only with REML or NCV smoothing parameter estimation.
 \itemize{
 \item \code{\link{cox.ph}} the Cox Proportional Hazards model for survival data (no NCV).
-\item \code{\link{gammals}} a gamma location-scale model, where the mean and standared deviation are modelled with separate linear predictors.
+\item \code{\link{gammals}} a gamma location-scale model, where the mean and standard deviation are modelled with separate linear predictors.
 \item \code{\link{gaulss}} a Gaussian location-scale model where the mean and the standard deviation are both modelled using smooth linear predictors.
 \item \code{\link{gevlss}} a generalized extreme value (GEV) model where the location, scale and shape parameters are each modelled using a linear predictor.
 \item \code{\link{gumbls}} a Gumbel location-scale model (2 linear predictors).
@@ -52,7 +53,7 @@ given potential presence is modelled with a second linear predictor.
 
 %- maybe also `usage' for other objects documented here.
 
-\author{ Simon N. Wood (s.wood@r-project.org) & Natalya Pya
+\author{ Simon N. Wood (s.wood@r-project.org), Natalya Pya, Matteo Fasiolo and Chris Shen.
 }
 \references{Wood, S.N., N. Pya and B. Saefken (2016), Smoothing parameter and
 model selection for general smooth models.

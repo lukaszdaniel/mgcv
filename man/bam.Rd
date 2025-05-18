@@ -23,7 +23,7 @@ bam(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,
     paraPen=NULL,chunk.size=10000,rho=0,AR.start=NULL,discrete=FALSE,
     cluster=NULL,nthreads=1,gc.level=0,use.chol=FALSE,samfrac=1,
     coef=NULL,drop.unused.levels=TRUE,G=NULL,fit=TRUE,drop.intercept=NULL,
-    in.out=NULL,...)
+    in.out=NULL,nei=NULL,...)
 }
 %- maybe also `usage' for other objects documented here.
 
@@ -69,7 +69,7 @@ included in \code{formula} (this used to conform to the behaviour of
 Mallows' Cp/UBRE/AIC for known scale. \code{"GACV.Cp"} is equivalent, but using GACV in place of GCV. \code{"REML"} 
 for REML estimation, including of unknown scale, \code{"P-REML"} for REML estimation, but using a Pearson estimate 
 of the scale. \code{"ML"} and \code{"P-ML"} are similar, but using maximum likelihood in place of REML. Default 
-\code{"fREML"} uses fast REML computation.}
+\code{"fREML"} uses fast REML computation. When \code{discrete=TRUE} then \code{"NCV"} is also possible.}
 
 \item{control}{A list of fit control parameters to replace defaults returned by 
 \code{\link{gam.control}}. Any control parameters not supplied stay at their default values.}
@@ -163,6 +163,8 @@ even with factor variables present.}
 
 \item{in.out}{If supplied then this is a two item list of intial values. \code{sp} is initial smoothing parameter estiamtes and \code{scale} the initial scale parameter estimate (set to 1 if famiy does not have one).}
 
+\item{nei}{list describing neighbourhood structure for NCV model smoothing parameter selection. See \code{\link{NCV}} for details.}
+
 \item{...}{further arguments for 
 passing on e.g. to \code{gam.fit} (such as \code{mustart}). }
 
@@ -173,8 +175,7 @@ An object of class \code{"gam"} as described in \code{\link{gamObject}}.
 }
 
 
-\details{ When \code{discrete=FALSE}, \code{bam} operates by first setting up the basis characteristics for the smooths, using a representative subsample of the data. Then the model matrix is constructed in blocks using \code{\link{predict.gam}}. For each block the factor R,
-from the QR decomposition of the whole model matrix is updated, along with Q'y. and the sum of squares of y. At the end of 
+\details{ When \code{discrete=FALSE}, \code{bam} operates by first setting up the basis characteristics for the smooths, using a representative subsample of the data. Then the model matrix is constructed in blocks using \code{\link{predict.gam}}. For each block the factor R, from the QR decomposition of the whole model matrix is updated, along with Q'y. and the sum of squares of y. At the end of 
 block processing, fitting takes place, without the need to ever form the whole model matrix. 
 
 In the generalized case, the same trick is used with the weighted model matrix and weighted pseudodata, at each step of the PIRLS.
@@ -193,6 +194,8 @@ can be used in the 1D case, and tensor product smooths (\code{te}) are typically
 If \code{cluster} is provided as a cluster set up using \code{\link[parallel]{makeCluster}} (or \code{\link[parallel:makeCluster]{makeForkCluster}}) from the \code{parallel} package, then the rate limiting QR decomposition of the model matrix is performed in parallel using this cluster. Note that the speed ups are often not that great. On a multi-core machine it is usually best to set the cluster size to the number of physical cores, which is often less than what is reported by \code{\link[parallel]{detectCores}}. Using more than the number of physical cores can result in no speed up at all (or even a slow down). Note that a highly parallel BLAS may negate all advantage from using a cluster of cores. Computing in parallel of course requires more memory than computing in series. See examples.
 
 When \code{discrete=TRUE} the covariate data are first discretized. Discretization takes place on a smooth by smooth basis, or in the case of tensor product smooths (or any smooth that can be represented as such, such as random effects), separately for each marginal smooth. The required spline bases are then evaluated at the discrete values, and stored, along with index vectors indicating which original observation they relate to. Fitting is by a version of performance oriented iteration/PQL using REML smoothing parameter selection on each iterative working model (as for the default method). The iteration is based on the derivatives of the REML score, without computing the score itself, allowing the expensive computations to be reduced to one parallel block Cholesky decomposition per iteration (plus two basic operations of equal cost, but easily parallelized). Unlike standard POI/PQL, only one step of the smoothing parameter update for the working model is taken at each step (rather than iterating to the optimal set of smoothing parameters for each working model). At each step a weighted model matrix crossproduct of the model matrix is required - this is efficiently computed from the pre-computed basis functions evaluated at the discretized covariate values. Efficient computation with tensor product terms means that some terms within a tensor product may be re-ordered for maximum efficiency. See Wood et al (2017) and Li and Wood (2019) for full details.
+
+With \code{discrete=TRUE} NCV can be used for smoothing parameter estimation. See  \code{\link{NCV}} for details of how to set up neighbourhoods using the \code{nei} argument. NCV is applied to the working penalized linear model using in iterative fitting. The computation is more efficient than that used by \code{\link{gam}} provided neighbourhoods are small, but is still costly. It is not efficient for k-fold cross validation, for example. The small neighbourhood restriction is because a matrix of side length given by the neibourhood side needs to be inverted for each neighbourhood. Because computational cost is typically much higher than for REML, for large data/models it is usually worth basing the NCV criterion on a sub-sample of the full data set. Supplying a \code{sample} element of the \code{nei} list is the way to do this. See \code{\link{NCV}}.
 
 When \code{discrete=TRUE} parallel computation is controlled using the \code{nthreads} argument. For this method no cluster computation is used, and the \code{parallel} package is not required. Note that actual speed up from parallelization depends on the BLAS installed and your hardware. With the (R default) reference BLAS using several threads can make a substantial difference, but with a single threaded tuned BLAS, such as openblas, the effect is less marked (since cache use is typically optimized for one thread, and is then sub optimal for several). However the tuned BLAS is usually much faster than using the reference BLAS, however many threads you use. If you have a multi-threaded BLAS installed then you should leave \code{nthreads} at 1, since calling a multi-threaded BLAS from multiple threads usually slows things down: the only exception to this is that you might choose to form discrete matrix cross products (the main cost in the fitting routine) in a multi-threaded way, but use single threaded code for other computations: this can be achieved by e.g. \code{nthreads=c(2,1)}, which would use 2 threads for discrete inner products, and 1 for most code calling BLAS. Not that the basic reason that multi-threaded performance is often disappointing is that most computers are heavily memory bandwidth limited, not flop rate limited. It is hard to get data to one core fast enough, let alone trying to get data simultaneously to several cores.   
 

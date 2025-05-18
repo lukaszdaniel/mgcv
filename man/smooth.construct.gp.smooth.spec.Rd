@@ -42,7 +42,7 @@ out duplicate locations).}
 \details{ Let \eqn{\rho>0}{r>0} be the range parameter, \eqn{0 < \kappa\le 2 }{0<k<=2} and \eqn{d}{d} denote the distance between two points. Then the correlation functions indexed by \code{m[1]} are:
 \enumerate{
 \item \eqn{1 - 1.5 d/\rho + 0.5 (d/\rho)^3}{1-1.5d/r+0.5(d/r)^3} if \eqn{d \le \rho}{d<=r} and 0 otherwise.
-\item \eqn{\exp(-(d/\rho)^\kappa)}{exp((d/r)^k)}.
+\item \eqn{\exp(-(d/\rho)^\kappa)}{exp(-(d/r)^k)}.
 \item \eqn{\exp(-d/\rho)(1+d/\rho)}{exp(-d/r)(1+d/r)}.
 \item \eqn{\exp(-d/\rho)(1+d/\rho + (d/\rho)^2/3)}{exp(-d/r)(1+d/r + (d/r)^2/3)}.
 \item \eqn{\exp(-d/\rho)(1+d/\rho+2(d/\rho)^2/5 + (d/\rho)^3/15)}{exp(-d/r)(1+d/r+2(d/r)^2/4+(d/r)^3/15)}.

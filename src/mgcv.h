@@ -132,31 +132,51 @@ SEXP mvnll(SEXP Y,SEXP x,SEXP xx,SEXP BETA,SEXP LPI, SEXP LL, SEXP LB,
 //void XWXd(double *XWX,double *X,double *w,int *k,int *ks, int *m,int *p, int *n, int *nx, 
 //          int *ts, int *dt, int *nt,double *v,int *qc,int *nthreads,int *ar_stop,
 //          int *ar_row,double *ar_weights);
-void XWXd0(double *XWX,double *X,double *w,int *k,int *ks, int *m,int *p, int *n, int *nx, 
+void XWXd0(double *XWX,double *X,double *w,int *k,int *ks, int *m,int *p, ptrdiff_t *n, int *nx, 
 	   int *ts, int *dt, int *nt,double *v,int *qc,int *nthreads,
           int *ar_stop,double *ar_weights);
 SEXP CXWXd0(SEXP XWXr, SEXP Xr, SEXP wr, SEXP kr, SEXP ksr, SEXP mr, SEXP pr, SEXP tsr, SEXP dtr,
 	    SEXP vr,SEXP qcr, SEXP nthreadsr, SEXP ar_stopr, SEXP ar_weightsr);
-void XWXd1(double *XWX,double *X,double *w,int *k,int *ks, int *m,int *p, int *n, int *nx, int *ts, 
+SEXP CXVXd0(SEXP XWXr, SEXP Xr, SEXP er, SEXP kr, SEXP ksr, SEXP mr, SEXP pr, SEXP tsr, SEXP dtr,
+	    SEXP vr,SEXP qcr, SEXP nthreadsr, SEXP ar, SEXP mar);
+void XWXd1(double *XWX,double *X,double *w,int *k,int *ks, int *m,int *p, ptrdiff_t *n, int *nx, int *ts, 
 	   int *dt, int *nt,double *v,int *qc,int *nthreads,int *ar_stop,double *ar_weights,
 	   int *rs, int *cs, int *nrs, int *ncs);
 SEXP CXWXd1(SEXP XWXr, SEXP Xr, SEXP wr, SEXP kr, SEXP ksr, SEXP mr, SEXP pr, SEXP tsr, SEXP dtr,
 	    SEXP vr,SEXP qcr, SEXP nthreadsr, SEXP ar_stopr, SEXP ar_weightsr,
-	    SEXP csr, SEXP rsr);
-void XWyd(double *XWy,double *y,double *X,double *w,int *k, int *ks, int *m,int *p, int *n,int *cy, 
+	    SEXP rsr, SEXP csr);
+void XWyd(double *XWy,double *y,double *X,double *w,int *k, int *ks, int *m,int *p, ptrdiff_t *n,int *cy, 
 	  int *nx, int *ts, int *dt, int *nt,double *v,int *qc,
           int *ar_stop,int *ar_row,double *ar_weights,int *cs,int *ncs);
 SEXP CXWyd(SEXP XWyr, SEXP yr, SEXP Xr, SEXP wr, SEXP kr, SEXP ksr, SEXP mr, SEXP pr, SEXP cyr, SEXP tsr,
 	   SEXP dtr,SEXP vr,SEXP qcr, SEXP ar_stopr, SEXP ar_rowr, SEXP ar_weightsr,SEXP csr);
-void Xbd(double *f,double *beta,double *X,int *k, int *ks, int *m,int *p, int *n, 
-	 int *nx, int *ts, int *dt, int *nt,double *v,int *qc,int *bc,int *cs,int *ncs);
+void Xbdspace(ptrdiff_t *space,int *m,int *p, ptrdiff_t *n, int *nx, int *dt, int *nt);
+void Xbd(double *f,double *beta,double *X,int *k, int *ks, int *m,int *p, ptrdiff_t  *n, 
+	 int *nx, int *ts, int *dt, int *nt,double *v,int *qc,int *bc,int *cs,int *ncs,
+	 int *iwork, ptrdiff_t *pwork,double *dwork);
 SEXP CXbd(SEXP fr, SEXP betar, SEXP Xr, SEXP kr, SEXP ksr, SEXP mr, SEXP pr,
 	  SEXP tsr, SEXP dtr,SEXP vr,SEXP qcr,SEXP bcr,SEXP csr);
-void diagXVXt(double *diag,double *V,double *X,int *k,int *ks,int *m,int *p, int *n, 
+void diagXVXt(double *diag,double *V,double *X,int *k1,int *k2,int *ks,int *m,int *p, ptrdiff_t *n, 
 	      int *nx, int *ts, int *dt, int *nt,double *v,int *qc,int *pv,int *cv,int *nthreads,int *cs,int *ncs,int *rs,int *nrs);
+void idiagXLLtXt(double *diag,double *L,double *X,int *k,int *ks,int *m,int *p, int *n, 
+		 int *nx, int *ts, int *dt, int *nt,double *v,int *qc,int *pl,int *cl,
+		 int *ri,int *ci,int *nrc,int *nthreads);
+void diagXLLtXt(double *diag,double *L,double *X,int *k,int *ks,int *m,int *p, ptrdiff_t *n, 
+	        int *nx, int *ts, int *dt, int *nt,double *v,int *qc,int *pl,int *cl,
+		int *ri,int *ci,ptrdiff_t *nrc,int *nthreads);
+void idiagXLUtXt(double *diag,double *L,double *U,double *X,int *k,int *ks,int *m,int *p, int *n, 
+		 int *nx, int *ts, int *dt, int *nt,double *v,int *qc,int *pl,int *cl,
+		 int *ri,int *ci,int *nrc,int *nthreads);
+void diagXLUtXt(double *diag,double *L,double *U,double *X,int *k,int *ks,int *m,int *p, ptrdiff_t *n, 
+	      int *nx, int *ts, int *dt, int *nt,double *v,int *qc,int *pl,int *cl,
+		int *ri,int *ci,ptrdiff_t *nrc,int *nthreads);
 SEXP CdiagXVXt(SEXP DIAG, SEXP Vp, SEXP x, SEXP K, SEXP KS, SEXP M, SEXP P, SEXP TS, SEXP DT,
 	       SEXP vp,SEXP QC, SEXP NTHREADS, SEXP CS, SEXP RS);
-
+SEXP CijXVXt(SEXP DIAG, SEXP Vp, SEXP x, SEXP K,SEXP K1, SEXP KS, SEXP M, SEXP P, SEXP TS, SEXP DT,
+	     SEXP vp,SEXP QC, SEXP NTHREADS, SEXP CS, SEXP RS);
+SEXP CNCV(SEXP NCVr, SEXP NCV1r, SEXP NCV2r, SEXP Gr, SEXP rsdr, SEXP betar, SEXP beta1r, SEXP wr,SEXP spr,
+	  SEXP Xr,SEXP kr, SEXP ksr, SEXP mr, SEXP pr, SEXP tsr, SEXP dtr,
+	  SEXP vr,SEXP qcr, SEXP nthreadsr, SEXP nei, SEXP Sr);
 
 /* various service routines */
 void davies(double *lb,double *nc,int *n,int *r,double *sigma,double *c,int *lim,
@@ -172,7 +192,7 @@ void rwMatrix(int *stop,int *row,double *w,double *X,int *n,int *p,int *trans,do
 void in_out(double *bx, double *by, double *break_code, double *x,double *y,int *in, int *nb, int *n);
 void Rlanczos(double *A,double *U,double *D,int *n, int *m, int *lm,double *tol,int *nt);
 void RuniqueCombs(double *X,int *ind,int *r, int *c);
-void  RPCLS(double *Xd,double *pd,double *yd, double *wd,double *Aind,double *bd,double *Afd,double *Sd,int *off,int *dim,double *theta, int *m,int *nar);
+void  RPCLS(double *Xd,double *pd,double *yd, double *wd,double *Aind,double *bd,double *Afd,double *Sd,int *off,int *dim,double *theta, int *m,int *nar,int *active);
 void RMonoCon(double *Ad,double *bd,double *xd,int *control,double *lower,double *upper,int *n);
 void MinimumSeparation(double *x,int *n, int *d,double *t,int *m,double *dist);
 void rksos(double *x,int *n,double *eps);
@@ -202,7 +222,8 @@ void mroot(double *A,int *rank,int *n);
 void R_cond(double *R,int *r,int *c,double *work,double *Rcondition);
 void mgcv_td_qy(double *S,double *tau,int *m,int *n, double *B,int *left,int *transpose);
 void mgcv_tri_diag(double *S,int *n,double *tau);
-void mgcv_trisymeig(double *d,double *g,double *v,int *n,int *getvec,int *descending); 
+void mgcv_trisymeig(double *d,double *g,double *v,int *n,int *getvec,int *descending);
+void mtrf(double *A, double *B,int *n,int *rank,int *psd,double *tol,double *work,int *iwork);
 void getXtWX(double *XtWX, double *X,double *w,int *r,int *c,double *work);
 void getXtX(double *XtX,double *X,int *r,int *c);
 void getXtMX(double *XtMX,double *X,double *M,int *r,int *c,double *work);
@@ -212,6 +233,7 @@ void row_block_reorder(double *x,int *r,int *c,int *nb,int *reverse);
 void mgcv_pqr(double *x,int *r, int *c,int *pivot, double *tau, int *nt);
 void getRpqr(double *R,double *x,int *r, int *c,int *rr,int *nt);
 void mgcv_pqrqy(double *b,double *a,double *tau,int *r,int *c,int *cb,int *tp,int *nt);
+SEXP wdiag(SEXP a,SEXP IND,SEXP B);
 SEXP dpdev(SEXP a);
 SEXP mgcv_Rpiqr(SEXP X, SEXP BETA,SEXP PIV,SEXP NT,SEXP NB);
 SEXP mgcv_tmm(SEXP x,SEXP t,SEXP D,SEXP M, SEXP N);
@@ -230,16 +252,22 @@ SEXP mgcv_madi(SEXP a, SEXP b,SEXP ind,SEXP diag);
 SEXP mrow_sum(SEXP x,SEXP M, SEXP K);
 SEXP ncv(SEXP x, SEXP hi, SEXP W1, SEXP W2, SEXP DB, SEXP DW, SEXP rS, SEXP IND, SEXP MI,SEXP M,
 	 SEXP K, SEXP BETA, SEXP SP, SEXP ETA, SEXP DETA,SEXP DLET,SEXP DERIV);
-SEXP Rncv(SEXP x, SEXP r, SEXP W1, SEXP W2, SEXP DB, SEXP DW, SEXP rS, SEXP IND, SEXP MI, SEXP M, SEXP K,SEXP BETA, SEXP SP, SEXP ETA,
-	  SEXP DETA,SEXP DLET,SEXP DERIV,SEXP EPS,SEXP NT);
+SEXP Rncv(SEXP x, SEXP r, SEXP W1, SEXP W2, SEXP DB, SEXP DW, SEXP rS, SEXP IND, SEXP MI, SEXP M, SEXP K,
+	  SEXP BETA, SEXP SP, SEXP ETA,SEXP DETA,SEXP DLET,SEXP DERIV,SEXP EPS,SEXP NT);
 SEXP ncvls(SEXP x,SEXP JJ,SEXP h,SEXP hi,SEXP dH,SEXP L1, SEXP L2,SEXP L3,SEXP IND, SEXP MI, SEXP M, SEXP K,SEXP BETA,
 	   SEXP ETACV,SEXP DETACV,SEXP DETA,SEXP DB,SEXP DERIV);
 SEXP Rncvls(SEXP x,SEXP JJ,SEXP R1,SEXP dH,SEXP L1, SEXP L2,SEXP L3,SEXP IND, SEXP MI, SEXP M, SEXP K,SEXP BETA,
 	    SEXP ETACV,SEXP DETACV,SEXP DETA,SEXP DB,SEXP DERIV,SEXP EPS,SEXP NT);
-SEXP nei_cov(SEXP v,SEXP d, SEXP M, SEXP K);
-
+SEXP nei_cov(SEXP v,SEXP d, SEXP d1, SEXP M, SEXP K);
+void ncvd(double *NCV,double *NCV1,double *NCV2,double *beta,double *db, double *G,double *rsd, double *w,int *pg,
+	  int *nn,int *a,ptrdiff_t *ma,int *d,ptrdiff_t *md,double *X,int *k,int *ck, int *ks,int *m,int *p, ptrdiff_t *n,
+	  double **S,
+	  int ns,int *sr,int *soff,double *sp,int *nx, int *ts, int *dt, int *nt,double *v,int *qc,int *nthreads);
 void chol_up(double *R,double *u, int *n,int *up,double *eps);
 void minres(double *R, double *u,double *b, double *x, int *p,int *m,double *work);
+SEXP QRdrop(SEXP q,SEXP r,SEXP K);
+SEXP QRadd(SEXP q,SEXP r,SEXP A);
+
 
 /* sparse matrix routines */
 SEXP isa1p(SEXP L,SEXP S,SEXP NT);
@@ -250,6 +278,9 @@ SEXP sXyd(SEXP X,SEXP Y,SEXP LT);
 SEXP sXWXd(SEXP X,SEXP W,SEXP LT, SEXP RT,SEXP NT);
 SEXP AddBVB(SEXP A,SEXP bt, SEXP vbt);
 SEXP spdev(SEXP A);
+SEXP getListEl(SEXP list, const char *str);
+
+
 
 /* basis constructor/prediction routines*/
 

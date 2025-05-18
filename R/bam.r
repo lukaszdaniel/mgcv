@@ -1,4 +1,4 @@
-# routines for very large dataset generalized additive modelling.
+## routines for very large dataset generalized additive modelling.
 ## (c) Simon N. Wood 2009-2023
 
 
@@ -429,7 +429,7 @@ mini.mf <-function(mf,chunk.size) {
 
 bgam.fitd <- function (G, mf, gp ,scale , coef=NULL, etastart = NULL,
     mustart = NULL, offset = rep(0, nobs),rho=0, control = gam.control(), intercept = TRUE, 
-    gc.level=0,nobs.extra=0,npt=c(1,1),gamma=1,in.out=NULL,...) {
+    gc.level=0,nobs.extra=0,npt=c(1,1),gamma=1,in.out=NULL,method="fREML",nei=NULL,...) {
 ## This is a version of bgam.fit designed for use with discretized covariates. 
 ## Difference to bgam.fit is that XWX, XWy and Xbeta are computed in C
 ## code using compressed versions of X. Parallelization of XWX formation
@@ -439,287 +439,357 @@ bgam.fitd <- function (G, mf, gp ,scale , coef=NULL, etastart = NULL,
 ## and to control the step length to ensure that at the end of the step we
 ## are not going uphill w.r.t. the REML criterion...
     
-    y <- G$y
-    weights <- G$w 
-    conv <- FALSE
-    nobs <- nrow(mf)
-    offset <- G$offset 
-   
-    if (inherits(G$family,"extended.family")) { ## preinitialize extended family
-      efam <- TRUE
-      if (!is.null(G$family$preinitialize) && !is.null(attr(G$family$preinitialize,"needG"))) attr(G$family,"G") <- G
-      pini <- if (is.null(G$family$preinitialize)) NULL else G$family$preinitialize(y,G$family)
-      if (is.null(G$family$preinitialize)) attr(G$family,"G") <- NULL
-      if (!is.null(pini$family)) G$family <- pini$family
-      if (!is.null(pini$Theta)) G$family$putTheta(pini$Theta)
-      if (!is.null(pini$y)) y <- pini$y
-      if (is.null(G$family$scale)) scale <- 1 else scale <- if (G$family$scale<0) scale else G$family$scale
-      scale1 <- scale
-      if (scale < 0) scale <- var(y) *.1 ## initial guess
-    } else efam <- FALSE
+  y <- G$y
+  weights <- G$w 
+  conv <- FALSE
+  nobs <- nrow(mf)
+  offset <- G$offset 
 
+  if (method=="NCV") {
+    if (rho!=0) {
+      warning("rho ignored with NCV"); rho <- 0
+    }
+    nei$af <- nei$a; nei$maf <- nei$ma ## for use in cov matrix computation
+    if (!is.null(nei$sample)) { ## only a sub-sample of points used in optimization NCV
+      if (length(nei$sample)==1) nei$sample <- sample(nei$ma,nei$sample)
+      m1 <- nei$ma[nei$sample]; m0 <- c(0,nei$ma)[nei$sample]
+      nei$a <- nei$a[sequence(m1-m0,m0+1L,1L)]
+      nei$ma <- cumsum(m1-m0)-1L
+      m1 <- nei$md[nei$sample]; m0 <- c(0,nei$md)[nei$sample]
+      nei$d <- nei$d[sequence(m1-m0,m0+1L,1L)]
+      nei$md <- cumsum(m1-m0)-1L
+    }
+  }
+  
+  if (inherits(G$family,"extended.family")) { ## preinitialize extended family
+    efam <- TRUE
+    if (!is.null(G$family$preinitialize) && !is.null(attr(G$family$preinitialize,"needG"))) attr(G$family,"G") <- G
+    pini <- if (is.null(G$family$preinitialize)) NULL else G$family$preinitialize(y,G$family)
+    if (is.null(G$family$preinitialize)) attr(G$family,"G") <- NULL
+    if (!is.null(pini$family)) G$family <- pini$family
+    if (!is.null(pini$Theta)) G$family$putTheta(pini$Theta)
+    if (!is.null(pini$y)) y <- pini$y
+    if (is.null(G$family$scale)) scale <- 1 else scale <- if (G$family$scale<0) scale else G$family$scale
+    scale1 <- scale
+    if (scale < 0) scale <- var(y) *.1 ## initial guess
+  } else efam <- FALSE
 
-    if (rho!=0) { ## AR1 error model
+  if (rho!=0) { ## AR1 error model
       
-      ld <- 1/sqrt(1-rho^2) ## leading diagonal of root inverse correlation
-      sd <- -rho*ld         ## sub diagonal
-      N <- nobs    
-      ## see rwMatrix() for how following are used...
-      ar.row <- c(1,rep(1:N,rep(2,N))[-c(1,2*N)]) ## index of rows to reweight
-      ar.weight <- c(1,rep(c(sd,ld),N-1))     ## row weights
-      ar.stop <- c(1,1:(N-1)*2+1)    ## (stop[i-1]+1):stop[i] are the rows to reweight to get ith row
-      if (!is.null(mf$"(AR.start)")) { ## need to correct the start of new AR sections...
-        ii <- which(mf$"(AR.start)"==TRUE)
-        if (length(ii)>0) {
-          if (ii[1]==1) ii <- ii[-1] ## first observation does not need any correction
-          ar.weight[ii*2-2] <- 0 ## zero sub diagonal
-          ar.weight[ii*2-1] <- 1 ## set leading diagonal to 1
+    ld <- 1/sqrt(1-rho^2) ## leading diagonal of root inverse correlation
+    sd <- -rho*ld         ## sub diagonal
+    N <- nobs    
+    ## see rwMatrix() for how following are used...
+    ar.row <- c(1,rep(1:N,rep(2,N))[-c(1,2*N)]) ## index of rows to reweight
+    ar.weight <- c(1,rep(c(sd,ld),N-1))     ## row weights
+    ar.stop <- c(1,1:(N-1)*2+1)    ## (stop[i-1]+1):stop[i] are the rows to reweight to get ith row
+    if (!is.null(mf$"(AR.start)")) { ## need to correct the start of new AR sections...
+      ii <- which(mf$"(AR.start)"==TRUE)
+      if (length(ii)>0) {
+        if (ii[1]==1) ii <- ii[-1] ## first observation does not need any correction
+        ar.weight[ii*2-2] <- 0 ## zero sub diagonal
+        ar.weight[ii*2-1] <- 1 ## set leading diagonal to 1
+      }
+    }
+  } else { ## AR setup complete
+    ar.row <- ar.weight <- ar.stop <- -1 ## signal no re-weighting
+  }
+
+  family <- G$family
+  additive <- if (family$family=="gaussian"&&family$link=="identity") TRUE else FALSE
+  linkinv <- family$linkinv;#dev.resids <- family$dev.resids
+  if (!efam) {
+    variance <- family$variance
+    mu.eta <- family$mu.eta
+    if (!is.function(variance) || !is.function(linkinv))
+        stop("'family' argument seems not to be a valid family object")
+  }
+  valideta <- family$valideta
+  if (is.null(valideta))
+      valideta <- function(eta) TRUE
+  validmu <- family$validmu
+  if (is.null(validmu))
+      validmu <- function(mu) TRUE
+  if (is.null(mustart)) {
+    eval(family$initialize)
+  }
+  else {
+    mukeep <- mustart
+    eval(family$initialize)
+    mustart <- mukeep
+  }
+
+  if (is.matrix(y)&&ncol(y)>1) stop("This family should not have a matrix response")
+  eta <- if (!is.null(etastart)) etastart else family$linkfun(mustart)
+    
+  mu <- linkinv(eta)
+  if (!(validmu(mu) && valideta(eta)))
+    stop("cannot find valid starting values: please specify some")
+  dev <- sum(family$dev.resids(y, mu, weights))*2 ## just to avoid converging at iter 1
+
+  conv <- FALSE
+  
+  G$coefficients <- rep(0,ncol(G$X))
+  class(G) <- "gam"  
+    
+  ## need to reset response and weights to post initialization values
+  ## in particular to deal with binomial properly...
+  G$y <- y
+  G$w <- weights
+  ## need to keep untransformed S matrices with NCV...
+  Sl <- Sl.setup(G,keepS=(method=="NCV")) ## setup block diagonal penalty object
+  rank <- 0
+  if (length(Sl)>0) for (b in 1:length(Sl)) rank <- rank + Sl[[b]]$rank
+  Mp <- ncol(G$X) - rank ## null space dimension
+  Nstep <- 0
+  if (efam) theta <- family$getTheta()
+
+  if(!is.null(coef)) { ## use supplied coef if supplied, including for step halving (Matteo Fasiolo)
+    # Define all quantities needed for step-halving
+    coef0 <- coef
+    b0 <- Sl.initial.repara(Sl, coef0, inverse = FALSE, both.sides = FALSE, cov = FALSE)
+    eta0 <- Xbd(G$Xd,coef0,G$kd,G$ks,G$ts,G$dt,G$v,G$qc,G$drop) + offset
+    mu0 <- linkinv(eta0)
+    dev0 <- if (efam) sum(family$dev.resids(G$y,mu0,G$w,theta)) else sum(family$dev.resids(G$y,mu0,G$w))
+    dev <- dev0 * 2  # just to avoid converging at iter 1 (see above)
+    # Note: possibly over-writing arguments etastart and mustart, and corresponding dev, but we must be coherent with coef0
+    etastart <- eta <- eta0
+    mustart <- mu <- mu0
+    c.iter <- 1 # Used later on to indicate whether to perform step-halving after 1st or...
+  } else c.iter <- 2 # ... 2nd iteration 
+
+
+  for (iter in 1L:control$maxit) { ## main fitting loop 
+    devold <- dev
+    dev <- 0
+     
+    if (iter==1||!additive) {
+      qrx <- list()
+
+      if (iter>1) {
+        ## form eta = X%*%beta
+        eta <- Xbd(G$Xd,coef,G$kd,G$ks,G$ts,G$dt,G$v,G$qc,G$drop) + offset
+        lsp.full <- G$lsp0
+	if (n.sp>0) lsp.full <- lsp.full + if (is.null(G$L)) lsp[1:n.sp] else G$L %*% lsp[1:n.sp]
+	rSb <- Sl.rSb(Sl,lsp.full,prop$beta) ## store S beta to allow rapid step halving
+	if (iter>c.iter) {
+	  rSb0 <- Sl.rSb(Sl,lsp.full,b0)
+	  bSb0 <- sum(rSb0^2) ## penalty at start of beta step
+	  ## get deviance at step start, with current theta if efam
+	  dev0 <- if (efam) sum(family$dev.resids(G$y,mu0,G$w,theta)) else
+	                    sum(family$dev.resids(G$y,mu0,G$w))
+	    
         }
       }
-    } else {## AR setup complete
-      ar.row <- ar.weight <- ar.stop <- -1 ## signal no re-weighting
-    }
-
-    family <- G$family
-    additive <- if (family$family=="gaussian"&&family$link=="identity") TRUE else FALSE
-    linkinv <- family$linkinv;#dev.resids <- family$dev.resids
-    if (!efam) {
-      variance <- family$variance
-      mu.eta <- family$mu.eta
-      if (!is.function(variance) || !is.function(linkinv))
-          stop("'family' argument seems not to be a valid family object")
-    }
-    valideta <- family$valideta
-    if (is.null(valideta))
-        valideta <- function(eta) TRUE
-    validmu <- family$validmu
-    if (is.null(validmu))
-        validmu <- function(mu) TRUE
-    if (is.null(mustart)) {
-        eval(family$initialize)
-    }
-    else {
-        mukeep <- mustart
-        eval(family$initialize)
-        mustart <- mukeep
-    }
-
-    if (is.matrix(y)&&ncol(y)>1) stop("This family should not have a matrix response")
-
-    eta <- if (!is.null(etastart))
-         etastart
-    else family$linkfun(mustart)
-    
-    mu <- linkinv(eta)
-    if (!(validmu(mu) && valideta(eta)))
-       stop("cannot find valid starting values: please specify some")
-    dev <- sum(family$dev.resids(y, mu, weights))*2 ## just to avoid converging at iter 1
-
-    conv <- FALSE
-   
-    G$coefficients <- rep(0,ncol(G$X))
-    class(G) <- "gam"  
-    
-    ## need to reset response and weights to post initialization values
-    ## in particular to deal with binomial properly...
-    G$y <- y
-    G$w <- weights
-
-    Sl <- Sl.setup(G) ## setup block diagonal penalty object
-    rank <- 0
-    if (length(Sl)>0) for (b in 1:length(Sl)) rank <- rank + Sl[[b]]$rank
-    Mp <- ncol(G$X) - rank ## null space dimension
-    Nstep <- 0
-    if (efam) theta <- family$getTheta()
-    for (iter in 1L:control$maxit) { ## main fitting loop 
-      devold <- dev
-      dev <- 0
-     
-      if (iter==1||!additive) {
-        qrx <- list()
-
-        if (iter>1) {
-          ## form eta = X%*%beta
-          eta <- Xbd(G$Xd,coef,G$kd,G$ks,G$ts,G$dt,G$v,G$qc,G$drop) + offset
-	  lsp.full <- G$lsp0
-	  if (n.sp>0) lsp.full <- lsp.full + if (is.null(G$L)) lsp[1:n.sp] else G$L %*% lsp[1:n.sp]
-	  rSb <- Sl.rSb(Sl,lsp.full,prop$beta) ## store S beta to allow rapid step halving
-	  if (iter>2) {
-	    rSb0 <- Sl.rSb(Sl,lsp.full,b0)
-	    bSb0 <- sum(rSb0^2) ## penalty at start of beta step
-	    ## get deviance at step start, with current theta if efam
-	    dev0 <- if (efam) sum(family$dev.resids(G$y,mu0,G$w,theta)) else
-	                 sum(family$dev.resids(G$y,mu0,G$w))
-	    
-          }
-        }
-	kk <- 1
-	repeat {
-          mu <- linkinv(eta)
-	  dev <- if (efam) sum(family$dev.resids(G$y,mu,G$w,theta)) else
+      kk <- 1
+      repeat { ## step control
+        mu <- linkinv(eta)
+	dev <- if (efam) sum(family$dev.resids(G$y,mu,G$w,theta)) else
 	                 sum(family$dev.resids(G$y,mu,G$w))
-          if (iter>2) { ## coef step length control
-	    bSb <- sum(rSb^2) ## penalty at end of beta step
-	    #stepr <- max(abs(coef-coef0))/(max(abs(coef0)))
-	    #if (stepr<2)
-	    stepr <- 2
-	    istepr <- 1-1/stepr
-            if ((!is.finite(dev) || dev0 + bSb0 < dev + bSb) && kk < 30) { ## beta step not improving current pen dev
-              coef <- coef0*istepr + coef/stepr ## reduce the step
-	      rSb <- rSb0*istepr + rSb/stepr
-	      eta <- eta0*istepr + eta/stepr
-	      prop$beta <- b0*istepr + prop$beta/stepr
-	      kk <- kk + 1
-            } else break
+        if (iter>c.iter) { ## coef step length control
+	  bSb <- sum(rSb^2) ## penalty at end of beta step
+	  #stepr <- max(abs(coef-coef0))/(max(abs(coef0)))
+	  #if (stepr<2)
+	  stepr <- 2
+	  istepr <- 1 - 1/stepr
+          if ((!is.finite(dev) || dev0 + bSb0 < dev + bSb) && kk < 30) { ## beta step not improving current pen dev
+            coef <- coef0*istepr + coef/stepr ## reduce the step
+	    rSb <- rSb0*istepr + rSb/stepr
+	    eta <- eta0*istepr + eta/stepr
+	    prop$beta <- b0*istepr + prop$beta/stepr
+	    kk <- kk + 1
           } else break
-        }		 
+        } else break
+      }	## step control	 
 
-        if (iter>1) { ## save components of penalized deviance for step control
-          coef0 <- coef ## original para
-	  eta0 <- eta
-	  mu0 <- mu
-	  b0 <- prop$beta ## beta repara
-	  dev <- dev + sum(rSb^2) ## add penalty to deviance
-	} else reml <- dev ## for convergence checking
+      if (iter>1) { ## save components of penalized deviance for step control
+        coef0 <- coef ## original para
+        eta0 <- eta
+	mu0 <- mu
+	b0 <- prop$beta ## beta repara
+	dev <- dev + sum(rSb^2) ## add penalty to deviance
+      } else crit <- dev ## for convergence checking
 	
-	if (efam) { ## extended family
-	  if (iter>1) { ## estimate theta
-            if (family$n.theta>0||scale1<0) theta <- estimate.theta(theta,family,y,mu,scale=scale1,wt=G$w,tol=1e-7)
-            if (!is.null(family$scale) && scale1<0) {
-	      scale <- exp(theta[family$n.theta+1])
-	      theta <- theta[1:family$n.theta]
-	    }  
-            family$putTheta(theta)
-          }
+      if (efam) { ## extended family
+	if (iter>1) { ## estimate theta
+          if (family$n.theta>0||scale1<0) theta <- estimate.theta(theta,family,y,mu,scale=scale1,wt=G$w,tol=1e-7)
+          if (!is.null(family$scale) && scale1<0) {
+	    scale <- exp(theta[family$n.theta+1])
+	    theta <- theta[1:family$n.theta]
+	  }  
+          family$putTheta(theta)
+        } ## theta estimation
 	  
-          dd <- dDeta(y,mu,G$w,theta=theta,family,0)
-	  ## note: no handling of infinities and wz case yet
+        dd <- dDeta(y,mu,G$w,theta=theta,family,0)
+	## note: no handling of infinities and wz case yet
 
-          if (rho==0) {
-	    w <- dd$Deta2 * .5 
-            z <- (eta-offset) - dd$Deta.Deta2
-          } else { ## use fisher weights
-	    w <- dd$EDeta2 * .5 
-            z <- (eta-offset) - dd$Deta.EDeta2
-	  }
-          good <- is.finite(z)&is.finite(w)
-	  w[!good] <- 0 ## drop if !good
-	  z[!good] <- 0 ## irrelevant
-        } else { ## exponential family
-          mu.eta.val <- mu.eta(eta)
-          good <- mu.eta.val != 0
-          mu.eta.val[!good] <- .1 ## irrelvant as weight is zero
-          z <- (eta - offset) + (G$y - mu)/mu.eta.val
-          w <- (G$w * mu.eta.val^2)/variance(mu)
-        }
+        if (rho==0) {
+          w <- dd$Deta2 * .5 
+          z <- (eta-offset) - dd$Deta.Deta2
+        } else { ## use fisher weights
+	  w <- dd$EDeta2 * .5 
+          z <- (eta-offset) - dd$Deta.EDeta2
+	}
+        good <- is.finite(z)&is.finite(w)
+	w[!good] <- 0 ## drop if !good
+	z[!good] <- 0 ## irrelevant
+      } else { ## exponential family
+        mu.eta.val <- mu.eta(eta)
+        good <- mu.eta.val != 0
+        mu.eta.val[!good] <- .1 ## irrelvant as weight is zero
+        z <- (eta - offset) + (G$y - mu)/mu.eta.val
+        w <- (G$w * mu.eta.val^2)/variance(mu)
+      }
       
   
-        qrx$y.norm2 <- if (rho==0) sum(w*z^2) else   ## AR mod needed
+      qrx$y.norm2 <- if (rho==0) sum(w*z^2) else   ## AR mod needed
           sum(rwMatrix(ar.stop,ar.row,ar.weight,sqrt(w)*z,trans=FALSE)^2) 
        
-        ## form X'WX efficiently...
-        qrx$R <- XWXd(G$Xd,w,G$kd,G$ks,G$ts,G$dt,G$v,G$qc,npt[1],G$drop,ar.stop,ar.row,ar.weight)
-        ## form X'Wz efficiently...
-        qrx$f <- XWyd(G$Xd,w,z,G$kd,G$ks,G$ts,G$dt,G$v,G$qc,G$drop,ar.stop,ar.row,ar.weight)
-        if(gc.level>1) gc()
+      ## form X'WX efficiently...
+      qrx$R <- XWXd(G$Xd,w,G$kd,G$ks,G$ts,G$dt,G$v,G$qc,npt[1],G$drop,ar.stop,ar.row,ar.weight)
+      ## form X'Wz efficiently...
+      qrx$f <- XWyd(G$Xd,w,z,G$kd,G$ks,G$ts,G$dt,G$v,G$qc,G$drop,ar.stop,ar.row,ar.weight)
+      if (gc.level>1) gc()
      
-        ## following reparameterizes X'X and f=X'y, according to initial reparameterizarion...
-        qrx$XX <- Sl.initial.repara(Sl,qrx$R,inverse=FALSE,both.sides=TRUE,cov=FALSE,nt=npt[1])
-        qrx$Xy <- Sl.initial.repara(Sl,qrx$f,inverse=FALSE,both.sides=TRUE,cov=FALSE,nt=npt[1])  
-        
-        G$n <- nobs
-      } else {  ## end of if (iter==1||!additive)
-        dev <- qrx$y.norm2 - sum(coef*qrx$f) ## actually penalized deviance
-      }
+      ## following reparameterizes X'X and f=X'y, according to initial reparameterizarion...
+     
+      qrx$XX <- Sl.initial.repara(Sl,qrx$R,inverse=FALSE,both.sides=TRUE,cov=FALSE,nt=npt[1])
+      qrx$Xy <- Sl.initial.repara(Sl,qrx$f,inverse=FALSE,both.sides=TRUE,cov=FALSE,nt=npt[1])  
+       
+      G$n <- nobs
+    } else {  ## end of if (iter==1||!additive)
+      dev <- qrx$y.norm2 - sum(coef*qrx$f) ## actually penalized deviance
+    }
   
-      if (control$trace)
+    if (control$trace)
          message(gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv"))
 
-      if (!is.finite(dev)) stop("Non-finite deviance")
+    if (!is.finite(dev)) stop("Non-finite deviance")
 
-      ## preparation for working model fit is ready, but need to test for convergence first
-      if (iter>2 && abs(dev - devold)/(0.1 + abs(dev)) < control$epsilon && (scale>0 || abs(Nstep[n.sp+1])<control$epsilon*(abs(log.phi)+1))) {
-          conv <- TRUE
-          break
-      }
+    ## preparation for working model fit is ready, but need to test for convergence first
+    if (iter>2 && abs(dev - devold)/(0.1 + abs(dev)) < control$epsilon && (scale>0 || method=="NCV" || abs(Nstep[n.sp+1])<control$epsilon*(abs(log.phi)+1))) {
+      conv <- TRUE
+      break
+    }
 
-      ## use fast REML code
-      ## block diagonal penalty object, Sl, set up before loop
+    ## use fast REML code
+    ## block diagonal penalty object, Sl, set up before loop
 
-      if (iter==1) { ## need to get initial smoothing parameters 
-        lambda.0 <- if (is.null(in.out)) initial.sp(qrx$R,G$S,G$off,XX=TRUE) else in.out$sp ## note that this uses the untransformed X'X in qrx$R
-        ## convert intial s.p.s to account for L 
-        lsp0 <- log(lambda.0) ## initial s.p.
-        if (!is.null(G$L)) lsp0 <- 
-          if (ncol(G$L)>0) as.numeric(coef(lm(lsp0 ~ G$L-1+offset(G$lsp0)))) else rep(0,0)
-        n.sp <- length(lsp0) 
-      }
+    if (iter==1) { ## need to get initial smoothing parameters 
+      lambda.0 <- if (is.null(in.out)) initial.sp(qrx$R,G$S,G$off,XX=TRUE) else in.out$sp ## note that this uses the untransformed X'X in qrx$R
+      ## convert intial s.p.s to account for L 
+      lsp0 <- log(lambda.0) ## initial s.p.
+      if (!is.null(G$L)) lsp0 <- 
+        if (ncol(G$L)>0) as.numeric(coef(lm(lsp0 ~ G$L-1+offset(G$lsp0)))) else rep(0,0)
+      n.sp <- length(lsp0) 
+    }
      
-      ## carry forward scale estimate if possible...
-      if (scale>0) log.phi <- log(scale) else {
-        if (iter==1) {
-	    if (is.null(in.out)) {
-              if (is.null(coef)||qrx$y.norm2==0) lsp0[n.sp+1] <- log(var(as.numeric(G$y))*.05) else
-                 lsp0[n.sp+1] <- log(qrx$y.norm2/(nobs+nobs.extra))
-            } else lsp0[n.sp+1] <- log(in.out$scale)		 
-        }
+    ## carry forward scale estimate if possible...
+    if (scale>0) log.phi <- log(scale) else {
+      if (iter==1&&method!="NCV") {
+        if (is.null(in.out)) {
+          if (is.null(coef)||qrx$y.norm2==0) lsp0[n.sp+1] <- log(var(as.numeric(G$y))*.05) else
+              lsp0[n.sp+1] <- log(qrx$y.norm2/(nobs+nobs.extra))
+        } else lsp0[n.sp+1] <- log(in.out$scale)		 
       }
+    }
 
-      ## get beta, grad and proposed Newton step... 
-      repeat { ## Take a Newton step to update log sp and phi
-        lsp <- lsp0 + Nstep
-        if (scale<=0) log.phi <- lsp[n.sp+1] 
-        prop <- Sl.fitChol(Sl,qrx$XX,qrx$Xy,rho=lsp[1:n.sp],yy=qrx$y.norm2,L=G$L,rho0=G$lsp0,log.phi=log.phi,
-                 phi.fixed=scale>0,nobs=nobs,Mp=Mp,nt=npt,tol=abs(reml)*.Machine$double.eps^.5,gamma=gamma)
-        if (max(Nstep)==0) { 
-          Nstep <- prop$step;lsp0 <- lsp;
-          break 
-        } else { ## step length control
-          if (sum(prop$grad*Nstep)>dev*1e-7) Nstep <- Nstep/2 else {
-            Nstep <- prop$step;lsp0 <- lsp;break;
+    ## get beta, grad and proposed Newton step... 
+    repeat { ## Take a Newton step to update log sp and phi
+      lsp <- lsp0 + Nstep ## Note that Nstep is 0 at iter==1
+        
+      if (method=="NCV") {
+        ## NOTE: scale param, tol based on 'reml',  nthreads!!
+	## basically only here for testing at the moment - not fully plumbed in
+	#prop2 <- Sl.fitChol(Sl,qrx$XX,qrx$Xy,rho=lsp[1:n.sp],yy=qrx$y.norm2,L=G$L,rho0=G$lsp0,log.phi=log.phi,
+        #        phi.fixed=scale>0,nobs=nobs,Mp=Mp,nt=npt,tol=abs(crit)*.Machine$double.eps^.5,gamma=gamma)
+        prop <- Sl.ncv(z,G$Xd,G$kd,G$ks,G$ts,G$dt,G$v,G$qc,nei=nei,Sl=Sl,XX=qrx$XX,w=w,f=qrx$Xy,rho=lsp[1:n.sp],
+	               nt=npt,L=G$L,rho0=G$lsp0,drop=G$drop,tol=abs(crit)*.Machine$double.eps^.5,nthreads=npt[1])
+	if (scale<=0) log.phi = log(sum((z-eta)^2*w)/nobs) ## not really needed		 
+        deriv.check <- FALSE
+        if (deriv.check) { ## for debug derivative testing
+          Hd <- prop$hess; eps <- 1e-7 ;fd <- prop$grad
+	  bfd <- prop$db
+          for (i in 1:n.sp) {
+            lspfd <- lsp; lspfd[i] <- lsp[i] + eps
+	    prop1 <- Sl.ncv(z,G$Xd,G$kd,G$ks,G$ts,G$dt,G$v,G$qc,nei=nei,Sl=Sl,XX=qrx$XX,w=w,f=qrx$Xy,rho=lspfd[1:n.sp],
+	                    nt=npt,L=G$L,rho0=G$lsp0,drop=G$drop,tol=abs(crit)*.Machine$double.eps^.5,nthreads=1)
+	    fd[i] <- (prop1$NCV - prop$NCV)/eps
+	    Hd[,i] <- (prop1$grad - prop$grad)/eps
+	    bfd[,i] <- (prop1$beta - prop$beta)/eps
           }
+	  Hd <- 0.5 * (Hd + t(Hd))
         }
-      } ## end of sp update
-
-      coef <- Sl.initial.repara(Sl,prop$beta,inverse=TRUE,both.sides=FALSE,cov=FALSE)
-
-      if (any(!is.finite(coef))) {
-          conv <- FALSE
-          warning(gettextf("non-finite coefficients at iteration %d",
-                  iter))
-          break
+      } else { ## method is REML
+        if (scale<=0) log.phi <- lsp[n.sp+1]
+        prop <- Sl.fitChol(Sl,qrx$XX,qrx$Xy,rho=lsp[1:n.sp],yy=qrx$y.norm2,L=G$L,rho0=G$lsp0,log.phi=log.phi,
+                phi.fixed=scale>0,nobs=nobs,Mp=Mp,nt=npt,tol=abs(crit)*.Machine$double.eps^.5,gamma=gamma)
+        deriv.check <- FALSE
+        if (deriv.check) { ## for debug derivative testing
+          Hd <- prop$hess; eps <- 1e-7
+          bfd <- prop$db
+          for (i in 1:n.sp) {
+            lspfd <- lsp; lspfd[i] <- lsp[i] + eps
+            prop1 <- Sl.fitChol(Sl,qrx$XX,qrx$Xy,rho=lspfd[1:n.sp],yy=qrx$y.norm2,L=G$L,rho0=G$lsp0,log.phi=log.phi,
+                  phi.fixed=scale>0,nobs=nobs,Mp=Mp,nt=npt,tol=abs(crit)*.Machine$double.eps^.5,gamma=gamma)
+            Hd[,i] <- (prop1$grad - prop$grad)/eps
+            bfd[,i] <- (prop1$beta - prop$beta)/eps
+          }
+          Hd <- 0.5 * (Hd + t(Hd))
+        }	  
       }
-      reml <- (dev/(exp(log.phi)*gamma) - prop$ldetS + prop$ldetXXS)/2
-    } ## end fitting iteration
+      if (max(Nstep)==0) { 
+        Nstep <- prop$step;lsp0 <- lsp;
+        break 
+      } else { ## step length control
+        if (sum(prop$grad*Nstep)>dev*1e-7) Nstep <- Nstep/2 else {
+          Nstep <- prop$step;lsp0 <- lsp;break;
+        }
+      }
+    } ## end of sp update
 
-    if (!conv)
-       warning("algorithm did not converge")
+    coef <- Sl.initial.repara(Sl,prop$beta,inverse=TRUE,both.sides=FALSE,cov=FALSE)
+
+    if (any(!is.finite(coef))) {
+      conv <- FALSE
+      warning(gettextf("non-finite coefficients at iteration %d",
+              iter))
+      break
+    }
+    crit <- if (method=="NCV") prop$NCV else (dev/(exp(log.phi)*gamma) - prop$ldetS + prop$ldetXXS)/2
+  } ## end fitting iteration
+
+  if (!conv) warning("algorithm did not converge")
    
-    eps <- 10 * .Machine$double.eps
-    if (family$family == "binomial") {
-         if (any(mu > 1 - eps) || any(mu < eps))
-                warning("fitted probabilities numerically 0 or 1 occurred")
-    }
-    if (family$family == "poisson") {
-            if (any(mu < eps))
-                warning("fitted rates numerically 0 occurred")
-    }
+  eps <- 10 * .Machine$double.eps
+  if (family$family == "binomial") {
+    if (any(mu > 1 - eps) || any(mu < eps))
+        warning("fitted probabilities numerically 0 or 1 occurred")
+  }
+  if (family$family == "poisson") {
+    if (any(mu < eps))
+      warning("fitted rates numerically 0 occurred")
+  }
+
+  object <- list(mgcv.conv=conv,rank=prop$r,
+                 scale.estimated = scale<=0,
+		 outer.info=NULL, optimizer=c("perf","chol")) 
   Mp <- G$nsdf
   if (length(G$smooth)>1) for (i in 1:length(G$smooth)) Mp <- Mp + G$smooth[[i]]$null.space.dim
   scale <- exp(log.phi)
-  reml <- (dev/(scale*gamma) - prop$ldetS + prop$ldetXXS + (length(y)/gamma-Mp)*log(2*pi*scale)+Mp*log(gamma))/2
+  crit <- if (method=="NCV") prop$NCV else (dev/(scale*gamma) - prop$ldetS + prop$ldetXXS +
+                                     (length(y)/gamma-Mp)*log(2*pi*scale)+Mp*log(gamma))/2
   if (rho!=0) { ## correct REML score for AR1 transform
     df <- if (is.null(mf$"(AR.start)")) 1 else sum(mf$"(AR.start)")
-    reml <- reml - (nobs/gamma-df)*log(ld)
+    crit <- crit - (nobs/gamma-df)*log(ld)
   }
 
   if (ncol(prop$db)>0) for (i in 1:ncol(prop$db)) prop$db[,i] <- ## d beta / d rho matrix
         Sl.initial.repara(Sl,as.numeric(prop$db[,i]),inverse=TRUE,both.sides=TRUE,cov=TRUE,nt=npt[1]) 
 
-  object <- list(db.drho=prop$db,
-                 gcv.ubre=reml,mgcv.conv=conv,rank=prop$r,
-                 scale.estimated = scale<=0,outer.info=NULL,
-                 optimizer=c("perf","chol"))
+  object$db.drho <- prop$db
+  object$gcv.ubre <- crit
+      
   object$coefficients <- coef
   object$family <- family
   ## form linear predictor efficiently...
@@ -736,21 +806,53 @@ bgam.fitd <- function (G, mf, gp ,scale , coef=NULL, etastart = NULL,
     }
     if (is.null(object$null.deviance)) object$null.deviance <- sum(family$dev.resids(G$y,weighted.mean(G$y,G$w),G$w,theta))   
   }
-
+ 
   PP <- Sl.initial.repara(Sl,prop$PP,inverse=TRUE,both.sides=TRUE,cov=TRUE,nt=npt[1])
   F <- pmmult(PP,qrx$R,FALSE,FALSE,nt=npt[1])  ##crossprod(PP,qrx$R) - qrx$R contains X'WX in this case
+ 
   object$edf <- diag(F)
   object$edf1 <- 2*object$edf - rowSums(t(F)*F)
   lsp <- if (n.sp>0) lsp[1:n.sp] else rep(0,0)
   object$sp <- exp(lsp)
   object$full.sp <- if (is.null(G$L)) object$sp else exp(drop(G$L%*%lsp + G$lsp0))
+  if (object$scale.estimated&&method=="NCV") {
+    rss <- if (additive) sum(w*(y-object$fitted.values)^2) else  sum((z-eta)^2*w)
+    scale <- rss/(nobs-sum(object$edf))
+  }
   object$sig2 <- object$scale <- scale
   object$Vp <- PP * scale
   object$Ve <- pmmult(F,object$Vp,FALSE,FALSE,nt=npt[1]) ## F%*%object$Vp
+
+  if (method=="NCV"&& max(diff(nei$ma))>1 && max(diff(nei$md))==1) { ## replace Vp with NCV estimate 
+    e <- if (additive) w*(y-object$fitted.values) else (z-eta)*w ## weighted residuals
+    XVX <- XVXd(G$Xd,e,G$kd,G$ks,G$ts,G$dt,G$v,G$qc,nthreads=1,a=nei$af,ma=nei$maf)
+    ## debug check of XVX
+    debug <- FALSE
+    if (debug) {
+      X <- Xbd(G$Xd,diag(1,nrow=nrow(XVX)),G$kd,G$ks,G$ts,G$dt,G$v,G$qc,drop=NULL,lt=NULL)
+      Ve <- matrix(0,nobs,nobs)
+      j0 <- 1;af <- nei$af + 1; maf <- nei$maf + 1
+      for (i in 1:nobs) {
+        for (j in af[j0:maf[i]]) Ve[i,j] <- e[i]*e[j]
+        j0 <- maf[i]+1
+      }
+      XVX1 <- t(X)%*%Ve%*%X
+    }  
+    ## debug end
+    ## note: prop$rsd contains weighted cross validated residuals
+    inflate <- max(1,1 + .6*(mad(prop$rsd)/mad(e)-1))
+    #inflate <- max(1,(prop$NCV/sum(e[nei$d]^2/w[nei$d])-1)/2+1)
+    V1 <- PP %*% XVX %*% PP *inflate^2
+    object$Vp <- sum(diag(V1))/sum(diag(object$Ve))*(object$Vp-object$Ve) + V1
+    ## NOTE: generally we will not have cross validated residuals for all data points.
+    ##       This is because we usually base NCV on a sample for large data. But average
+    ##       CV inflation factor is computable.
+  }
+  
   ## sp uncertainty correction... 
   if (!is.null(G$L)) prop$db <- prop$db%*%G$L
   M <- ncol(prop$db) 
-  if (M>0) {
+  if (M>0&&method!="NCV") {
     ev <- eigen(prop$hess,symmetric=TRUE)
     ind <- ev$values <= 0
     ev$values[ind] <- 0;ev$values[!ind] <- 1/sqrt(ev$values[!ind])
@@ -777,7 +879,7 @@ bgam.fitd <- function (G, mf, gp ,scale , coef=NULL, etastart = NULL,
   object$prior.weights <- G$w
   rm(G);if (gc.level>0) gc()
   object
-} ## end bgam.fitd
+} ## end bgam.fitd 
 
 
 regular.Sb <- function(S,off,sp,beta) {
@@ -1651,6 +1753,8 @@ predict.bamd <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,excl
                          block.size=50000,newdata.guaranteed=FALSE,na.action=na.pass,
 			 n.threads=1,gc.level=0,...) {
 ## function for prediction from a bam object, by discrete methods
+## Note that behaviour with factor levels not in fit differs from predict.gam - the dummies
+## for the factor all get set to zero (there is a warning). 
 
   ## remove some un-needed stuff from object
   object$Sl <- object$qrx <- object$R <- object$F <- object$Ve <-
@@ -1659,7 +1763,7 @@ predict.bamd <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,excl
   if (gc.level>0) gc()
   if (missing(newdata)) newdata <- object$model
    
-  convert2mf <- is.null(attr(newdata,"terms"))
+  #convert2mf <- is.null(attr(newdata,"terms")) ### was needed to get variables post any transform for discretization
 
   if (type=="iterms") {
     type <- "terms"
@@ -1675,11 +1779,21 @@ predict.bamd <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,excl
 
   newterms <- attr(newdata,"terms") ## non NULL for model frame
 
+  ## for discretization to work, we need the model frame names, not data frame ones. i.e. variables post any transform
+  object$pred.formula <- reformulate(object$dinfo$gp$fake.names)
+
   newd <- predict.gam(object,newdata=newdata,type="newdata",se.fit=se.fit,terms=terms,exclude=exclude,
             block.size=block.size,newdata.guaranteed=newdata.guaranteed,
             na.action=na.action,...) 
   if (nrow(newd)>0) {
     newdata <- newd;rm(newd)
+    ## could use xlev indicator of extra factor levels to attach xlev attributes to Xd below,
+    ## then modify Xbd to use these to insert NA at extra level positions - seems convoluted
+    ## for the tiny gain (NAs when term not excluded. )
+    #for (i in which(sapply(newdata,function(x) !is.null(attr(x,"xlev"))))) {
+      ## EXPERIMENTAL: problem is that "xlev" lost at model frame stage...
+      #newdata[[i]][attr(newdata[[i]],"xlev")] <- levels(newdata[[i]])[1] ## reset extra levels to first level
+    #}
   } else { ## no non NA data, might as well call predict.gam
     return(predict.gam(object,newdata=newdata,type=type,se.fit=se.fit,terms=terms,exclude=exclude,
             block.size=block.size,newdata.guaranteed=newdata.guaranteed,
@@ -1706,7 +1820,9 @@ predict.bamd <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,excl
   pp <- if (se.fit) list(fit=rep(0,0),se.fit=rep(0,0)) else rep(0,0) ## note: needed in terms branch below
 
   ## now discretize covariates...
-  if (convert2mf) newdata <- model.frame(object$dinfo$gp$fake.formula[-2],newdata)
+  
+  #if (convert2mf) newdata <- model.frame(object$dinfo$gp$fake.formula[-2],newdata) ## Why??
+  
   dk <- discrete.mf(object$dinfo$gp,mf=newdata,names.pmf=object$dinfo$pmf.names,full=TRUE)
   Xd <- list() ### list of discrete model matrices...
   n <- if (is.matrix(newdata[[1]])) nrow(newdata[[1]]) else length(newdata[[1]])
@@ -2041,7 +2157,7 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
                 offset=NULL,method="fREML",control=list(),select=FALSE,scale=0,gamma=1,knots=NULL,sp=NULL,
                 min.sp=NULL,paraPen=NULL,chunk.size=10000,rho=0,AR.start=NULL,discrete=FALSE,
                 cluster=NULL,nthreads=1,gc.level=0,use.chol=FALSE,samfrac=1,coef=NULL,
-                drop.unused.levels=TRUE,G=NULL,fit=TRUE,drop.intercept=NULL,in.out=NULL,...) {
+                drop.unused.levels=TRUE,G=NULL,fit=TRUE,drop.intercept=NULL,in.out=NULL,nei=NULL,...) {
 
 ## Routine to fit an additive model to a large dataset. The model is stated in the formula, 
 ## which is then interpreted to figure out which bits relate to smooth terms and which to 
@@ -2052,30 +2168,43 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
 ## 'n.threads' is number of threads to use for non-cluster computation (e.g. combining 
 ## results from cluster nodes). If 'NA' then is set to max(1,length(cluster)).
   control <- do.call("gam.control",control)
+ 
   if (control$trace) t3 <- t2 <- t1 <- t0 <- proc.time()
   if (length(nthreads)==1) nthreads <- rep(nthreads,2)
   if (is.null(G)) { ## need to set up model!
+    weights.name <- substitute(weights) ## needed in case of update
+    AR.sname <- substitute(AR.start) ## needed in case of update
     if (is.character(family))
             family <- eval(parse(text = family))
     if (is.function(family))
             family <- family()
     if (is.null(family$family))
             stop("family not recognized")
-      
+    family <- fix.family(family) ## apply any general family patches (e.g. gaussian log link initialization)  
     if (family$family=="gaussian"&&family$link=="identity") am <- TRUE else am <- FALSE
     if (scale==0) { if (family$family %in% c("poisson","binomial")) scale <- 1 else scale <- -1} 
     if (!method%in%c("fREML","GACV.Cp","GCV.Cp","REML",
-                    "ML","P-REML","P-ML")) stop("unsupported smoothness selection method")
+                    "ML","P-REML","P-ML","NCV")) stop("un-supported smoothness selection method")
     if (is.logical(discrete)) {
       discretize <- discrete
       discrete <- NULL ## use default discretization, if any
     } else {
       discretize <- if (is.numeric(discrete)) TRUE else FALSE
     }
+    if (method=="NCV") {
+      if (!discretize) {
+        discretize <- TRUE
+	warning("NCV only available with discrete=TRUE - resetting")
+      }
+      if (rho!=0) {
+        rho <- 0
+	warning("AR1 residuals not available with NCV, resetting rho=0")
+      }
+    } ## NCV pre-processing
     if (discretize) { 
-      if (method!="fREML") { 
+      if (!method %in% c("fREML","NCV")) { 
         discretize <- FALSE
-        warning("discretization only available with fREML")
+        warning("discretization only available with fREML or NCV")
       } else {
         if (!is.null(cluster)) warning("discrete method does not use parallel cluster - use nthreads instead")
 	if (all(is.finite(nthreads)) && any(nthreads>1) && !mgcv.omp()) warning("openMP not available: single threaded computation only")
@@ -2085,9 +2214,9 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
       family <- fix.family.link(family); efam <- TRUE
     } else efam <- FALSE
     
-    if (method%in%c("fREML")&&!is.null(min.sp)) {
+    if (method%in%c("fREML","NCV")&&!is.null(min.sp)) {
       min.sp <- NULL
-      warning("min.sp not supported with fast REML computation, and ignored.")
+      warning("min.sp not supported with fast REML and NCV computation, and ignored.")
     }
    
     gp <- interpret.gam(formula) # interpret the formula
@@ -2135,7 +2264,7 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
     mf$method <-  mf$family<-mf$control<-mf$scale<-mf$knots<-mf$sp<-mf$min.sp <- mf$gc.level <-
     mf$gamma <- mf$paraPen<- mf$chunk.size <- mf$rho  <- mf$cluster <- mf$discrete <-
     mf$use.chol <- mf$samfrac <- mf$nthreads <- mf$G <- mf$fit <- mf$select <- mf$drop.intercept <-
-    mf$coef <- mf$in.out <- mf$... <-NULL
+    mf$coef <- mf$in.out <- mf$nei <- mf$... <-NULL
     mf$drop.unused.levels <- drop.unused.levels
     mf[[1]] <- quote(stats::model.frame) ## as.name("model.frame")
 
@@ -2176,6 +2305,27 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
     terms <- attr(mf,"terms")
     if (gc.level>0) gc()  
     if (rho!=0&&!is.null(mf$"(AR.start)")) if (!is.logical(mf$"(AR.start)")) stop("AR.start must be logical")
+
+    if (!is.null(nei)) { ## check if data dropped
+      k <- attr(mf,"na.action")
+      if (!is.null(k)) { ## need to adjust nei for dropped data
+        nei <- nanei(nei,as.numeric(k))
+      }
+    }
+
+    if (method=="NCV") { ## pre-process the neighbourhood structure 'nei'
+      n <- nrow(mf)
+      if (is.null(nei)||is.null(nei$a)||is.null(nei$ma)) {
+        nei <- list(a=1:n,ma=1:n,d=1:n,md=1:n) ## LOOCV  
+      } else if (is.null(nei$d)||is.null(nei$md)) {
+        if (length(nei$ma)!=n) stop("nei$d and nei$md must be supplied if number of neighbourhoods is not number of data")
+	nei$d <- 1:n; nei$md <- 1:n
+      }
+      if (max(nei$ma)>length(nei$a)||min(nei$ma)<1) stop("nei$ma does not match nei$a")
+      if (max(nei$md)>length(nei$d)||min(nei$md)<1) stop("nei$md does not match nei$d")
+      if (max(nei$d)>n||min(nei$d)<1||max(nei$a)>n||min(nei$a)<1) stop("supplied nei index out of range")
+      nei <- onei(nei,TRUE) ## order indices within neighbourhoods and chnage to C indexing - needed for discrete NCV C code
+    } ## nei pre-processing
     
     ## summarize the *raw* input variables
     ## note can't use get_all_vars here -- buggy with matrices
@@ -2435,9 +2585,7 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
       G$offset <- model.offset(mf)
       if (is.null(G$offset)) G$offset <- rep(0,n)
     }
-   
-##    if (!discretize && ncol(G$X)>nrow(mf)) stop("Model has more coefficients than data") 
-  
+     
     if (ncol(G$X) > chunk.size && !discretize) { ## no sense having chunk.size < p
       chunk.size <- 4*ncol(G$X)
       warning(gettextf("chunk.size < number of coefficients. Reset to %d",chunk.size))    
@@ -2450,6 +2598,7 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
     if (G$m) for (i in 1:G$m) G$min.edf<-G$min.edf+G$smooth[[i]]$null.space.dim
     G$discretize <- discretize
     G$formula<-formula
+    G$weights.name <- weights.name; G$AR.sname <- AR.sname
     ## environment(G$formula)<-environment(formula)
     environment(G$pterms) <- environment(G$terms) <- environment(G$pred.formula) <- 
     environment(G$formula) <- .BaseNamespaceEnv
@@ -2501,7 +2650,8 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
                       gc.level=gc.level,use.chol=use.chol,in.out=in.out,npt=nthreads[1])
   } else if (G$discretize) {
     object <- bgam.fitd(G, mf, gp ,scale ,nobs.extra=0,rho=rho,coef=coef,
-                       control = control,npt=nthreads,gc.level=gc.level,gamma=gamma,in.out=in.out,...)
+                       control = control,npt=nthreads,gc.level=gc.level,
+		       gamma=gamma,in.out=in.out,method=method,nei=nei,...)
                        
   } else {
     G$X  <- matrix(0,0,ncol(G$X)); if (gc.level>1) gc()
@@ -2540,7 +2690,9 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
   object$boundary <- FALSE  # always FALSE for this case
   object$call<-G$cl # needed for update() to work 
   object$cmX <- G$cmX ## column means of model matrix --- useful for CIs
- 
+  object$weights.name <- G$weights.name
+  object$AR.sname <- G$AR.sname
+
   object$contrasts <- G$contrasts
   object$control <- control
   object$converged <- TRUE ## no iteration
@@ -2585,9 +2737,9 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
   class(object) <- c("bam","gam","glm","lm")
   if (!G$discretize) { object$linear.predictors <- 
           as.numeric(predict.bam(object,newdata=object$model,block.size=chunk.size,cluster=cluster))
+    dr <- dim(object$R) ## R can have fewer rows than columns if model rank def without penalization 
+    if (dr[1]<dr[2]) object$R <- rbind(object$R,matrix(0,dr[2]-dr[1],dr[2]))
   } else { ## store discretization specific information to help with discrete prediction
-    #object$dinfo <- list(gp=gp, v = G$v, ts = G$ts, dt = G$dt, qc = G$qc, drop = G$drop, pmf.names=pmf.names,lpip=lpip)
-    #if (paratens) object$dinfo$para.discrete <- TRUE 
     object$dinfo <- G$dinfo
   } 
   rm(G);if (gc.level>0) gc()
@@ -2635,28 +2787,26 @@ bam.update <- function(b,data,chunk.size=10000) {
   if (is.null(b$qrx)) { 
     stop("Model can not be updated")
   }
-  gp<-interpret.gam(b$formula) # interpret the formula 
+  gp <- interpret.gam(b$formula) # interpret the formula 
 
   ## next 2 lines problematic if there are missings in the response, so now constructed from mf below...
   ## X <- predict(b,newdata=data,type="lpmatrix",na.action=b$NA.action) ## extra part of model matrix
   ## rownames(X) <- NULL
   cnames <- names(b$coefficients)
 
-  AR.start <- NULL ## keep R checks happy
+  AR.start <- NULL ## keep R checks happy 
 
   ## now get the new data in model frame form...
   getw <- "(weights)"%in%names(b$model)
   getARs <- "(AR.start)"%in%names(b$model)
-  if (getw&&getARs) {
-    mf <- model.frame(gp$fake.formula,data,weights=weights,AR.start=AR.start,
-                      xlev=b$xlev,na.action=b$NA.action)
-    w <- mf[["(weights)"]]
-  } else if (getw) { 
-    mf <- model.frame(gp$fake.formula,data,weights=weights,xlev=b$xlev,na.action=b$NA.action)
-    w <- mf[["(weights)"]]
-  } else if (getARs) {
-    mf <- model.frame(gp$fake.formula,data,AR.start=AR.start,xlev=b$xlev,na.action=b$NA.action)
-    w <- rep(1,nrow(mf))
+ 
+  if (getw||getARs) {
+    mfstr <- "mf <- model.frame(gp$fake.formula,data,"
+    if (getw) mfstr <- paste(mfstr,"weights=",b$weights.name,",",sep="")
+    if (getARs) mfstr <- paste(mfstr,"AR.start=",b$AR.sname,",",sep="")
+    mfstr <- paste(mfstr,"xlev=b$xlev,na.action=b$NA.action)",sep="")
+    eval(parse(text=mfstr))
+    w <- if (getw) mf[["(weights)"]] else  rep(1,nrow(mf))
   } else {
     mf <- model.frame(gp$fake.formula,data,xlev=b$xlev,na.action=b$NA.action)
     w <- rep(1,nrow(mf))
@@ -2677,7 +2827,7 @@ bam.update <- function(b,data,chunk.size=10000) {
   b$G$y <- c(b$G$y,y)
   b$G$offset <- c(b$G$offset,offset)
   b$G$w <- c(b$G$w,w)
-  b$G$n <- nrow(b$model)
+  b$G$n <- length(b$G$y) ## nrow(b$model) - allow user to drop b$model...
   n <- b$G$n;
   ## update the qr decomposition...
 

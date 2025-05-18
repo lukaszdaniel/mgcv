@@ -2,7 +2,7 @@
 \alias{twlss}
 %- Also NEED an `\alias' for EACH other topic documented here.
 \title{Tweedie location scale family}
-\description{Tweedie family in which the mean, power and scale parameters can all depend on smooth linear predictors. Restricted to estimation via the extended Fellner Schall method of Wood and Fasiolo (2017). Only usable with \code{\link{gam}}. Tweedie distributions are exponential family with variance given by \eqn{\phi \mu^p}{s*m^p} where \eqn{\phi}{s} is a scale parameter, \eqn{p}{p} a parameter (here between 1 and 2) and \eqn{\mu}{m} is the mean. 
+\description{Tweedie family in which the mean, scale and power parameters can all depend on smooth linear predictors. Restricted to estimation via the extended Fellner Schall method of Wood and Fasiolo (2017). Only usable with \code{\link{gam}}. Tweedie distributions are exponential family with variance given by \eqn{\phi \mu^p}{s*m^p} where \eqn{\phi}{s} is a scale parameter, \eqn{p}{p} a parameter (here between 1 and 2) and \eqn{\mu}{m} is the mean. 
 }
 
 \usage{
@@ -21,7 +21,9 @@ twlss(link=list("log","identity","identity"),a=1.01,b=1.99)
 An object inheriting from class \code{general.family}.
 }
 
-\details{ A Tweedie random variable with 1<p<2 is a sum of \code{N} gamma random variables 
+\details{ The first linear predictor defines the mean parameter \eqn{\mu}{m} (default link \code{log}). The Tweedie variance is given by \eqn{\phi\mu^p}{sm^p}. The second linear predictor defines the log scale parameter \eqn{\rho=\log(\phi)}{r=log(s)} (no link choice). The third linear predictor, \eqn{\theta}{t}, defines \eqn{p = \{a + b\exp(\theta)\}/\{1+\exp(\theta)\}}{p=(a+b exp(t))/(1+exp(t))} (again with no choice of link). 
+
+A Tweedie random variable with 1<p<2 is a sum of \code{N} gamma random variables 
 where \code{N} has a Poisson distribution. The p=1 case is a generalization of a Poisson distribution and is a discrete 
 distribution supported on integer multiples of the scale parameter. For 1<p<2 the distribution is supported on the 
 positive reals with a point mass at zero. p=2 is a gamma distribution. As p gets very close to 1 the continuous 
@@ -71,11 +73,15 @@ n<-400
 dat <- gamSim(1,n=n,dist="poisson",scale=.2)
 dat$y <- rTweedie(exp(dat$f),p=1.3,phi=.5) ## Tweedie response
 
-## Fit a fixed p Tweedie, with wrong link ...
+## Fit a fixed p Tweedie ...
 b <- gam(list(y~s(x0)+s(x1)+s(x2)+s(x3),~1,~1),family=twlss(),
          data=dat)
 plot(b,pages=1)
 print(b)
+
+eb <- exp(coef(b));nb <- length(eb)
+eb[nb-1] ## scale
+(1+2*eb[nb])/(1+eb[nb]) ## p
 
 rm(dat)
 }

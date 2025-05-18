@@ -30,83 +30,45 @@ USA.*/
 #include "mgcv.h"
 #include "matrix.h"
 #include "general.h"
-#define RANGECHECK
-#define PAD 1
+//#define RANGECHECK
+//#define PAD 1
 
 #define ROUND(a) ((a)-(int)floor(a)>0.5) ? ((int)floor(a)+1):((int)floor(a))
 
 
 matrix null_mat; /* matrix for passing when you don't actually need to */
-#define PADCON (-1.234565433647588392902028934e270)
+//#define PADCON (-1.234565433647588392902028934e270)
 
 /* counter for memory used */
 
 
-long memused=0L,matrallocd=0L;
+//long memused=0L,matrallocd=0L;
 
 /* the routines */
 
-struct mrec
-{ matrix mat;
-  struct mrec *fp,*bp;
-};
-typedef struct mrec MREC;
+//struct mrec
+//{ matrix mat;
+//  struct mrec *fp,*bp;
+//};
+//typedef struct mrec MREC;
 
-matrix null_mat;
-MREC *top,*bottom;
+//matrix null_mat;
+//MREC *top,*bottom;
+
+// x <- runif(100);sm <- smoothCon(s(x),data.frame(x=x),knots=NULL)
 
 matrix initmat(int rows,int cols)
 /* Don't alter this without altering freemat() as well !! */
-{ matrix A;int i,j,pad;
-#ifdef RANGECHECK
-  pad=PAD;
-#else
-  pad=0;
-#endif
+{ matrix A;int i;
   A.vec=0;
-  A.M=(double **)CALLOC((size_t)(rows+2*pad),sizeof(double *));
-  if ((cols==1)||(rows==1))
-  { if (A.M)
-    A.M[0]=(double *)CALLOC((size_t)(cols*rows+2*pad),sizeof(double));
-    for (i=1;i<rows+2*pad;i++) A.M[i]=A.M[0]+i*cols;
-    A.vec=1;
-  } else
-  { if (A.M)
-    for (i=0;i<rows+2*pad;i++)
-    A.M[i]=(double *)CALLOC((size_t)(cols+2*pad),sizeof(double));
-  }
+  A.M=(double **)CALLOC((size_t)rows,sizeof(double *));
+  if ((cols==1)||(rows==1)) A.vec=1;
+  if (A.M) A.M[0]=(double *)CALLOC((size_t)(cols*rows),sizeof(double));
+  for (i=1;i<rows;i++) A.M[i]=A.M[0]+i*cols;
+
   A.mem=(long)(rows*cols*sizeof(double));
-  memused+=A.mem;matrallocd++;
   A.original_r=A.r=rows;A.original_c=A.c=cols;
-  if (((!A.M)||(!A.M[rows-1+2*pad]))&&(rows*cols>0))
-  { error(_("Failed to initialize memory for matrix."));}
-  if (pad)  /* This lot is debugging code that checks out matrix errors
-		       on allocation and release */
-  { if (A.vec)
-    { A.V=A.M[0];for (i=0;i<pad;i++) { A.V[i]=PADCON;A.V[i+pad+A.r*A.c]=PADCON;}
-    } else
-    { for (i=0;i<A.r+2*pad;i++)
-      { for (j=0;j<pad;j++) A.M[i][j]=PADCON;
-	     for (j=A.c+pad;j<A.c+2*pad;j++) A.M[i][j]=PADCON;
-      }
-      for (i=0;i<A.c+2*pad;i++)
-      { for (j=0;j<pad;j++) A.M[j][i]=PADCON;
-	     for (j=A.r+pad;j<A.r+2*pad;j++) A.M[j][i]=PADCON;
-      }
-    }
-    for (i=0;i<A.r+2*pad;i++)
-    for (j=0;j<pad;j++) A.M[i]++;  /* shifting pointers forward past padding */
-    if (!A.vec) for (j=0;j<pad;j++) A.M++;
-    A.V=A.M[0];
-  /* putting a record of the matrix on the linked list of all extant matrices */
-    if (matrallocd==1) /*new list*/
-    { top=bottom=(MREC *)CALLOC(1,sizeof(MREC));
-      bottom->mat=top->mat=A;top->bp=bottom;bottom->fp=top;
-    } else  /* expanding the linked list by one */
-    { top->fp=(MREC *)CALLOC(1,sizeof(MREC));
-      top->fp->mat=A;top->fp->bp=top;top=top->fp; /* crystal clear, no? */
-    }
-  }
+
   A.V=A.M[0];/* This allows vectors to be accessed using A.V[i] */
   return(A);
 } /* initmat */
@@ -115,96 +77,10 @@ matrix initvec(int rows)
 
 { return(initmat(1,rows));}
 
-void freemat(matrix A)
-
-{ int i,j,pad;int ok=1;
-  MREC *delet;
-#ifdef RANGECHECK
-  pad=PAD;
-#else
-  pad=0;
-#endif
-/*  if (A.original_r*A.original_c!=0L) */
-  { if (pad)
-    { if (A.vec)
-      { for (i=-pad;i<0;i++)
-	     if ((A.V[i]!=PADCON)||(A.V[i+A.original_r*A.original_c+pad]!=PADCON))
-	     ok=0;
-      } else
-      { for (i=-pad;i<A.original_r+pad;i++)
-	     { for (j=A.original_c;j<A.original_c+pad;j++) if (A.M[i][j]!=PADCON) ok=0;
-	       for (j=-pad;j<0;j++) if (A.M[i][j]!=PADCON) ok=0;
-	     }
-	     for (i=-pad;i<A.original_c+pad;i++)
-	     { for (j=A.original_r;j<A.original_r+pad;j++) if (A.M[j][i]!=PADCON) ok=0;
-	       for (j=-pad;j<0;j++) if (A.M[j][i]!=PADCON) ok=0;
-	     }
-      }
-      if (!ok)
-      { error(_("An out of bound write to matrix has occurred!"));
-      }
-      /* find the matrix being deleted in the linked list of extant matrices */
-      i=0;delet=bottom;
-      while ((i<matrallocd)&&(delet->mat.M!=A.M)) { i++;delet=delet->fp;}
-      if (i==matrallocd)
-      { error(_("INTEGRITY PROBLEM in the extant matrix list."));
-      } else
-      { if (i)
-	     delet->bp->fp=delet->fp;
-	     else bottom=delet->fp;
-	     if (i!=matrallocd-1)
-	     delet->fp->bp=delet->bp;
-	     else top=delet->bp;
-	     FREE(delet);
-      }
-      /* repositioning pointers so that what was allocated gets freed */
-      if (!A.vec) for (i=0;i<pad;i++) A.M--;
-      for (i=0;i<A.original_r+2*pad;i++)
-      for (j=0;j<pad;j++) A.M[i]--;
-    }
-    if (A.vec) FREE(A.M[0]); else
-    for (i=0;i<A.original_r+2*pad;i++) if (A.M[i]) FREE(A.M[i]);
-    if (A.M) FREE(A.M);
-    memused -= A.mem;matrallocd--;
-  }
+void freemat(matrix A) { 
+  if (A.V) FREE(A.V); /* points to A.M[0] and never moved (unlike A.M[0]) */
+  if (A.M) FREE(A.M);
 } /* freemat */
-
-void matrixintegritycheck(void)
-
-/* iff RANGECHECK is defined above then you can call this routine to check
-   on the integrity of the matrix system. The routine looks for writing out
-   of bounds from the matrix */
-
-{ MREC *B;
-  int ok=1,pad=PAD,i,j,k=0;
-  matrix A;
-#ifndef RANGECHECK
-  error(_("You are trying to check matrix integrity without defining RANGECHECK."));
-#endif
-  B=bottom;
-  while (k<matrallocd) {
-    A=B->mat;
-    if (A.vec) {
-      for (i=-pad;i<0;i++)
-      if ((A.V[i]!=PADCON)||(A.V[i+A.original_r*A.original_c+pad]!=PADCON))
-      ok=0;
-    } else {
-      for (i=-pad;i<A.original_r+pad;i++) {
-        for (j=A.original_c;j<A.original_c+pad;j++) if (A.M[i][j]!=PADCON) ok=0;
-	for (j=-pad;j<0;j++) if (A.M[i][j]!=PADCON) ok=0;
-      }
-      for (i=-pad;i<A.original_c+pad;i++) {
-	for (j=A.original_r;j<A.original_r+pad;j++) if (A.M[j][i]!=PADCON) ok=0;
-	for (j=-pad;j<0;j++) if (A.M[j][i]!=PADCON) ok=0;
-      }
-    }
-    if (!ok) {
-      error(_("An out of bound write to matrix has occurred!"));
-    }
-    k++;B=B->fp;
-  }
-} /* matrixintegritycheck */
-
 
 
 
@@ -673,19 +549,26 @@ int QR(matrix *Q,matrix *R)
    Q can be used with OrthoMult(). 
    Under/overflow avoidance added 13/1/2000 along with more efficient calculation
    of length of u (modifications tested).
-   
+   Explicit RM[i][k] optimizes much better than alternative
 */
 
-{ int i,j,k,n,Rr;
-  double *u,t,z,**RM,*p,m;
-  RM=R->M;Rr=R->r;
-  if (Rr<R->c) n=Rr; else n=R->c;
+{ int i,j,k,n,Rr,Rc;
+  double *u,t,z,**RM,*p,m;//*Rp;
+  RM=R->M;Rr=R->r;Rc = R->c;
+  if (Rr<Rc) n=Rr; else n=Rc;
   u=(double *)CALLOC((size_t)Rr,sizeof(double));
-  for (k=0;k<n;k++)
-  { m=0.0;for (i=k;i<Rr;i++) { z=RM[i][k];z=fabs(z);if (z>m) m=z;}
+  for (k=0;k<n;k++) {
+    //m=0.0;for (Rp=RM[k]+k,i=k;i<Rr;i++,Rp+=Rc) { z = *Rp;z=fabs(z);if (z>m) m=z;}
+    m=0.0;for (i=k;i<Rr;i++) { z = RM[i][k];z=fabs(z);if (z>m) m=z;}
+
+    //if (m) for (Rp=RM[k]+k,i=k;i<Rr;i++,Rp+=Rc) *Rp/=m; /* avoid over/underflow problems */
     if (m) for (i=k;i<Rr;i++) RM[i][k]/=m; /* avoid over/underflow problems */
-    t=0.0;for (i=k;i<Rr;i++) { z=RM[i][k];t+=z*z;} /* get euclidean length of column */
+    
+    //t=0.0;for (Rp=RM[k]+k,i=k;i<Rr;i++,Rp+=Rc) { z= *Rp;t+=z*z;} /* get euclidean length of column */
+    t=0.0;for (i=k;i<Rr;i++) { z= RM[i][k];t+=z*z;} /* get euclidean length of column */
+
     if (RM[k][k]>0.0) t = -sqrt(t);else t= sqrt(t);  /* value of new RM[k][k] (stable) */
+    //for (Rp=RM[k+1]+k,i=k+1;i<Rr;i++,Rp+=Rc) { u[i]= *Rp; *Rp=0.0;}
     for (i=k+1;i<Rr;i++) { u[i]=RM[i][k];RM[i][k]=0.0;}
     z=RM[k][k]; 
     u[k]=RM[k][k]-t;RM[k][k]=t*m;
@@ -694,9 +577,11 @@ int QR(matrix *Q,matrix *R)
     t=sqrt(t/2);
     if (t==0.0) {FREE(u);return(0);} /* singular matrix */
     for (p=u+k;p<u+Rr;p++) *p /= t;
-    for (j=k+1;j<R->c;j++)
-    { t=0.0;for (i=k;i<Rr;i++) t+=u[i]*RM[i][j];
-      for (i=k;i<Rr;i++) RM[i][j]-=u[i]*t;
+    for (j=k+1;j<R->c;j++) {
+      //t=0.0;for (Rp=RM[k]+j,i=k;i<Rr;i++,Rp+=Rc) t+=u[i] * *Rp;
+      t=0.0;for (i=k;i<Rr;i++) t+=u[i] * RM[i][j];
+      //for (Rp = RM[k]+j,i=k;i<Rr;i++,Rp+=Rc) *Rp -= u[i]*t;
+      for (i=k;i<Rr;i++) RM[i][j] -= u[i]*t;
     }
     if (Q->r) /* store vectors u for making Q */
     { p=Q->M[k];

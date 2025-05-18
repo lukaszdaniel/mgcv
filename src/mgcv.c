@@ -32,35 +32,17 @@ USA. */
 
 #define round(a) ((a)-floor(a) <0.5 ? (int)floor(a):(int) floor(a)+1)
 
-/* The following are some rather ancient routines used to set up an example
-   additive model using regression (cubic) splines, via RGAMsetup(). */
-void RUnpackSarray(int m,matrix *S,double *RS)
-/* unpacks the R array RS into an array of matrices initialized to the correct dimensions 
-   let kk = sum_{i=0}^k S[i].r*S[i].c
-   Then the kth matrix starts at element kk of RS and stops at element k(k+1)
-   ... let this extracted array be M. S[k].M[i][j]=M[i+S[k].r*j] - in this way we ensure that 
-   M can be extracted straight to a matrix in R with 
-   A<-matrix(M,S[k].r,S[k].c) 
-*/ 
-{ int start,i,j,k;
-  start=0;
-  for (k=0;k<m;k++)
-  { for (i=0;i<S[k].r;i++) for (j=0;j<S[k].c;j++) S[k].M[i][j]=RS[start+i+S[k].r*j];
-    start += S[k].r*S[k].c;
-  }
-}
 
-void RPackSarray(int m,matrix *S,double *RS)
+//void RPackSarray(int m,matrix *S,double *RS)
 /* Packs an array of matrices S[] into an R array RS in the manner described in RUnpackSarray
 */
-{ int start,i,j,k;
-  start=0;
-  for (k=0;k<m;k++)
-  { for (i=0;i<S[k].r;i++) for (j=0;j<S[k].c;j++) RS[start+i+S[k].r*j]=S[k].M[i][j];
-    start += S[k].r*S[k].c;
-  }
-
-}
+//{ int start,i,j,k;
+//  start=0;
+//  for (k=0;k<m;k++)
+//  { for (i=0;i<S[k].r;i++) for (j=0;j<S[k].c;j++) RS[start+i+S[k].r*j]=S[k].M[i][j];
+//    start += S[k].r*S[k].c;
+//  }
+//}
 
 
 matrix getD(matrix h,int nak)
@@ -405,123 +387,4 @@ void RMonoCon(double *Ad,double *bd,double *xd,int *control,double *lower,double
   freemat(x);freemat(A);freemat(b);  
 
 }
-
-
-void  RPCLS(double *Xd,double *pd,double *yd, double *wd,double *Aind,double *bd,
-            double *Afd,double *Sd,
-            int *off,int *dim,double *theta, int *m,int *nar)
-
-/* Interface routine for PCLS the constrained penalized weighted least squares solver.
-   nar is an array of dimensions. Let:
-   n=nar[0] - number of data
-   np=nar[1] - number of parameters
-   nai=nar[2] - number of inequality constraints
-   naf=nar[3] - number of fixed constraints
-  
-   
-   Problem to be solved is:
-
-   minimise      ||W^0.5 (y - Xp)||^2 + p'Bp
-   subject to    Ain p >= b  & Af p = "constant"
-
-   where B = \sum_{i=1}^m \theta_i S_i and W=diag(w)
-
-   - in fact S_i are not stored whole - rather the smallest non-zero sub-matrix of each S_i is 
-   stored in a densely packed form in S[]: see routines RpackSarray() and RUnpackSarray() for 
-   details of the sub-matrix packing. off[i],off[i] is the location within the full S_i to
-   insert the sub-matrix actually stored which is of dimension dim[i] by dim[i].
-
-   W = diag(w) 
-
-   on exit p contains the best fit parameter vector. 
-
-*/
-{ matrix y,X,p,w,Ain,Af,b,*S;
-  int n,np,i,*active;
- 
-  np=nar[1];n=nar[0];
-  /* unpack from R into matrices */
-  X=Rmatrix(Xd,(long)n,(long)np);
-  p=Rmatrix(pd,(long)np,1L);
-  y=Rmatrix(yd,(long)n,1L);
-  w=Rmatrix(wd,(long)n,1L);
-  if (nar[2]>0) Ain=Rmatrix(Aind,(long)nar[2],(long)np); else Ain.r=0L;
-  if (nar[3]>0) Af=Rmatrix(Afd,(long)nar[3],(long)np); else Af.r=0L;
-  if (nar[2]>0) b=Rmatrix(bd,(long)nar[2],1L);else b.r=0L;
- 
-  if (*m) S=(matrix *)CALLOC((size_t) *m,sizeof(matrix));
-  else S=NULL; /* avoid spurious compiler warning */
-  for (i=0;i< *m;i++) S[i]=initmat((long)dim[i],(long)dim[i]);
-  RUnpackSarray(*m,S,Sd);
-  
-  //if (nar[4]) H=initmat(y.r,y.r); else H.r=H.c=0L;
-  active=(int *)CALLOC((size_t)(p.r+1),sizeof(int)); /* array for active constraints at best fit active[0] will be  number of them */
-  /* call routine that actually does the work */
- 
-  PCLS(&X,&p,&y,&w,&Ain,&b,&Af,S,off,theta,*m,active);
-
-  /* copy results back into R arrays */ 
-  for (i=0;i<p.r;i++) pd[i]=p.V[i];
- 
-  //if (H.r) RArrayFromMatrix(Hd,H.r,&H);
-  /* clear up .... */
-  FREE(active);
- 
-  for (i=0;i< *m;i++) freemat(S[i]);
-  if (*m) FREE(S);
- 
-  freemat(X);freemat(p);freemat(y);freemat(w);
-  //if (H.r) freemat(H);
-  if (Ain.r) freemat(Ain);
-  if (Af.r) freemat(Af);
-  if (b.r) freemat(b);
-#ifdef MEM_CHECK
-  dmalloc_log_unfreed();  dmalloc_verify(NULL);
-#endif
-}
-
-/*********************************************************************************************/
-/* Bug fix and revision record:
-
-1. 20/10/00: Knot placement method in GAMsetup() modified. Previous method had an error, so 
-   that when df for a term was close to the number of data, a non-existent covariate value
-   (i.e. out of array bound). New code also yields more regular placement, and now deals with 
-   repeat values of covariates.
-3. 5/1/01: Modified RGAMsetup(), GAMsetup(), gam_map() and RGAMpredict() so that nsdf is now
-   total number of non-spline parameters including any constant. Hence R code must now provide 
-   column for constant explicitly.
-4. 5/1/01: fixed bug in RGAMpredict - standard errors of parametric components of linear predictor
-   were wrongly calculated.
-5. 30/5/01: GAMsetup re-organised to ease introduction of new tprs basis and multi-dimensional 
-   smooths
-6. 10/2001: b0,b1,d0,d1 modified so that extrapolation is linear beyond ends of spline as
-   it should be for a natural spline.
-7. 31/10/01: mgcv.c covariance and edf calculations made more robust - for poorly conditioned 
-   cases choleski can fail in calculation of covariance matrix: in these cases use svd instead.
-8. 2/11/01: RGAMpredict, RGAMsetup, GAMsetup, and gam_map modified to take array of penalty
-   orders, p_order. This allows user explicit control of the order of penalty in spline terms, 
-   while still supporting autoselection when p_order[i]==0. 
-9. 9/11/01: RGAMpredict modified to allow 5th control option, which returns a matrix mapping 
-            params to l.p. vector
-10. 9/11/01: New routine RPackSArray and RUnpackSarray so that storage of arrays of penalty 
-             matrices is not so wasteful.
-11. 12/11/01: UZ and Xu now packed efficiently using above 2 routines.
-12. 12/11/01: Routine RPCLS added for solving linearly constrained penalized least squares problems 
-              by quadratic programming
-13. 13/11/01: Routine RMonoCon added for finding monotonic constraint matrices for cubic regression 
-              splines.
-14. 5/2/02: GAMsetup and RGAMsetup modified to deal with "by" variables - covariates that multiply a 
-            whole smooth term. The centering conditions have not been changed.
-15. 6/9/02: Slight modification to gam_map() - terms are not calculated if corresponding by variable 
-            is zero. This can save flops in fairly advanced use (e.g. posum package)
-16.23/10/02: mgcv modified in order to check that Tr(A) calculations are sensible, and that termwise 
-             effective degrees of freedom are calculated correctly. The problem arises with ill-conditioned 
-             models when an inversion required for the term-wise effective degrees of freedom can 
-             become unstable.
-17.23/10/02: Bug in TrA calculation when smoothing parameters supplied. X'X used in place of X'WX - fixed.
-
-18. 24/1/04: RGAMpredict, RGAMsetup, GAMsetup and gam_map deleted, to make way for a more object oriented
-             and modular approach to model setup and prediction, based on "smooth objects". Constructor and 
-             prediction code added instead.
-*/
 

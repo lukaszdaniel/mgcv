@@ -19,7 +19,89 @@ Issues:
 present, and reparameterization needs checking (also for bam). 
 
 * bam(...,discrete=TRUE) has no option to use the identical
-  discretizaton to that used in fitting when predicting.
+	discretizaton to that used in fitting when predicting
+
+* efsud Vb every time? Fix bam NCV variance comp, to be as gam.
+
+1.9-3
+
+* fixes a read-one-beyond-allocated memory error (in a redundant check with no
+  consequences)
+
+1.9-2
+
+** 'NCV' added as a method option for bam(...,discrete=TRUE). More efficient 
+  than gam(...,method='NCV'), but much less efficient than default REML.
+
+* added basic linear programming routine, lp, mainly to find initial values 
+  under linear constraint. 
+
+* default margins changed for plot.gam(...,pages=1)
+
+* 'clog' censored logistic family added for AFT models. Written by Chris Shen.
+
+* 'cpois' censored Poisson family added. 
+
+* improved cov matrix estimation under NCV used with correlated errors.
+
+* names in NCV 'nei' structure modified to better match paper and documentation 
+  notation.
+
+* estimate.theta improved for semi-definite case (e.g. infinite DoF in scat).  
+
+* extended families now give a useful error if an illegal link is supplied.
+
+* pcls now returns indices of active set constraints as attribute of return 
+  vector.
+
+* fix bam to always return a square QR R factor of the model matrix 
+  (previously it was possible for it not to be square for a rank deficient 
+  model matrix, which could cause a failure in summary). Thanks to Amy Hughes
+
+* Fixed bam/bam.update to pick up weights correctly, rather than failing. 
+  Thanks to Max Moldovan. Also adjusted to allow correct behaviour if model
+  frame has been deleted.
+
+* Added sparse matrix Cholesky routine, mchol, a wrapper for 
+  Matrix::Cholesky, giving the same functionality as Matrix::chol prior 
+  to the decision for this not to return the pivot sequence. 
+
+* 'mroot' modified so that svd option uses an efficient symmetric eigen routine 
+  to compute SVD (argument is positive semi-definite after all).
+
+* fixed gam.vcomp to avoid failure with extended families and bam. Thanks to
+  Nathan LaSpina for reporting.
+
+* modification of discrete bam prediction method function to better deal with
+  extra factor levels in prediction. Slightly differs from predict.gam, in 
+  setting effect to zero, rather than NA.
+
+* fix to NCV handling of dropped NA points - previously could end up with
+  different numbers of predict and drop neighbourhoods. Thanks to Nicole
+  Augustin.	
+
+* XWXd fix for row col interchange bug introduced with long vector support in 
+  1.9-1.
+
+* fix of gumbls initializtion code bug. Initial parameters were so bad that 
+  fit could fail. 
+
+* zoom in bfgs modified so that start values always the same to avoid
+  occasional step failures from repeatedly changing initial values.
+
+* gevlss improved xi initialization.
+
+* gam(...,discrete=TRUE) no longer ignores starting coefficient values (thanks
+  to Matteo Fasiolo).
+
+* Sl.setup and ldetS changes to return totla penalty matrices directly 
+  (avoiding a redundant crossproduct)
+
+* Fix to Pearson residuals in gammals family - thanks to gavin Simpson and 
+  Arthur Fendrich
+
+* ldetS slight efficiency improvement by direct matrix diagonal modification 
+  in C code, as suggested by Matteo Fasiolo.
 
 1.9-1
 
@@ -60,7 +142,6 @@ present, and reparameterization needs checking (also for bam).
 * removed discrete method prediction from discrete bam objects fitted 
   before 1.8-32 (deprecated since then). 
 
-
 * 'multinom' variance fix for K>=3 cases. A counter was initialized in the wrong
   place. Thanks to Max Goplerud for finding and reporting this.
 
@@ -80,6 +161,7 @@ present, and reparameterization needs checking (also for bam).
 * tests directory removed, as check time was tripping up every CRAN submission.
 
 * coxph memory error fix - could make bfgs fitting fail.
+
 
 1.8-42
 

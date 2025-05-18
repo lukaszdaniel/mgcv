@@ -63,10 +63,10 @@ rig <- function(n,mean,scale) {
   x ## E(x) = mean; var(x) = scale*mean^3
 }
 
-strip.offset <- function(x)
+strip.offset <- function(x) {
 # sole purpose is to take a model frame and rename any "offset(a.name)"
 # columns "a.name"
-{ na <- names(x)
+  na <- names(x)
   for (i in 1:length(na)) {
     if (substr(na[i],1,7)=="offset(") 
       na[i] <- substr(na[i],8,nchar(na[i])-1)
@@ -74,6 +74,99 @@ strip.offset <- function(x)
   names(x) <- na
   x
 }
+
+lp <- function(c,A,b,C=NULL,d=NULL,Bi=NULL,maxit=max(1000,nrow(A)*10),phase1=FALSE) {
+## Solves linear program min c'x s.t. Ax = b x>=0 given m initial
+## active indices Bi, where A is m by p. The condition on Bi is that
+## The solution to A[,Bi] x* = b must exist and x* >= 0.
+## If Bi not supplied then a phase 1 LP is used to find it.
+## Alternatively if both C and d are non-NULL then solves
+## min  c'x s.t. Ax>b Cx=d, x otherwise unrestricted. (C and d
+## can have no rows without counting as NULL.)
+ 
+  sf <- is.null(C)||is.null(d) ## standard form
+  if (!sf) { ## re-write in standard form
+    pa <- ncol(A);ma <- nrow(A)
+    A <- rbind(A,C)
+    m <- nrow(A)
+    A <- if (ma) cbind(A,-A,-diag(1,m)[,1:ma]) else cbind(A,-A)
+    b <- c(b,d)
+    c <- c(c,-c,rep(0,ma))
+    if (!is.null(Bi)) {
+      warning("Bi ignored when LP not in standard form")
+      Bi <- NULL
+    }
+  }
+  p <- ncol(A);m <- nrow(A)
+  if (is.null(Bi)) { ## find Bi
+    x <- feasible(A,b)
+    Bi <- which(x!=0)
+  }
+  Ni <- (1:p)[-Bi] ## currently excluded
+  conv <- FALSE
+  B <- A[,Bi];
+  qrb <- qr(t(B)); Q <- qr.Q(qrb); R <- qr.R(qrb)
+  for (i in 1:maxit) {  
+    N <- A[,Ni]
+    # equivalent to xb <- solve(B,b)...
+    xb <- Q%*%forwardsolve(R,b,upper.tri=TRUE,transpose=TRUE)
+    # equivalent to sn <- c[Ni] - drop(t(N)%*%solve(t(B),c[Bi]))...
+    v <- drop(c[Bi]%*%Q)
+    sn <- c[Ni] - drop(t(N)%*%backsolve(R,v))
+    eps <- kappa(R)*max(abs(v))*norm(N,"M")*.Machine$double.eps^.9
+    if (phase1) {
+      conv <- sum(c[Bi]*xb)==0 ## in phase 1, objective should end up at zero
+      if (conv||all(sn>=0)) break
+    } else if (all(sn >= -eps)) { conv <- TRUE; break }
+    Nk <- which(sn==min(sn))[1] ## index of k within Ni
+    k <- Ni[Nk] ## index in Ni to include
+    # equivalent to w <- solve(B,A[,k])...
+    w <- Q%*%forwardsolve(R,A[,k],upper.tri=TRUE,transpose=TRUE)
+    if (all(w<=0)) stop("unbounded")
+    ii <- w>0; xbd.min <- min(xb[ii]/w[ii])
+    Bq <- which(xb/w==xbd.min&ii)[1] ## index (in Bi) to exclude
+    q <- Bi[Bq] ## col of A to exclude
+    ## now update Bi and Ni
+    Ni[Nk] <- q; Bi[Bq] <- k
+    .Call(C_QRdrop,Q,R,as.integer(Bq-1))
+    .Call(C_QRadd,Q,R,A[,k])
+    if (Bq<m) { Qm <- Q[m,]; Q[(Bq+1):m,] <- Q[Bq:(m-1),];Q[Bq,] <- Qm} 
+  }
+  if (!conv) stop("not converged")
+  xb[xb<0] <- 0
+  x <- rep(0,p)
+  x[Bi] <- xb;
+  if (!sf) x <- x[1:pa] - x[1:pa+pa] ## assemble +ve and negative parts of solution
+  #cat(sum(c[Bi]*xb),"\n")  ## final objective 
+  x
+} ## lp
+
+feasible <- function(A,b,C=NULL,d=NULL,maxit=max(1000,nrow(A)*10)) {
+## Finds feasible initial parameter vector x, satisfying
+## C x = d and A x >= b. First re-writes in standard form...
+## [ A -A I ] [x'] = [b]  x' >= 0, z >= 0
+## [ C -C 0 ] [z ]   [d]
+## ... using slack variables and +/- parts of x in x'. Then constructs
+## phase I LP to solve to find feasible x', and hence x.
+## If C or d are NULL then it is assumed that the problem is already
+## in standard form Ax=b x>=0. A 0-row C matrix is not NULL!
+  sf <- is.null(C)||is.null(d)
+  if (sf) { ## already in standard form Ax=b, x>=0 
+    A1 <- A;b1 <- b; m <- nrow(A1); p <- ncol(A1)
+  } else { ## in C x = d and A x >= b form
+    ma <- nrow(A)
+    A1 <- rbind(A,C)
+    m <- nrow(A1);p <- ncol(A)
+    A1 <- if (ma) cbind(A1,-A1,-diag(1,m)[,1:ma]) else cbind(A1,-A1) 
+    b1 <- c(b,d)
+  }  
+  ## A1 is first matrix in above standard form, and b1 is r.h.s. vector
+  ## Now form the phase 1 problem...
+  Bi <- 1:m + ncol(A1);c1 <- c(rep(0,ncol(A1)),rep(1,m))
+  A1 <- cbind(A1,diag(1*(b1>=0)-1*(b1<0),m))
+  x0 <- lp(c1,A1,b1,Bi=Bi,maxit=maxit,phase1=TRUE)
+  x1 <- if (sf) x0[1:p] else x0[1:p] - x0[1:p+p] ## assemble +ve and negative parts of solution
+} ## feasible
 
 
 pcls <- function(M)
@@ -95,7 +188,10 @@ pcls <- function(M)
 # M$C  - fixed constraint matrix
 # M$S  - List of (minimal) penalty matrices
 # M$off - used for unpacking M$S
-# M$sp - array of theta_i's 
+# M$sp - array of theta_i's
+# M$active - currently active constraints - i.e. those for
+#            which Ain p = bin. Must not be >= length(p)
+#            - typically used when calling sequentially
 # Ain, bin and p are not in the object needed to call mgcv....
 #
 { nar<-c(length(M$y),length(M$p),dim(M$Ain)[1],dim(M$C)[1])
@@ -107,13 +203,19 @@ pcls <- function(M)
   if (nrow(M$Ain)>0) {
     if (ncol(M$Ain)!=nar[2]) stop("nrow(M$Ain) != length(M$p)") 
     res <- as.numeric(M$Ain%*%M$p) - as.numeric(M$bin)
-    if (sum(res<0)>0) stop("initial parameters not feasible")
-    res <- abs(res)
-    if (sum(res<.Machine$double.eps^.5)>0) 
-      warning("initial point very close to some inequality constraints")
-    res <- mean(res)
-    if (res<.Machine$double.eps^.5) 
-      warning("initial parameters very close to inequality constraints")
+    if (min(res)< -max(c(abs(M$bin),norm(M$Ain,"M")))*.Machine$double.eps^.8) stop("initial parameters not feasible")
+
+    if (is.null(M$active)||length(M$active)==0||M$active[1]==0) {
+      res <- abs(res)
+      if (sum(res<.Machine$double.eps^.5)>0) 
+        warning("initial point very close to some inequality constraints")
+      res <- mean(res)
+      if (res<.Machine$double.eps^.5) 
+        warning("initial parameters very close to inequality constraints")
+    }	
+  } else { ## dummy constraint
+    M$Ain <- numeric(nar[2])
+    M$bin <- -1; nar[3] <- 1
   }
   
   if (nrow(M$C)>0) if (ncol(M$C)!=nar[2]) stop("ncol(M$C) != length(M$p)")  
@@ -130,10 +232,10 @@ pcls <- function(M)
     if (M$off[i]+df[i]-1>nar[2]) stop(gettextf("M$S[%d] is too large given M$off[%d]", i, i))
   }
   qra.exist <- FALSE
-  if (ncol(M$X)>nrow(M$X)) {
+  if (ncol(M$X)>nrow(M$X)) { ## p>n branch
     if (m>0) stop("Penalized model matrix must have no more columns than rows") 
     else { ## absorb M$C constraints
-      qra <- qr(t(M$C))
+      qra <- qr(t(M$C)) ## note only absorbed in p>n case
       j <- nrow(M$C);k <- ncol(M$X)
       M$X <- t(qr.qty(qra,t(M$X))[(j+1):k,])
       M$Ain <- t(qr.qty(qra,t(M$Ain))[(j+1):k,])
@@ -144,11 +246,17 @@ pcls <- function(M)
       if  (ncol(M$X)>nrow(M$X)) stop("Model matrix not full column rank")
     }
   }
+  active <- integer(length(M$p)+1)
+  if (!is.null(M$active)&&length(M$active>0)&&M$active[1]>1) {
+    active[1] <- length(M$active);active[1:length(M$active)+1] <- M$active
+    if (active[1]>=length(M$p)) stop("too many active constraints!")
+  }  
   o<-.C(C_RPCLS,as.double(M$X),as.double(M$p),as.double(M$y),as.double(M$w),as.double(M$Ain),as.double(M$bin)
         ,as.double(M$C),as.double(Sa),as.integer(M$off),as.integer(df),as.double(M$sp),
-        as.integer(length(M$off)),as.integer(nar))
+        as.integer(length(M$off)),as.integer(nar),active=active)
   p <- array(o[[2]],length(M$p))
   if (qra.exist) p <- qr.qy(qra,c(rep(0,j),p))
+  attr(p,"active") <- if (o$active[1]>0) o$active[1:o$active[1]+1]+1 else integer(0) ## the active set
   p
 } ## pcls
 
@@ -304,6 +412,8 @@ interpret.gam0 <- function(gf,textra=NULL,extra.special=NULL)
   }
   fake.formula <- as.formula(fake.formula,p.env)
   if (length(av)) {
+    ## need original variable names (without any transforms) for checking purposes
+    ## when predicting. This facilitates...
     pred.formula <- as.formula(paste("~",paste(av,collapse="+")))
     pav <- all.vars(pred.formula) ## trick to strip out 'offset(x)' etc...
     pred.formula <- reformulate(pav,env=p.env) 
@@ -422,29 +532,35 @@ fixDependence <- function(X1,X2,tol=.Machine$double.eps^.5,rank.def=0,strict=FAL
 } ## fixDependence
 
 
-augment.smX <- function(sm,nobs,np) {
+augment.smX <- function(sm,nobs,np,nc) {
 ## augments a smooth model matrix with a square root penalty matrix for
 ## identifiability constraint purposes.
   ns <- length(sm$S) ## number of penalty matrices
-  if (ns==0) { ## nothing to do
+  nco <- if (is.null(sm$C)||!is.matrix(sm$C)) 0 else nrow(sm$C)
+  if (ns==0&&nc==0) { ## nothing to do
     return(rbind(sm$X,matrix(0,np,ncol(sm$X))))
   }
-  ind <- colMeans(abs(sm$S[[1]]))!=0
-  sqrmaX  <- mean(abs(sm$X[,ind]))^2
-  alpha <- sqrmaX/mean(abs(sm$S[[1]][ind,ind]))
-  St <- sm$S[[1]]*alpha
-  if (ns>1) for (i in 2:ns) { 
-    ind <- colMeans(abs(sm$S[[i]]))!=0
-    alpha <- sqrmaX/mean(abs(sm$S[[i]][ind,ind]))
-    St <- St +  sm$S[[i]]*alpha
+  if (ns) {
+    ind <- colMeans(abs(sm$S[[1]]))!=0
+    sqrmaX  <- mean(abs(sm$X[,ind]))^2
+    alpha <- sqrmaX/mean(abs(sm$S[[1]][ind,ind]))
+    St <- sm$S[[1]]*alpha
+    if (ns>1) for (i in 2:ns) { 
+      ind <- colMeans(abs(sm$S[[i]]))!=0
+      alpha <- sqrmaX/mean(abs(sm$S[[i]][ind,ind]))
+      St <- St +  sm$S[[i]]*alpha
+    }
+    rS <- mroot(St,rank=ncol(St)) ## get sqrt of penalty
+    X <- rbind(sm$X,matrix(0,np+nc,ncol(sm$X))) ## create augmented model matrix
+    X[nobs+sm$p.ind,] <- t(rS) ## add in
   }
-  rS <- mroot(St,rank=ncol(St)) ## get sqrt of penalty
-  X <- rbind(sm$X,matrix(0,np,ncol(sm$X))) ## create augmented model matrix
-  X[nobs+sm$p.ind,] <- t(rS) ## add in 
+  if (nco) {
+    X[nobs+np+1:nco,] <- sm$C/norm(sm$C)
+  }
   X ## scaled augmented model matrix
 } ## augment.smX
 
-gam.side <- function(sm,Xp,tol=.Machine$double.eps^.5,with.pen=FALSE)
+gam.side <- function(sm,Xp,tol=.Machine$double.eps^.5,with.pen=TRUE)
 # works through a list of smooths, sm, aiming to identify nested or partially
 # nested terms, and impose identifiability constraints on them.
 # Xp is the parametric model matrix. It is needed in order to check whether
@@ -509,11 +625,12 @@ gam.side <- function(sm,Xp,tol=.Machine$double.eps^.5,with.pen=FALSE)
   ## Now set things up to enable term specific model matrices to be
   ## augmented with square root penalties, on the fly...
   if (with.pen) {
-    k <- 1
+    k <- 1; nc <- 0
     for (i in 1:m) { ## create parameter indices for each term
       k1 <- k + ncol(sm[[i]]$X) - 1
       sm[[i]]$p.ind <- k:k1
       k <- k1 + 1
+      if (!is.null(sm[[i]]$C)&&is.matrix(sm[[i]]$C)) nc <- max(nrow(sm[[i]]$C),nc) ## largest constraint
     }
     np <- k-1 ## number of penalized parameters
   }
@@ -522,8 +639,10 @@ gam.side <- function(sm,Xp,tol=.Machine$double.eps^.5,with.pen=FALSE)
   for (d in 1:maxDim) { ## work up through dimensions 
     for (i in 1:m) { ## work through smooths
       if (sm[[i]]$dim == d&&sm[[i]]$side.constrain) { ## check for nesting
-        if (with.pen) X1 <- matrix(c(rep(1,nobs),rep(0,np)),nobs+np,as.integer(intercept)) else
-        X1 <- matrix(1,nobs,as.integer(intercept))
+        if (with.pen) {
+	  X1 <- if (intercept) matrix(c(rep(1,nobs),rep(0,np+nc)),nobs+np+nc,1) else
+	                       matrix(0,nobs+np+nc,0)
+	} else X1 <- matrix(1,nobs,as.integer(intercept))
 	X1comp <- rep(0,0) ## list of components of X1 to avoid duplication
         for (j in 1:d) { ## work through variables
           b <- sm.id[[sm[[i]]$vn[j]]] # list of smooths dependent on this variable
@@ -531,24 +650,24 @@ gam.side <- function(sm,Xp,tol=.Machine$double.eps^.5,with.pen=FALSE)
           if (k>1) for (l in 1:(k-1)) if (!b[l] %in% X1comp) { ## collect X columns
            X1comp <- c(X1comp,b[l]) ## keep track of components to avoid adding same one twice
            if (with.pen) { ## need to use augmented model matrix in testing 
-              if (is.null(sm[[b[l]]]$Xa)) sm[[b[l]]]$Xa <- augment.smX(sm[[b[l]]],nobs,np)
+              if (is.null(sm[[b[l]]]$Xa)) sm[[b[l]]]$Xa <- augment.smX(sm[[b[l]]],nobs,np,nc)
               X1 <- cbind(X1,sm[[b[l]]]$Xa)
             } else X1 <- cbind(X1,sm[[b[l]]]$X) ## penalties not considered
           }
         } ## Now X1 contains columns for all lower dimensional terms
         if (ncol(X1)==as.integer(intercept)) ind <- NULL else {
           if (with.pen) {
-             if (is.null(sm[[i]]$Xa)) sm[[i]]$Xa <- augment.smX(sm[[i]],nobs,np)
+             if (is.null(sm[[i]]$Xa)) sm[[i]]$Xa <- augment.smX(sm[[i]],nobs,np,nc)
              ind <- fixDependence(X1,sm[[i]]$Xa,tol=tol) 
           } else ind <- fixDependence(X1,sm[[i]]$X,tol=tol)        
         }
         ## ... the columns to zero to ensure independence
         if (!is.null(ind)) { 
-          sm[[i]]$X <- sm[[i]]$X[,-ind]
+          sm[[i]]$X <- sm[[i]]$X[,-ind,drop=FALSE]
           ## work through list of penalty matrices, applying constraints...
           nsmS <- length(sm[[i]]$S)
           if (nsmS>0) for (j in nsmS:1) { ## working down so that dropping is painless
-            sm[[i]]$S[[j]] <- sm[[i]]$S[[j]][-ind,-ind]
+            sm[[i]]$S[[j]] <- sm[[i]]$S[[j]][-ind,-ind,drop=FALSE]
             if (sum(sm[[i]]$S[[j]]!=0)==0) rank <- 0 else
             rank <- qr(sm[[i]]$S[[j]],tol=tol,LAPACK=FALSE)$rank
             sm[[i]]$rank[j] <- rank ## replace previous rank with new rank
@@ -569,13 +688,18 @@ gam.side <- function(sm,Xp,tol=.Machine$double.eps^.5,with.pen=FALSE)
             sm[[i]]$null.space.dim <- sum(es$values<max(es$values)*.Machine$double.eps^.75) 
           } ## rank found
 
+          ## deal with any constraints (e.g. when not pre-absorbed)
+	  if (!is.null(sm[[i]]$C)) sm[[i]]$C <- sm[[i]]$C[,-ind,drop=FALSE]
+	  if (!is.null(sm[[i]]$Ain)) sm[[i]]$Ain <- sm[[i]]$Ain[,-ind,drop=FALSE]
+
           if (!is.null(sm[[i]]$L)) {
             ind <- as.numeric(colSums(sm[[i]]$L!=0))!=0
             sm[[i]]$L <- sm[[i]]$L[,ind,drop=FALSE] ## retain only those sps that influence something!
           }
 
           sm[[i]]$df <- ncol(sm[[i]]$X)
-          attr(sm[[i]],"del.index") <- ind
+	  ind0 <- attr(sm[[i]],"del.index")
+          attr(sm[[i]],"del.index") <- c(ind0,ind)
           ## Now deal with case in which prediction constraints differ from fit constraints
           if (!is.null(sm[[i]]$Xp)) { ## need to get deletion indices under prediction parameterization
             ## Note that: i) it doesn't matter what the identifiability con on X1 is
@@ -584,11 +708,11 @@ gam.side <- function(sm,Xp,tol=.Machine$double.eps^.5,with.pen=FALSE)
               smi <- sm[[i]]  ## clone smooth 
               smi$X <- smi$Xp ## copy prediction Xp to X slot.
               smi$S <- smi$Sp ## and make sure penalty parameterization matches. 
-              Xpa <- augment.smX(smi,nobs,np)
+              Xpa <- augment.smX(smi,nobs,np,nc)
               ind <- fixDependence(X1,Xpa,rank.def=length(ind)) 
             } else ind <- fixDependence(X1,sm[[i]]$Xp,rank.def=length(ind)) 
             sm[[i]]$Xp <- sm[[i]]$Xp[,-ind,drop=FALSE]
-            attr(sm[[i]],"del.index") <- ind ## over-writes original
+            attr(sm[[i]],"del.index") <- c(ind0,ind) ## over-writes original
           }
         }
         sm[[i]]$vn <- NULL
@@ -803,7 +927,7 @@ gam.setup.list <- function(formula,pterms,
 ## key difference to gam.setup is an attribute to the model matrix, "lpi", which is a list
 ## of column indices for each linear predictor 
   if (!is.null(paraPen)) stop("paraPen not supported for multi-formula models")
-  if (!absorb.cons) stop("absorb.cons must be TRUE for multi-formula models")
+#  if (!absorb.cons) stop("absorb.cons must be TRUE for multi-formula models")
   d <- length(pterms) ## number of formulae
   if (is.null(drop.intercept)) drop.intercept <- rep(FALSE, d)
   if (length(drop.intercept) != d) stop("length(drop.intercept) should be equal to number of model formulas")
@@ -864,7 +988,21 @@ gam.setup.list <- function(formula,pterms,
     G$assign[[i]] <- um$assign
     G$rank <- c(G$rank,um$rank)
     pstart[i] <- pof+1
+
+    if (!is.null(um$C)||!is.null(G$C)) { ## extend any constraint matrix
+      if (is.null(G$C)) {
+        G$C <- matrix(0,0,ncol(G$X)); G$d <- numeric(0)
+      }	
+      if (is.null(um$C)) { 
+        um$C <- matrix(0,0,ncol(um$X)); um$d <- numeric(0)
+      }	
+      G$C <- rbind(cbind(G$C,matrix(0,nrow(G$C),ncol(um$C))),
+                   cbind(matrix(0,nrow(um$C),ncol(G$C)),um$C))
+      G$d <- c(G$d,um$d)		   
+    }
+    
     G$X <- cbind(G$X,um$X) ## extend model matrix
+    
     ## deal with the smooths...
     k <- G$m
     if (um$m) for (j in 1:um$m) {
@@ -883,6 +1021,7 @@ gam.setup.list <- function(formula,pterms,
       G$L <- rbind(cbind(G$L,matrix(0,nrow(G$L),ncol(um$L))),cbind(matrix(0,nrow(um$L),ncol(G$L)),um$L))
     }
 
+ 
     G$off <- c(G$off,um$off+pof)
     if (M) for (j in 1:M) {
       ks <- ks + 1
@@ -913,7 +1052,8 @@ gam.setup.list <- function(formula,pterms,
     rt <- olid(G$X,G$nsdf,pstart,flpi,lpi)
     if (length(rt$dind)>0) { ## then columns have to be dropped
       warning("dropping unidentifiable parametric terms from model",call.=FALSE)
-      G$X <- G$X[,-rt$dind] ## drop cols 
+      G$X <- G$X[,-rt$dind,drop=FALSE] ## drop cols
+      if (!is.null(G$C)) G$C <- G$C[,-rt$dind,drop=FALSE]
       G$cmX <- G$cmX[-rt$dind]
       G$term.names <- G$term.names[-rt$dind]
       ## adjust indexing in smooth list, noting that coefs of smooths 
@@ -1336,6 +1476,7 @@ gam.setup <- function(formula,pterms,
       k.sp <- k.sp+1
       G$off[k.sp] <- sm$first.para 
       G$S[[k.sp]] <- sm$S[[j]]
+      if (!is.null(sm$C)) attr(G$S[[k.sp]],"C") <- sm$C 
       G$rank[k.sp]<-sm$rank[j]
       if (!is.null(min.sp)) {
         if (is.null(H)) H<-matrix(0,n.p,n.p)
@@ -1396,15 +1537,16 @@ gam.setup <- function(formula,pterms,
   names(G$lsp0) <- lsp.names ## names of all smoothing parameters (not just underlying)
 
   if (absorb.cons==FALSE) {  ## need to accumulate constraints 
-    G$C <- matrix(0,0,n.p)
+    G$C <- matrix(0,0,n.p); G$d <- numeric(0)
     if (m>0) {
       for (i in 1:m) {
-        if (is.null(G$smooth[[i]]$C)) n.con<-0 
-        else n.con<- nrow(G$smooth[[i]]$C)
+        n.con <- if (is.null(G$smooth[[i]]$C)) 0 else nrow(G$smooth[[i]]$C)
         C <- matrix(0,n.con,n.p)
-        C[,G$smooth[[i]]$first.para:G$smooth[[i]]$last.para]<-G$smooth[[i]]$C
+        C[,G$smooth[[i]]$first.para:G$smooth[[i]]$last.para] <- G$smooth[[i]]$C
         G$C <- rbind(G$C,C)
-        G$smooth[[i]]$C <- NULL
+	dd <- if (is.null(G$smooth[[i]]$d)) numeric(n.con) else G$smooth[[i]]$d
+	G$d <- c(G$d,dd)
+        G$smooth[[i]]$d <- G$smooth[[i]]$C <- NULL
       }
       rm(C)
     }
@@ -1474,26 +1616,6 @@ corBC <- function(lambda,y,mu) {
   -cor(qn,sort(BC(y,lambda)-BC(mu,lambda)))
 }
 
-neico4 <- function(nei,dd,dd1) {
-## nei is neighbourhood structure. dd are leave one out perturbations.
-## dd1 the same for a different residual
-## This routine computes the most basic covariance
-## matrix estimate, based on observed correlation within neighbourhoods
-## and assumption of zero correlation without. Somehow it is a testement
-## to my extreme slowness that it took me 6 months to come up with this
-## skull-thumpingly obvious solution having tried every other hare brained
-## scheme first.
-  n <- length(nei$i)
-  i1 <- 0
-  W <- dd*0 ## dbeta/dy (y-mu)
-  for (i in 1:n) {
-    i0 <- i1+1
-    i1 <- nei$m[i]
-    ii <- nei$k[i0:i1] ## neighbours of i
-    W[nei$i[i],] <-  W[nei$i[i],] + colSums(dd[ii,,drop=FALSE]) 
-  }
-  V <- t(dd1)%*%W
-} ## neico4
 
 pdef <- function(V,eps = .Machine$double.eps^.9) {
 ## find nearest pdf matrix to symmetric matrix V
@@ -1607,8 +1729,8 @@ gam.outer <- function(lsp,fscale,family,control,method,optimizer,criterion,scale
 
   object[names(mv)] <- mv
   if (!is.null(nei)) {
-    if (isTRUE(all.equal(sort(nei$i),1:nrow(G$X))) && length(nei$mi)==nrow(G$X) && criterion=="NCV") { ## each point predicted on its own
-      loocv <- length(nei$k)==length(nei$i) && isTRUE(all.equal(nei$i,nei$k)) && length(nei$m) == length(nei$k) ## leave one out CV,
+    if (isTRUE(all.equal(sort(nei$d),1:nrow(G$X))) && length(nei$md)==nrow(G$X) && criterion=="NCV") { ## each point predicted on its own
+      loocv <- length(nei$a)==length(nei$d) && isTRUE(all.equal(nei$d,nei$a)) && length(nei$ma) == length(nei$a) ## leave one out CV,
       if (is.logical(nei$jackknife)&&nei$jackknife) loocv <- TRUE ## straight jackknife requested
       if (nei$jackknife < 0) nei$jackknife <- TRUE ## signal cov matrix calc
     } else {
@@ -1624,8 +1746,8 @@ gam.outer <- function(lsp,fscale,family,control,method,optimizer,criterion,scale
     if (is.null(nei$gamma)) nei$gamma <- 1 ## a major application of this NCV is to select gamma - so it must not itself change with gamma!
     if (criterion!="NCV") nei$jackknife <- FALSE ## no cov matrix stuff.
     if (nei$jackknife) {
-      n <- length(nei$i)
-      nei1 <- if (loocv) nei else list(i=1:n,mi=1:n,m=1:n,k=1:n) ## set up for LOO CV or requested straight jackknife
+      n <- length(nei$d)
+      nei1 <- if (loocv) nei else list(d=1:n,md=1:n,ma=1:n,a=1:n) ## set up for LOO CV or requested straight jackknife
       nei1$jackknife <- 10 ## signal that cross-validated beta perturbations are required
     } else nei1 <- nei ## called with another criteria
     b <- gam.fit3(x=G$X, y=G$y, sp=lsp,Eb=G$Eb,UrS=G$UrS,
@@ -1648,21 +1770,52 @@ gam.outer <- function(lsp,fscale,family,control,method,optimizer,criterion,scale
                 family$linfo[[j]]$linkinv(eta.cv[,j])
           }	
         } else {
-          object$fitted.values <- object$family$linkinv(eta.cv+G$offset)
+          object$fitted.values <- object$family$linkinv(eta.cv+G$offset) 
         }
-        rsd <- residuals.gam(object)
-        object$fitted.values <- fitted0
-        ii <- !is.finite(rsd);if (any(ii)) rsd[ii] <- rsd0[ii]
-        dd1 <- dd*rsd/rsd0 ## correct to avoid underestimation (over-estimation if CV residuals used alone)	
+        rsd1 <- residuals.gam(object) ## CV residuals
+	ii <- !is.finite(rsd1);if (any(ii)) rsd1[ii] <- rsd0[ii]
 
-        Vcv <- pdef(neicov(dd1,nei))  #*n/(n-sum(object$edf)) ## cross validated V (too large)
-	V0 <- pdef(neicov(dd,nei))  #*n/(n-sum(object$edf))   ## direct V (too small)
-	Vj <- (Vcv+V0)/2       ## combination less bad
-	alpha <- max(sum(diag(Vj))/sum(diag(object$Ve)),1) ## inverse learning rate - does lower limit make sense? 
-	alpha1 <- max(sum(Vj*object$Ve)/sum(object$Ve^2),1)
-	Vcv <- Vcv + (object$Vp-object$Ve)*alpha1 ## bias correct conservative (too large)
-	Vj <- Vj + (object$Vp-object$Ve)*alpha ## bias correct
-	attr(Vj,"Vcv") <- Vcv ## conservative as attribute
+        if (FALSE) {
+	## version based on estimating correction factors for Vj. Not as well founded as current version.
+        ## adaptive weighting to avoid underestimating mu error, while accounting for higher variance in
+	## cv mu relative to mu...
+        alpha <- 0.4 ## half way between full shrinkage compensation (.3) and none (.5)  
+      
+	mu.err <- (1-alpha)*(rsd0-rsd1)
+	#rsd <- alpha*rsd0 + (1-alpha)*rsd1
+        object$fitted.values <- fitted0
+
+        V0 <- neicov(dd,nei=nei)    ## direct V (too small)
+	dd0 <- dd*mu.err/rsd0
+	
+        V0 <- V0 - neicov(dd,dd0,nei)-neicov(dd0,dd,nei)
+        #dd0 <- dd*(rsd0-rsd)/rsd0
+        V0 <- V0+neicov(dd0,dd0,nei)
+        Vj <- V0
+	## get nearest +ve def matrix
+        ev <- eigen(Vj)
+        mev <- mean(ev$values)
+        ev$values[ev$values<0] <- 0
+	#if (mev>0) ev$values <- ev$values*mev/mean(ev$values)
+	V0 <- sqrt(ev$values)*t(ev$vectors);
+	Vj <- crossprod(V0) *n/(n-sum(object$edf))
+        }
+	
+        Vj <- neicov(dd,nei=nei)*n/(n-sum(object$edf)) ## estimate based on raw residuals
+        rat <- rsd1/rsd0; rat[!is.finite(rat)] <- 1
+        Vcv <- neicov(dd*rat,nei=nei)*n/(n-sum(object$edf)) ## based on cross validated resdiduals
+	ev <- eigen(Vj,symmetric=TRUE,only.values=TRUE)$values 
+        trVj <- sum(ev[ev>0]) # trace of closest pdef matrix if Vj not pdef
+	alpha <- max(trVj/sum(diag(object$Ve)),1) ## inverse learning rate (conservative Vj)
+	#alpha1 <- sum(Vj*object$Ve)/sum(object$Ve^2) ## LS version - little difference
+	Vj <- Vcv + (object$Vp-object$Ve)*alpha ## bias correct conservative (too large)
+	#Vj <- Vj + (object$Vp-object$Ve)*alpha ## bias correct
+	ev <- eigen(Vj,symmetric=TRUE)
+	if (any(ev$values<0)) { ## find closest pdef matrix
+	  ev$values[ev$values<0] <- 0
+	  Vj <- crossprod(sqrt(ev$values)*t(ev$vectors))
+	}
+	#attr(Vj,"Vcv") <- Vcv ## conservative as attribute
       } else { ## LOO or straight jackknife requested
         Vj <- pdef(crossprod(dd)) ## straight jackknife is fine.
 	alpha <- sum(diag(Vj))/sum(diag(object$Ve)) ## inverse learning rate (do not impose lower limit)
@@ -1704,7 +1857,7 @@ get.null.coef <- function(G,start=NULL,etastart=NULL,mustart=NULL,...) {
   ##start <- etastart <- mustart <- NULL
   family <- G$family
   eval(family$initialize) ## have to do this to ensure y numeric
-  y <- as.numeric(y)
+  #y <- as.numeric(y)
   mum <- mean(y)+0*y
   etam <- family$linkfun(mum)
   null.coef <- qr.coef(qr(G$X),etam)
@@ -1722,14 +1875,14 @@ estimate.gam <- function (G,method,optimizer,control,in.out,scale,gamma,start=NU
   if (method %in% c("QNCV","NCV")||!is.null(nei)) {
     optimizer <- c("outer","bfgs")
     if (method=="QNCV") { method <- "NCV";G$family$qapprox <- TRUE } else G$family$qapprox <- FALSE
-    if (is.null(nei)) nei <- list(i=1:G$n,mi=1:G$n,m=1:G$n,k=1:G$n) ## LOOCV
-    if (is.null(nei$k)||is.null(nei$m)) nei$k <- nei$m <- nei$mi <- nei$i <- 1:G$n 
-    if (is.null(nei$i)) if (length(nei$m)==G$n) nei$mi <- nei$i <- 1:G$n else stop("unclear which points NCV neighbourhoods belong to")
-    if (length(nei$mi)!=length(nei$m)) stop("for NCV number of dropped and predicted neighbourhoods must match")
-    nei$m <- round(nei$m); nei$mi <- round(nei$mi); nei$k <- round(nei$k); nei$i <- round(nei$i); 
-    if (min(nei$i)<1||max(nei$i>G$n)||min(nei$k)<1||max(nei$k>G$n)) stop("nei indexes non-existent points")
-    if (nei$m[1]<1||max(nei$m)>length(nei$k)||length(nei$m)<2||any(diff(nei$m)<1)) stop('nei$m faulty')
-    if (nei$mi[1]<1||max(nei$mi)>length(nei$i)||length(nei$mi)<2||any(diff(nei$mi)<1)) stop('nei$mi faulty')
+    if (is.null(nei)) nei <- list(d=1:G$n,md=1:G$n,ma=1:G$n,a=1:G$n) ## LOOCV
+    if (is.null(nei$a)||is.null(nei$ma)) nei$a <- nei$ma <- nei$md <- nei$d <- 1:G$n 
+    if (is.null(nei$d)) if (length(nei$ma)==G$n) nei$md <- nei$d <- 1:G$n else stop("unclear which points NCV neighbourhoods belong to")
+    if (length(nei$md)!=length(nei$ma)) stop("for NCV number of dropped and predicted neighbourhoods must match")
+    nei$ma <- round(nei$ma); nei$md <- round(nei$md); nei$a <- round(nei$a); nei$d <- round(nei$d); 
+    if (min(nei$d)<1||max(nei$d>G$n)||min(nei$a)<1||max(nei$a>G$n)) stop("nei indexes non-existent points")
+    if (nei$ma[1]<1||max(nei$ma)>length(nei$a)||length(nei$ma)<2||any(diff(nei$ma)<1)) stop('nei$ma faulty')
+    if (nei$md[1]<1||max(nei$md)>length(nei$d)||length(nei$md)<2||any(diff(nei$md)<1)) stop('nei$md faulty')
     if (is.null(nei$jackknife)) nei$jackknife <- -1
   }  
 
@@ -1840,9 +1993,8 @@ estimate.gam <- function (G,method,optimizer,control,in.out,scale,gamma,start=NU
     }
   }
 
-  if (length(G$sp)>0) lsp2 <- log(initial.spg(G$X,G$y,G$w,G$family,G$S,G$rank,G$off,
-                                  offset=G$offset,L=G$L,lsp0=G$lsp0,E=G$Eb,...))
-  else lsp2 <- rep(0,0)
+  lsp2 <- if (length(G$sp)>0) log(initial.spg(G$X,G$y,G$w,G$family,G$S,G$rank,G$off,
+                       offset=G$offset,L=G$L,lsp0=G$lsp0,E=G$Eb,...))  else rep(0,0)
 
   if (!outer.looping) { ## additive GCV/UBRE
     object <- am.fit(G,control=control,gamma=gamma,...)
@@ -2022,27 +2174,63 @@ nanei <- function(nb,k) {
 ## this function adjusts nb to remove the dropped points and adjust the
 ## indices accordingly, so that the structure works with a data frame
 ## from which rows in k have been dropped.
+## A problem is that if a whole prediction/omission fold is dropped then
+## the corresponding omission/prediction fold must be dropped too. 
   if (!length(k)) return()
-  if (is.null(nb$k)||is.null(nb$m)||is.null(nb$mi)||is.null(nb$i)) stop("full nei list needed if data incomplete")
-  ## first work on dropped folds...
-  kk <- which(nb$k %in% k) ## position of dropped in nb$k
-  ## adjust m for the fact that points are to be dropped...
-  nb$m <- nb$m - cumsum(tabulate(findInterval(kk-1,nb$m)+1,nbins=length(nb$m)))
-  ii <- which(diff(c(0,nb$m))==0) ## identify zero length folds
-  if (length(ii)) nb$m <- nb$m[-ii] ## drop zero length folds
-  nb$k <- nb$k[-kk] ## drop the elements of k
-  nb$k <- nb$k - findInterval(nb$k,sort(k)) ## and shift indices to account for dropped
+  if (is.null(nb$a)||is.null(nb$ma)||is.null(nb$md)||is.null(nb$d)) stop("full nei list needed if data incomplete")
 
-  ## now the prediction folds...
-  kk <- which(nb$i %in% k) ## position of dropped in nb$i
-  ## adjust mi for the fact that points are to be dropped...
-  nb$mi <- nb$mi - cumsum(tabulate(findInterval(kk-1,nb$mi)+1,nbins=length(nb$m)))
-  ii <- which(diff(c(0,nb$mi))==0) ## identify zero length folds
-  if (length(ii)) nb$mi <- nb$mi[-ii] ## drop zero length folds
-  nb$i <- nb$i[-kk] ## drop the elements of k
-  nb$i <- nb$i - findInterval(nb$i,sort(k)) ## and shift indices to account for dropped
+  ## first work on drop-folds...
+  kk <- which(nb$a %in% k) ## position of omitted in nb$a
+  ## adjust ma for the fact that points are to be omitted...
+  m <- nb$ma - cumsum(tabulate(findInterval(kk-1,nb$ma)+1,nbins=length(nb$ma)))
+  mdi <- which(diff(c(0,m))==0) ## identify zero length folds to omit entirely
+
+  ## now get elements of nb$d to omit from pred-folds because some drop-folds omitted entirely from k...
+  mm <- nb$md
+  i0 <- if (length(mdi)) unlist(apply(array(mdi),1,function(mdi) (c(0,mm)[mdi]+1):c(0,mm)[mdi+1] ,simplify=TRUE)) else rep(0,0)
+
+  ## now the pred-folds...
+  ii <- unique(c(i0,which(nb$d %in% k))) ## position of omitted in nb$i
+  ## adjust mi for the fact that points are to be omitted...
+  mi <- nb$md - cumsum(tabulate(findInterval(ii-1,nb$md)+1,nbins=length(nb$ma)))
+  midi <- which(diff(c(0,mi))==0) ## identify zero length folds
+
+  ## Now once more through drop-folds folds to omit because pred-fold omitted
+  mm <- nb$ma
+  k0 <- if (length(midi)) unlist(apply(array(midi),1,function(mdi) (c(0,mm)[mdi]+1):c(0,mm)[mdi+1] ,simplify=TRUE)) else rep(0,0)
+  kk <- unique(c(k0,kk)) ## all points to omit from drop-folds
+  m <- nb$ma - cumsum(tabulate(findInterval(kk-1,nb$ma)+1,nbins=length(nb$ma)))
+  mdi <- which(diff(c(0,m))==0) ## identify zero length folds to omit entirely
+
+  
+  if (length(mdi)) nb$ma <- m[-mdi] ## omit zero length folds
+  nb$a <- nb$a[-kk] ## omit the elements of k
+  nb$a <- nb$a - findInterval(nb$a,sort(k)) ## and shift indices to account for omitted
+
+  if (length(midi)) nb$md <- mi[-midi] ## omit zero length folds
+  nb$d <- nb$d[-ii] ## omit the elements of i
+  nb$d <- nb$d - findInterval(nb$d,sort(k)) ## and shift indices to account for omitted
   nb 
 } ## nanei
+
+
+onei <- function(nb,cbase=FALSE) {
+## orders the neighbourhood indices into ascending order within each neighbourhood.
+## this makes some matching tasks easier especially for bam.
+  if (is.null(nb$a)||is.null(nb$ma)) return() ## LOOCV - nothing to do
+  nn <- length(nb$ma) ## number of neighbourhoods
+  b <- rep(1:nn,times=diff(c(0,nb$ma))) ## neighbourhood indices/labels
+  nb$a <- nb$a[order(b,nb$a)] ## order drop indices within neighbourhood.
+  if (!is.null(nb$md)) {
+    b <- rep(1:nn,times=diff(c(0,nb$md))) ## neighbourhood indices/labels
+    nb$d <- nb$d[order(b,nb$d)] ## order predict indices within neighbourhood.
+  }
+  if (cbase) {
+    nb$a <- as.integer(nb$a) - 1L; nb$d <-  as.integer(nb$d) - 1L
+    nb$ma <-  as.integer(nb$ma) - 1L; nb$md <-  as.integer(nb$md) - 1L
+  }
+  nb
+} ## onei
 
 ## don't be tempted to change to control=list(...) --- messes up passing on other stuff via ...
 
@@ -2946,23 +3134,31 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
 
   if (new.data.ok) {
     ## check factor levels are right ...
-    names(newdata)->nn # new data names
-    colnames(object$model)->mn # original names
+    names(newdata) -> nn # new data names
+    colnames(object$model) -> mn # original names
     for (i in 1:length(newdata)) 
     if (nn[i]%in%mn && is.factor(object$model[,nn[i]])) { # then so should newdata[[i]] be 
       levm <- levels(object$model[,nn[i]]) ## original levels
-      ## need to avoid dropping NAs if they are a factor level in origianl model
+      ## need to avoid dropping NAs if they are a factor level in original model
       levn <- if (any(is.na(levm))) levels(factor(newdata[[i]],exclude=NULL)) else levels(factor(newdata[[i]])) ## new levels
       if (sum(!levn%in%levm)>0) { ## check not trying to sneak in new levels 
         msg <- paste("factor levels",paste(levn[!levn%in%levm],collapse=", "),"not in original fit",collapse="")
         warning(msg)
-      }
+	xlev <- !(newdata[[i]] %in% levm) & !is.na(newdata[[i]]) ## attribute marking extra (non-NA) levels in factor 
+      } else xlev <- NULL
       ## set prediction levels to fit levels...
       if (is.matrix(newdata[[i]])) {
         dum <- factor(newdata[[i]],levels=levm,exclude=NULL)
 	dim(dum) <- dim(newdata[[i]])
 	newdata[[i]] <- dum
-      } else newdata[[i]] <- factor(newdata[[i]],levels=levm,exclude=NULL)
+	if (!is.null(xlev)) {
+	  dim(xlev) <- dim(dum)
+	  attr(newdata[[i]],"xlev") <- xlev
+	}  
+      } else {
+        newdata[[i]] <- factor(newdata[[i]],levels=levm,exclude=NULL)
+	if (!is.null(xlev)) attr(newdata[[i]],"xlev") <- xlev ## not used in this routine
+      }
     }
     if (type=="newdata") return(newdata)
 
@@ -4044,7 +4240,6 @@ summary.gam <- function (object, dispersion = NULL, freq = FALSE,re.test = TRUE,
       if (!fx&&object$smooth[[i]]$null.space.dim==0&&!is.null(object$R)) { ## random effect or fully penalized term
         res <- if (re.test) reTest(object,i) else NULL
       } else { ## Inverted Nychka interval statistics
-       
         if (est.disp) rdf <- residual.df else rdf <- -1
         res <- testStat(p,Xt,V,min(ncol(Xt),edf1i),type=0,res.df = rdf)
       }
@@ -4112,7 +4307,8 @@ print.summary.gam <- function(x, digits = max(3, getOption("digits") - 3),
   if (!is.null(x$r.sq)) cat("R-sq.(adj) = ",formatC(x$r.sq,digits=3,width=5),"  ")
   if (length(x$dev.expl)>0) cat("Deviance explained = ",formatC(x$dev.expl*100,digits=3,width=4),"%",sep="")
   cat("\n")
-  if (!is.null(x$method)&&!(x$method%in%c("PQL","lme.ML","lme.REML")))  
+  if ((!is.null(x$sp.criterion)&&!is.na(x$sp.criterion)) &&
+      !is.null(x$method) && !(x$method%in%c("PQL","lme.ML","lme.REML")))  
     cat(x$method," = ",formatC(x$sp.criterion,digits=5),sep="")
  
   cat("  Scale est. = ",formatC(x$scale,digits=5,width=8,flag="-"),"  n = ",x$n,"\n",sep="")
@@ -4283,7 +4479,8 @@ gam.vcomp <- function(x,rescale=TRUE,conf.lev=.95) {
       if (ok) { 
        if (length(x$smooth[[i]]$S.scale)!=length(x$smooth[[i]]$S))
          warning("S.scale vector doesn't match S list - please report to maintainer")
-        for (j in 1:length(x$smooth[[i]]$S.scale)) {
+	n.s <- length(x$smooth[[i]]$S.scale)
+        if (n.s>0) for (j in 1:n.s) {
           if (x$smooth[[i]]$sp[j]<0) { ## sp not supplied
             x$sp[k] <- x$sp[k] / x$smooth[[i]]$S.scale[j]
             k <- k + 1
@@ -4298,7 +4495,8 @@ gam.vcomp <- function(x,rescale=TRUE,conf.lev=.95) {
         }
       } else { ## this id already dealt with, but full.sp not scaled yet 
         ii <- idxi[idx%in%x$smooth[[i]]$id] ## smooth prototype
-        for (j in 1:length(x$smooth[[ii]]$S.scale)) {
+	n.s <- length(x$smooth[[ii]]$S.scale)
+        for (j in 1:n.s) {
           x$full.sp[kf] <- x$full.sp[kf] / x$smooth[[ii]]$S.scale[j]
           kf <- kf + 1
         }
@@ -4306,7 +4504,7 @@ gam.vcomp <- function(x,rescale=TRUE,conf.lev=.95) {
     } ## finished rescaling
   }
   ## variance components (original scale)
-  vc <- c(scale/x$sp)
+  vc <-  scale/x$sp
   names(vc) <- names(x$sp)
 
   if (is.null(x$full.sp)) vc.full <- NULL else { 
@@ -4316,8 +4514,8 @@ gam.vcomp <- function(x,rescale=TRUE,conf.lev=.95) {
   ## If a Hessian exists, get CI's for variance components...
 
   if (x$method%in%c("ML","P-ML","REML","P-REML","fREML")&&!is.null(x$outer.info$hess)) {
-    if (is.null(x$family$n.theta)||x$family$n.theta<=0) H <- x$outer.info$hess ## the hessian w.r.t. log sps and log scale
-    else {
+    if (is.null(x$family$n.theta)||x$family$n.theta<=0||"perf" %in% x$optimizer) H <- x$outer.info$hess ## the hessian w.r.t. log sps and log scale
+    else { ## first rows and cols of Hessian relate to extra log lik params
       ind <- 1:x$family$n.theta
       H <- x$outer.info$hess[-ind,-ind,drop=FALSE]
     }
@@ -4438,25 +4636,16 @@ logLik.gam <- function (object,...)
 mroot <- function(A,rank=NULL,method="chol")
 # finds the smallest square root of A, or the best approximate square root of 
 # given rank. B is returned where BB'=A. A assumed non-negative definite. 
-# Current methods "chol", "svd". "svd" is much slower, but much better at getting the 
+# Current methods "chol", "svd". "svd" is slower, but much better at getting the 
 # correct rank if it isn't known in advance. 
 { if (is.null(rank)) rank <- 0 
   if (!isTRUE(all.equal(A,t(A)))) stop("Supplied matrix not symmetric")
   if (method=="svd") { 
-    um <- La.svd(A)
-    if (sum(um$d!=sort(um$d,decreasing=TRUE))>0) 
-    stop("singular values not returned in order")
-    if (rank < 1) # have to work out rank
-    { rank <- dim(A)[1]
-      if (um$d[1]<=0) rank <- 1 else
-      while (rank>0&&(um$d[rank]/um$d[1]<.Machine$double.eps||
-                           all.equal(um$u[,rank],um$vt[rank,])!=TRUE)) rank<-rank-1 
-      if (rank==0) stop("Something wrong - matrix probably not +ve semi definite")    
-    }
-    d<-um$d[1:rank]^0.5
-    return(t(t(um$u[,1:rank])*as.vector(d))) # note recycling rule used for efficiency
-  } else
-  if (method=="chol") { 
+    um <- eigen(A,symmetric=TRUE) ## same as svd for +ve semi def, but faster
+    if (rank<1) rank <- sum(um$values > max(um$values)*.Machine$double.eps)
+    if (rank==0) stop("Something wrong - matrix probably not +ve semi definite")
+    return(t(t(um$vectors[,1:rank])*sqrt(um$values[1:rank])))
+  } else if (method=="chol") { 
     ## don't want to be warned it's not +ve def...
     L <- suppressWarnings(chol(A,pivot=TRUE,tol=0))
     piv <- order(attr(L,"pivot"))
@@ -4542,7 +4731,22 @@ initial.spg <- function(x,y,weights,family,S,rank,off,offset=NULL,L=NULL,lsp0=NU
   if (is.null(mustart)) mukeep <- NULL else mukeep <- mustart 
   eval(family$initialize) 
   if (inherits(family,"general.family")) { ## Cox, gamlss etc...   
-    lbb <- family$ll(y,x,start,weights,family,offset=offset,deriv=1)$lbb ## initial Hessian 
+    lbb <- family$ll(y,x,start,weights,family,offset=offset,deriv=1)$lbb ## initial Hessian
+    lambda <- rep(0,length(S))
+    if (TRUE) { ## experimental
+      for (i in 1:length(S)) {
+        ind <- off[i]:(off[i]+ncol(S[[i]])-1)
+	if (rank[i]<ncol(S[[i]])) { ## find a basis for row/col space of S[[i]] and project into that.
+          suppressWarnings(cs <- chol(S[[i]],pivot=TRUE))
+          piv <- attr(cs,"pivot")
+	  Z <- S[[i]][,piv[1:rank[i]],drop=FALSE] ## basis for the space of S[[i]]
+          Z <- Z/norm(Z)
+	  ZHZ <- -t(Z)%*%lbb[ind,ind]%*%Z
+          ZSZ <- t(Z)%*%S[[i]]%*%Z
+        } else { ZHZ <- -lbb[ind,ind];ZSZ <- S[[i]] }
+	lambda[i] <- .3*norm(ZHZ,"M")/norm(ZSZ,"M")
+      }
+    } else { ## original
     ## initially work out the number of times that each coefficient is penalized
     pcount <- rep(0,ncol(lbb))
     for (i in 1:length(S)) {
@@ -4552,8 +4756,6 @@ initial.spg <- function(x,y,weights,family,S,rank,off,offset=NULL,L=NULL,lsp0=NU
       ind <- ind[indp] ## drop indices of unpenalized
       pcount[ind] <- pcount[ind] + 1 ## add up times penalized
     }
-
-    lambda <- rep(0,length(S))
     ## choose lambda so that corresponding elements of lbb and S[[i]]
     ## are roughly in balance...
     for (i in 1:length(S)) {
@@ -4576,6 +4778,7 @@ initial.spg <- function(x,y,weights,family,S,rank,off,offset=NULL,L=NULL,lsp0=NU
       lambda[i] <- lami 
       ## norm(lbb[ind,ind])/norm(S[[i]])
     }
+    }
   } else { ## some sort of conventional regression
     if (is.null(mukeep)) {
       if (!is.null(start)) etastart <- drop(x%*%start)
@@ -4588,7 +4791,6 @@ initial.spg <- function(x,y,weights,family,S,rank,off,offset=NULL,L=NULL,lsp0=NU
       mu.eta2 <-family$mu.eta(family$linkfun(mustart))^2 
       w <- .5 * as.numeric(Ddo$Dmu2 * mu.eta2)
       if (any(w<0)) w <- .5 * as.numeric(Ddo$EDmu2 * mu.eta2) 
-      #w <- .5 * as.numeric(family$Dd(y,mustart,theta,weights)$EDmu2*family$mu.eta(family$linkfun(mustart))^2)  
     } else w <- as.numeric(weights*family$mu.eta(family$linkfun(mustart))^2/family$variance(mustart))
     w <- sqrt(w)
     if (type==1) { ## what PI would have used
@@ -4611,7 +4813,7 @@ initial.spg <- function(x,y,weights,family,S,rank,off,offset=NULL,L=NULL,lsp0=NU
 
   lambda ## initial values
 
-}
+} ## initial.spg
 
 initial.sp <- function(X,S,off,expensive=FALSE,XX=FALSE)
 # Find initial smoothing parameter guesstimates based on model matrix X 

@@ -4,13 +4,15 @@
 \alias{Sl.setup}
 \title{Setting up a list representing a block diagonal penalty matrix}
 \usage{
-Sl.setup(G,cholesky=FALSE,no.repara=FALSE,sparse=FALSE)
+Sl.setup(G,cholesky=FALSE,no.repara=FALSE,sparse=FALSE,keepS=FALSE)
 }
 \arguments{
 \item{G}{the output of \code{gam.setup}.}
 \item{cholesky}{re-parameterize using Cholesky only.}
 \item{no.repara}{set to \code{TRUE} to turn off all initial reparameterization.}
 \item{sparse}{sparse setup?}
+\item{keepS}{store original penalties in \code{S0}? (after any splitting
+of multiple penalties into singletons, but before reparameterization)}
 }
 \value{
 A list with an element for each block. 
@@ -29,7 +31,8 @@ A list with an element for each block.
                          and \code{b.orig = D*b.repara} (where \code{b.orig} is the original parameter vector).
                          If matrix then \code{X[,start:stop]\%*\%D} is re-parametrization of \code{X[,start:stop]},
                          and \code{b.orig = D\%*\%b.repara} (where \code{b.orig} is the original parameter vector).}
-                         }
+         \item{\code{S0}: original penalties if requested.}
+	 }
 }
 \description{
 INTERNAL function for setting up a list representing a block diagonal penalty matrix

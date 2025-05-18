@@ -53,7 +53,7 @@ Demmel, J. (1997) Applied Numerical Linear Algebra. SIAM
 
 \author{ Simon N. Wood \email{simon.wood@r-project.org}}
 
-\seealso{\code{\link{cyclic.p.spline}}}
+\seealso{\code{\link{tprs}}}
 
 \examples{
  require(mgcv)

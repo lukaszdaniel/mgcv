@@ -3,7 +3,7 @@
 %- Also NEED an `\alias' for EACH other topic documented here.
 \title{Gamma location-scale model family}
 \description{The \code{gammals} family implements gamma location scale additive models in which 
-the log of the mean and the log of the scale parameter (see details) can depend on additive smooth predictors. Useable only with \code{\link{gam}}, the linear predictors are specified via a list of formulae.
+the log of the mean, \eqn{\mu}{m}, and the log of the scale parameter, \eqn{\phi}{s} (see details) can depend on additive smooth predictors.The parameterization is of the usual GLM type where the variance of the response is given by \eqn{\phi\mu^2}{sm^2}. Useable only with \code{\link{gam}}, the linear predictors are specified via a list of formulae.
 }
 
 \usage{

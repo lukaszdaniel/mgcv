@@ -7,7 +7,7 @@
 }
 \description{
 \code{mgcv} provides functions for generalized additive modelling (\code{\link{gam}} and \code{\link{bam}})  and
-generalized additive mixed modelling (\code{\link{gamm}}, and \code{\link{random.effects}}). The term GAM is taken to include 
+generalized additive mixed modelling (\code{\link{gamm}}, and \code{\link{random.effects}}), including location scale and shape extensions. The term GAM is taken to include 
 any model dependent on unknown smooth functions of predictors and estimated by quadratically penalized (possibly quasi-) likelihood maximization. Available distributions are covered in \code{\link{family.mgcv}} and available smooths in \code{\link{smooth.terms}}.
 
 Particular features of the package are facilities for automatic smoothness selection (Wood, 2004, 2011), 

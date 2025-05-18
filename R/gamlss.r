@@ -138,72 +138,72 @@ gamlss.ncv <- function(X,y,wt,nei,beta,family,llf,H=NULL,Hi=NULL,R=NULL,offset=N
   eta <- matrix(0,n,nlp)
   for (i in 1:nlp) eta[,i] <- X[,jj[[i]],drop=FALSE] %*% beta[jj[[i]]]
   ## end debug
-  nm <- length(nei$i)
+  nm <- length(nei$d)
   eta.cv <- matrix(0,nm,nlp)
   
-  deta.cv <- if (deriv>0) matrix(0,nm*nlp,nsp) else if (deriv<0) matrix(0,length(nei$m),length(beta))  else 0.0
+  deta.cv <- if (deriv>0) matrix(0,nm*nlp,nsp) else if (deriv<0) matrix(0,length(nei$ma),length(beta))  else 0.0
   if (is.null(R)) {
-    cg.iter <- .Call(C_ncvls,X,jj,H,Hi,dH,llf$l1,llf$l2,llf$l3,nei$i-1,nei$mi,nei$m,nei$k-1,beta,eta.cv,deta.cv,
+    cg.iter <- .Call(C_ncvls,X,jj,H,Hi,dH,llf$l1,llf$l2,llf$l3,nei$d-1,nei$md,nei$ma,nei$a-1,beta,eta.cv,deta.cv,
                    deta,db,deriv)		   
   } else {
-    cg.iter <- .Call(C_Rncvls,X,jj,R,dH,llf$l1,llf$l2,llf$l3,nei$i-1,nei$mi,nei$m,nei$k-1,beta,eta.cv,deta.cv,
+    cg.iter <- .Call(C_Rncvls,X,jj,R,dH,llf$l1,llf$l2,llf$l3,nei$d-1,nei$md,nei$ma,nei$a-1,beta,eta.cv,deta.cv,
                    deta,db,deriv,.Machine$double.eps,nt)
   }
   if (!is.null(offset)) {
-    for (i in 1:ncol(eta.cv)) if (i <= length(offset)&&!is.null(offset[[i]])) eta.cv[,i] <- eta.cv[,i] + offset[[i]][nei$i]
+    for (i in 1:ncol(eta.cv)) if (i <= length(offset)&&!is.null(offset[[i]])) eta.cv[,i] <- eta.cv[,i] + offset[[i]][nei$d]
   }
   ## ll must be set up to return l1..l3 as derivs w.r.t. linear predictors if ncv=TRUE
   ncv1 <- NULL
   gamma <- llf$gamma;qapprox <- family$qapprox
-  dev <- if (gamma!=1||qapprox) -sum(family$ll(y,X,beta,wt,family,offset,deriv=0,db,eta=eta,ncv=TRUE)$l0[nei$i]) else 0 
+  dev <- if (gamma!=1||qapprox) -sum(family$ll(y,X,beta,wt,family,offset,deriv=0,db,eta=eta,ncv=TRUE)$l0[nei$d]) else 0 
   if (qapprox) { ## quadratic approximate version
-    ncv <-  dev - gamma*sum(llf$l1[nei$i,]*(eta.cv-eta[nei$i,]))
+    ncv <-  dev - gamma*sum(llf$l1[nei$d,]*(eta.cv-eta[nei$d,]))
     k <- 0
     for (i in 1:nlp) for (j in i:nlp) {
       k <- k  + 1
-      ncv <- ncv - 0.5*gamma*(1+(i!=j))*sum(llf$l2[nei$i,k]*(eta.cv[,i]-eta[nei$i,i])*(eta.cv[,j]-eta[nei$i,j])) ## symmetric term
+      ncv <- ncv - 0.5*gamma*(1+(i!=j))*sum(llf$l2[nei$d,k]*(eta.cv[,i]-eta[nei$d,i])*(eta.cv[,j]-eta[nei$d,j])) ## symmetric term
     }
     if (deriv>0) {
-      #ncv1 <- -colSums(as.numeric(llf$l1[nei$i,])*(deta.cv*gamma+(1-gamma)*deta))
+      #ncv1 <- -colSums(as.numeric(llf$l1[nei$d,])*(deta.cv*gamma+(1-gamma)*deta))
       rowk <- 1:nm
-      ncv1 <- -as.numeric(llf$l1[nei$i,1])*(deta.cv[rowk,]*gamma+(1-gamma)*deta[rowk,])
+      ncv1 <- -as.numeric(llf$l1[nei$d,1])*(deta.cv[rowk,]*gamma+(1-gamma)*deta[rowk,])
       if (nlp>1) for (j in 2:nlp) {
         rowk <- rowk + nm 
-        ncv1 <- ncv1 - as.numeric(llf$l1[nei$i,j])*(deta.cv[rowk,]*gamma+(1-gamma)*deta[rowk,])
+        ncv1 <- ncv1 - as.numeric(llf$l1[nei$d,j])*(deta.cv[rowk,]*gamma+(1-gamma)*deta[rowk,])
       }
       kk <- 0;jj <- 0
       for (j in 1:nlp) for (k in j:nlp) {
         kk <- kk  + 1
 	rowk <- 1:nm+(k-1)*nm
 	rowj <- 1:nm+(j-1)*nm
-	#ncv1 <- ncv1 - colSums(llf$l2[nei$i,kk]*((deta[1:nm+(k-1)*nm,] + deta.cv[1:nm+(k-1)*nm,])*(eta.cv[,j]-eta[nei$i,j]) + 
-	#                   (eta.cv[,k]-eta[nei$i,k])*(deta.cv[1:nm+(j-1)*nm,] - deta[nei$i+(j-1)*n,])))*gamma*.5
-        ncv1 <- ncv1 - llf$l2[nei$i,kk]*((deta[rowk,] + deta.cv[rowk,])*(eta.cv[,j]-eta[nei$i,j]) +
-	                       (eta.cv[,k]-eta[nei$i,k])*(deta.cv[rowj,] - deta[nei$i+(j-1)*n,]))*gamma*.5
-        #if (j!=k) ncv1 <- ncv1 - colSums(llf$l2[nei$i,kk]*((deta[1:nm+(j-1)*nm,] + deta.cv[1:nm+(j-1)*nm,])*(eta.cv[,k]-eta[nei$i,k]) + 
-	#                   (eta.cv[,j]-eta[nei$i,j])*(deta.cv[1:nm+(k-1)*nm,] - deta[nei$i+(k-1)*n,])))*gamma*.5		  
-        if (j!=k) ncv1 <- ncv1 - llf$l2[nei$i,kk]*((deta[rowj,] + deta.cv[rowj,])*(eta.cv[,k]-eta[nei$i,k]) +
-	          (eta.cv[,j]-eta[nei$i,j])*(deta.cv[rowk,] - deta[nei$i+(k-1)*n,]))*gamma*.5
+	#ncv1 <- ncv1 - colSums(llf$l2[nei$d,kk]*((deta[1:nm+(k-1)*nm,] + deta.cv[1:nm+(k-1)*nm,])*(eta.cv[,j]-eta[nei$d,j]) + 
+	#                   (eta.cv[,k]-eta[nei$d,k])*(deta.cv[1:nm+(j-1)*nm,] - deta[nei$d+(j-1)*n,])))*gamma*.5
+        ncv1 <- ncv1 - llf$l2[nei$d,kk]*((deta[rowk,] + deta.cv[rowk,])*(eta.cv[,j]-eta[nei$d,j]) +
+	                       (eta.cv[,k]-eta[nei$d,k])*(deta.cv[rowj,] - deta[nei$d+(j-1)*n,]))*gamma*.5
+        #if (j!=k) ncv1 <- ncv1 - colSums(llf$l2[nei$d,kk]*((deta[1:nm+(j-1)*nm,] + deta.cv[1:nm+(j-1)*nm,])*(eta.cv[,k]-eta[nei$d,k]) + 
+	#                   (eta.cv[,j]-eta[nei$d,j])*(deta.cv[1:nm+(k-1)*nm,] - deta[nei$d+(k-1)*n,])))*gamma*.5		  
+        if (j!=k) ncv1 <- ncv1 - llf$l2[nei$d,kk]*((deta[rowj,] + deta.cv[rowj,])*(eta.cv[,k]-eta[nei$d,k]) +
+	          (eta.cv[,j]-eta[nei$d,j])*(deta.cv[rowk,] - deta[nei$d+(k-1)*n,]))*gamma*.5
         for (l in k:nlp) {
           jj <- jj + 1
 	  #ncv1 <- ncv1 - (1+(j!=k)) * gamma*.5 * colSums(
-   	  #        llf$l3[nei$i,jj]*deta[nei$i+(l-1)*n,]*(eta.cv[,k]-eta[nei$i,k])*(eta.cv[,j]-eta[nei$i,j]))
-	  ncv1 <- ncv1 - (1+(j!=k)) * gamma*.5 * llf$l3[nei$i,jj]*deta[nei$i+(l-1)*n,]*(eta.cv[,k]-eta[nei$i,k])*(eta.cv[,j]-eta[nei$i,j])
+   	  #        llf$l3[nei$d,jj]*deta[nei$d+(l-1)*n,]*(eta.cv[,k]-eta[nei$d,k])*(eta.cv[,j]-eta[nei$d,j]))
+	  ncv1 <- ncv1 - (1+(j!=k)) * gamma*.5 * llf$l3[nei$d,jj]*deta[nei$d+(l-1)*n,]*(eta.cv[,k]-eta[nei$d,k])*(eta.cv[,j]-eta[nei$d,j])
 	  #if (l!=k) ncv1 <- ncv1 - (1+(l!=j&&j!=k)) * gamma * .5 * colSums(
-	  #        llf$l3[nei$i,jj]*deta[nei$i+(k-1)*n,]*(eta.cv[,l]-eta[nei$i,l])*(eta.cv[,j]-eta[nei$i,j]))
+	  #        llf$l3[nei$d,jj]*deta[nei$d+(k-1)*n,]*(eta.cv[,l]-eta[nei$d,l])*(eta.cv[,j]-eta[nei$d,j]))
 	  if (l!=k) ncv1 <- ncv1 - (1+(l!=j&&j!=k)) * gamma * .5 * 
-	            llf$l3[nei$i,jj]*deta[nei$i+(k-1)*n,]*(eta.cv[,l]-eta[nei$i,l])*(eta.cv[,j]-eta[nei$i,j])
+	            llf$l3[nei$d,jj]*deta[nei$d+(k-1)*n,]*(eta.cv[,l]-eta[nei$d,l])*(eta.cv[,j]-eta[nei$d,j])
 	  #if (l!=j) ncv1 <- ncv1 - (1+(l!=k&&j!=k)) * gamma * .5 * colSums(
-	  #        llf$l3[nei$i,jj]*deta[nei$i+(j-1)*n,]*(eta.cv[,k]-eta[nei$i,k])*(eta.cv[,l]-eta[nei$i,l]))
+	  #        llf$l3[nei$d,jj]*deta[nei$d+(j-1)*n,]*(eta.cv[,k]-eta[nei$d,k])*(eta.cv[,l]-eta[nei$d,l]))
           if (l!=j) ncv1 <- ncv1 - (1+(l!=k&&j!=k)) * gamma * .5 * 
-	          llf$l3[nei$i,jj]*deta[nei$i+(j-1)*n,]*(eta.cv[,k]-eta[nei$i,k])*(eta.cv[,l]-eta[nei$i,l])
+	          llf$l3[nei$d,jj]*deta[nei$d+(j-1)*n,]*(eta.cv[,k]-eta[nei$d,k])*(eta.cv[,l]-eta[nei$d,l])
         }
       }
     } 
   } else { ## exact
     offi <- offset
-    if (!is.null(offset)) for (i in 1:length(offset)) if (!is.null(offset[[i]])) offi[[i]] <- offset[[i]][nei$i]
-    ll <- family$ll(y[nei$i],X[nei$i,],beta,wt[nei$i],family,offi,deriv=1,db,eta=eta.cv,ncv=TRUE)
+    if (!is.null(offset)) for (i in 1:length(offset)) if (!is.null(offset[[i]])) offi[[i]] <- offset[[i]][nei$d]
+    ll <- family$ll(y[nei$d],X[nei$d,],beta,wt[nei$d],family,offi,deriv=1,db,eta=eta.cv,ncv=TRUE)
     ncv <- -ll$l
     ncv <- gamma*ncv - (gamma-1)*dev
     if (deriv>0) {
@@ -212,8 +212,8 @@ gamlss.ncv <- function(X,y,wt,nei,beta,family,llf,H=NULL,Hi=NULL,R=NULL,offset=N
       for (i in 1:nlp) {
         #ncv1 <- ncv1 - colSums(ll$l1[,i]*deta.cv[ind,])
         ncv1 <- ncv1 - ll$l1[,i]*deta.cv[ind,]
-        #if (gamma!=1) dev1 <- dev1 - colSums((llf$l1[,i]*deta[iin,])[nei$i,,drop=FALSE])
-	if (gamma!=1) dev1 <- dev1 - (llf$l1[,i]*deta[iin,])[nei$i,,drop=FALSE]
+        #if (gamma!=1) dev1 <- dev1 - colSums((llf$l1[,i]*deta[iin,])[nei$d,,drop=FALSE])
+	if (gamma!=1) dev1 <- dev1 - (llf$l1[,i]*deta[iin,])[nei$d,,drop=FALSE]
         ind <- ind + nm; iin <- iin + n
       }
       ncv1 <- gamma*ncv1 - (gamma-1)*dev1
@@ -1000,7 +1000,7 @@ gaulss <- function(link=list("identity","logb"),b=0.01) {
     ll(y,X,coef,wt,family,offset=NULL,deriv=1,sandwich=TRUE)$lbb
   }
   
-  initialize <- expression({
+  initialize <- expression({ ## init gaulss
   ## idea is to regress g(y) on model matrix for mean, and then 
   ## to regress the corresponding log absolute residuals on 
   ## the model matrix for log(sigma) - may be called in both
@@ -1019,7 +1019,8 @@ gaulss <- function(link=list("identity","logb"),b=0.01) {
 	if (!is.null(offset[[1]])) yt1 <- yt1 - offset[[1]]
         if (is.list(x)) { ## discrete case
 	  start <- rep(0,max(unlist(jj)))
-	  R <- suppressWarnings(chol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[1]])+crossprod(E[,jj[[1]]]),pivot=TRUE))
+	  R <- suppressWarnings(mchol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,
+	              v=x$v,qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[1]])+crossprod(E[,jj[[1]]])))
 	  Xty <- XWyd(x$Xd,rep(1,length(y)),yt1,x$kd,x$ks,x$ts,x$dt,x$v,x$qc,x$drop,lt=x$lpid[[1]])
           piv <- attr(R,"pivot")
 	  rrank <- attr(R,"rank") 
@@ -1034,7 +1035,8 @@ gaulss <- function(link=list("identity","logb"),b=0.01) {
 	  eta1 <- Xbd(x$Xd,start,k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,qc=x$qc,drop=x$drop,lt=x$lpid[[1]])
 	  lres1 <- log(abs(y-family$linfo[[1]]$linkinv(eta1)))
 	  if (!is.null(offset[[2]])) lres1 <- lres1 - offset[[2]]
-	  R <- suppressWarnings(chol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[2]])+crossprod(E[,jj[[2]]]),pivot=TRUE))
+	  R <- suppressWarnings(mchol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,
+	       v=x$v,qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[2]])+crossprod(E[,jj[[2]]])))
 	  Xty <- XWyd(x$Xd,rep(1,length(y)),lres1,x$kd,x$ks,x$ts,x$dt,x$v,x$qc,x$drop,lt=x$lpid[[2]])
 	  piv <- attr(R,"pivot")
 	  rrank <- attr(R,"rank")
@@ -1338,7 +1340,7 @@ multinom <- function(K=1) {
     apply(cp,1,function(x) min(which(x>runif(1))))-1    
   } ## rd
 
-  initialize <- expression({
+  initialize <- expression({ ## for multinom
   ## Binarize each category and lm on 6*y-3 by category.
  
       n <- rep(1, nobs)
@@ -1350,9 +1352,8 @@ multinom <- function(K=1) {
           start <- rep(0,max(unlist(jj)))
           for (k in 1:length(jj)) { ## loop over the linear predictors
             yt1 <- 6*as.numeric(y==k)-3
-	    R <- suppressWarnings(chol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,
-	         v=x$v,qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[k]])+crossprod(E[,jj[[k]]]),
-		 pivot=TRUE))
+	    R <- suppressWarnings(mchol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,
+	         v=x$v,qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[k]])+crossprod(E[,jj[[k]]])))
 	    Xty <- XWyd(x$Xd,rep(1,length(y)),yt1,x$kd,x$ks,x$ts,x$dt,x$v,x$qc,x$drop,lt=x$lpid[[k]])
 	    piv <- attr(R,"pivot")
 	    rrank <- attr(R,"rank")
@@ -1429,8 +1430,8 @@ pen.reg <- function(x,e,y) {
     qrr <- qr(rbind(R,e*k));
     edf <- sum(qr.Q(qrr)[1:r,]^2)
   } 
-  while (edf<.7*rr) { ## reduce penalization
-    k <- k/20
+  while (edf<.85*rr) { ## reduce penalization (was .7)
+    k <- k/5 ## was 20! 
     qrr <- qr(rbind(R,e*k));
     edf <- sum(qr.Q(qrr)[1:r,]^2)
   } 
@@ -2306,8 +2307,8 @@ gevlss <- function(link=list("identity","identity","logit")) {
           start <- rep(0,max(unlist(jj)))
           yt1 <- if (family$link[[1]]=="identity") y else 
                  family$linfo[[1]]$linkfun(abs(y)+max(y)*1e-7)
-          R <- suppressWarnings(chol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,
-	         v=x$v,qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[1]])+crossprod(E[,jj[[1]]]),pivot=TRUE))
+          R <- suppressWarnings(mchol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,
+	         v=x$v,qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[1]])+crossprod(E[,jj[[1]]])))
 	  Xty <- XWyd(x$Xd,rep(1,length(y)),yt1,x$kd,x$ks,x$ts,x$dt,x$v,x$qc,x$drop,lt=x$lpid[[1]])
           piv <- attr(R,"pivot");rrank <- attr(R,"rank");startji <- rep(0,ncol(R))
           if (rrank<ncol(R)) {
@@ -2320,8 +2321,8 @@ gevlss <- function(link=list("identity","identity","logit")) {
           ## LP 2...
 	  lres1 <- Xbd(x$Xd,start,k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,qc=x$qc,drop=x$drop,lt=x$lpid[[1]])
           lres1 <- log(abs(y-family$linfo[[1]]$linkinv(lres1)))
-          R <- suppressWarnings(chol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,
-	         v=x$v,qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[2]])+crossprod(E[,jj[[2]]]),pivot=TRUE))
+          R <- suppressWarnings(mchol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,
+	         v=x$v,qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[2]])+crossprod(E[,jj[[2]]])))
 	  Xty <- XWyd(x$Xd,rep(1,length(y)),lres1,x$kd,x$ks,x$ts,x$dt,x$v,x$qc,x$drop,lt=x$lpid[[2]])
           piv <- attr(R,"pivot");rrank <- attr(R,"rank");startji <- rep(0,ncol(R))
           if (rrank<ncol(R)) {
@@ -2333,18 +2334,35 @@ gevlss <- function(link=list("identity","identity","logit")) {
 	  start[jj[[2]]] <- startji
 	  ## LP 3...
 	  yt1 <- rep(family$linfo[[3]]$linkfun(1e-3),length(yt1))
-	  R <- suppressWarnings(chol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,
-	         v=x$v,qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[3]])+crossprod(E[,jj[[3]]]),pivot=TRUE))
+	  R <- suppressWarnings(mchol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,
+	         v=x$v,qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[3]])+crossprod(E[,jj[[3]]])))
 	  Xty <- XWyd(x$Xd,rep(1,length(y)),yt1,x$kd,x$ks,x$ts,x$dt,x$v,x$qc,x$drop,lt=x$lpid[[3]])
           piv <- attr(R,"pivot");rrank <- attr(R,"rank");startji <- rep(0,ncol(R))
           if (rrank<ncol(R)) {
               R <- R[1:rrank,1:rrank]
 	      piv <- piv[1:rrank]
           }
-          startji[piv] <- backsolve(R,forwardsolve(t(R),Xty[piv]))
-	  startji[!is.finite(startji)] <- 0
-	  start[jj[[3]]] <- startji
-        } else {
+	  fob <- function(m=1) {
+            startji[piv] <- backsolve(R,forwardsolve(t(R),Xty[piv]*m))
+	    startji[!is.finite(startji)] <- 0
+	    start[jj[[3]]] <- startji
+	    list(l=family$ll(y,x,start,weights,family,offset)$l,start=start)
+	  } ## fob
+	  f0b <- fob(); dm <- .2; mm <- 1; up <- FALSE
+	  while (mm>-4.2 && mm <4.2) { ## crude search for improved initial xi
+            f1b <- fob(mm+dm)
+	    if (is.finite(f1b$l) && f1b$l>f0b$l) {
+              up <- TRUE;f0b <- f1b;mm <- mm + dm
+            } else if (up) { ## f0b best
+              break
+            } else if (dm>0) dm <- -dm else break
+          }
+	  if (!is.finite(f1b$l)) { ## move back a bit from non finite regime
+            f1b <- fob(mm-dm)
+	    if (is.finite(f1b$l)) f0b <- f1b
+          }
+	  start <- f0b$start
+        } else { ## not discrete case
 	  start <- rep(0,ncol(x))
           yt1 <- if (family$link[[1]]=="identity") y else 
                  family$linfo[[1]]$linkfun(abs(y)+max(y)*1e-7)
@@ -2368,9 +2386,27 @@ gevlss <- function(link=list("identity","identity","logit")) {
           } else startji <- pen.reg(x1,e1,lres1)
           start[jj[[2]]] <- startji
 	  x1 <-  x[,jj[[3]],drop=FALSE]
-	  startji <- qr.coef(qr(x1),c(rep(family$linfo[[3]]$linkfun(1e-3),nrow(x1))))   
-          startji[!is.finite(startji)] <- 0
-	  start[jj[[3]]] <- startji
+	  qrx1 <- qr(x1);yt1 <- rep(family$linfo[[3]]$linkfun(1e-3),nrow(x1))
+	  fob <- function(m=1) {
+	    startji <- qr.coef(qrx1,yt1*m)   
+            startji[!is.finite(startji)] <- 0
+	    start[jj[[3]]] <- startji
+	    list(l=family$ll(y,x,start,weights,family,offset)$l,start=start)
+	  } ## fob
+	  f0b <- fob(); dm <- .2; mm <- 1; up <- FALSE
+	  while (mm>-4.2 && mm <4.2) { ## crude search for improved initial xi
+            f1b <- fob(mm+dm)
+	    if (is.finite(f1b$l) && f1b$l>f0b$l) {
+              up <- TRUE;f0b <- f1b;mm <- mm + dm
+            } else if (up) { ## f0b best
+              break
+            } else if (dm>0) dm <- -dm else break
+          }
+	  if (!is.finite(f1b$l)) { ## move back a bit from non finite regime
+            f1b <- fob(mm-dm)
+	    if (is.finite(f1b$l)) f0b <- f1b
+          }
+	  start <- f0b$start  
         } ## non-discrete initiailization
       }	
   }) ## initialize gevlss
@@ -2699,7 +2735,7 @@ gammals <- function(link=list("identity","log"),b=-7) {
         rsd <- 2*((y-mu)/mu-log(y/mu))*exp(-rho)
         rsd <- sqrt(pmax(0,rsd))*sign(y-mu)
       } else if (type=="pearson") {
-        rsd <- (y-mu)/(exp(rho)*mu)
+        rsd <- (y-mu)/(exp(rho*.5)*mu)
       } else {
         rsd <- y-mu
       }
@@ -2840,8 +2876,8 @@ gammals <- function(link=list("identity","log"),b=-7) {
 	if (!is.null(offset[[1]])) yt1 <- yt1 - offset[[1]]
         if (is.list(x)) { ## discrete case
 	  start <- rep(0,max(unlist(jj)))
-	  R <- suppressWarnings(chol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,
-	            qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[1]])+crossprod(E[,jj[[1]]]),pivot=TRUE))
+	  R <- suppressWarnings(mchol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,
+	            qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[1]])+crossprod(E[,jj[[1]]])))
 	  Xty <- XWyd(x$Xd,rep(1,length(y)),yt1,x$kd,x$ks,x$ts,x$dt,x$v,x$qc,x$drop,lt=x$lpid[[1]])
           piv <- attr(R,"pivot")
 	  rrank <- attr(R,"rank")
@@ -2854,10 +2890,10 @@ gammals <- function(link=list("identity","log"),b=-7) {
 	  startji[!is.finite(startji)] <- 0
 	  start[jj[[1]]] <- startji
 	  eta1 <- Xbd(x$Xd,start,k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,qc=x$qc,drop=x$drop,lt=x$lpid[[1]])
-	  lres1 <- log(abs(y-family$linfo[[1]]$linkinv(eta1)))
+	  lres1 <- family$linfo[[2]]$linkfun(log(abs(y-family$linfo[[1]]$linkinv(eta1))))
 	  if (!is.null(offset[[2]])) lres1 <- lres1 - offset[[2]]
-	  R <- suppressWarnings(chol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,
-	            qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[2]])+crossprod(E[,jj[[2]]]),pivot=TRUE))
+	  R <- suppressWarnings(mchol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,
+	            qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[2]])+crossprod(E[,jj[[2]]])))
 	  Xty <- XWyd(x$Xd,rep(1,length(y)),lres1,x$kd,x$ks,x$ts,x$dt,x$v,x$qc,x$drop,lt=x$lpid[[2]])
 	  piv <- attr(R,"pivot");startji <- rep(0,ncol(R));rrank <- attr(R,"rank")
 	  if (rrank<ncol(R)) {
@@ -3068,10 +3104,12 @@ gumbls <- function(link=list("identity","log"),b=-7) {
     discrete <- is.list(X)
     jj <- attr(X,"lpi") ## extract linear predictor index
     if (is.null(eta)) {
-      eta <- if (discrete) Xbd(X$Xd,coef,k=X$kd,ks=X$ks,ts=X$ts,dt=X$dt,v=X$v,qc=X$qc,drop=X$drop,lt=X$lpid[[1]]) else X[,jj[[1]],drop=FALSE]%*%coef[jj[[1]]]
+      eta <- if (discrete) Xbd(X$Xd,coef,k=X$kd,ks=X$ks,ts=X$ts,dt=X$dt,v=X$v,qc=X$qc,drop=X$drop,lt=X$lpid[[1]]) else
+                           X[,jj[[1]],drop=FALSE]%*%coef[jj[[1]]]
       if (!is.null(offset[[1]])) eta <- eta + offset[[1]] ## mu
     
-      etab <- if (discrete) Xbd(X$Xd,coef,k=X$kd,ks=X$ks,ts=X$ts,dt=X$dt,v=X$v,qc=X$qc,drop=X$drop,lt=X$lpid[[2]]) else X[,jj[[2]],drop=FALSE]%*%coef[jj[[2]]]
+      etab <- if (discrete) Xbd(X$Xd,coef,k=X$kd,ks=X$ks,ts=X$ts,dt=X$dt,v=X$v,qc=X$qc,drop=X$drop,lt=X$lpid[[2]]) else
+                            X[,jj[[2]],drop=FALSE]%*%coef[jj[[2]]]
       if (!is.null(offset[[2]])) etab <- etab + offset[[2]]
     } else {
       etab <- eta[,2]
@@ -3175,8 +3213,8 @@ gumbls <- function(link=list("identity","log"),b=-7) {
 	if (!is.null(offset[[1]])) yt1 <- yt1 - offset[[1]]
         if (is.list(x)) { ## discrete case
 	  start <- rep(0,max(unlist(jj)))
-	  R <- suppressWarnings(chol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,
-	            qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[1]])+crossprod(E[,jj[[1]]]),pivot=TRUE))
+	  R <- suppressWarnings(mchol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,
+	            qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[1]])+crossprod(E[,jj[[1]]])))
 	  Xty <- XWyd(x$Xd,rep(1,length(y)),yt1,x$kd,x$ks,x$ts,x$dt,x$v,x$qc,x$drop,lt=x$lpid[[1]])
           piv <- attr(R,"pivot")
 	  rrank <- attr(R,"rank")
@@ -3189,40 +3227,55 @@ gumbls <- function(link=list("identity","log"),b=-7) {
 	  startji[!is.finite(startji)] <- 0
 	  start[jj[[1]]] <- startji
 	  eta1 <- Xbd(x$Xd,start,k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,qc=x$qc,drop=x$drop,lt=x$lpid[[1]])
-	  lres1 <- log((y-family$linfo[[1]]$linkinv(eta1))^2)/2 - .25
+	  lres1 <- family$linfo[[2]]$linkfun(log((y-family$linfo[[1]]$linkinv(eta1))^2)/2 - .25)
 	  if (!is.null(offset[[2]])) lres1 <- lres1 - offset[[2]]
-	  lres1 <- family$linfo[[2]]$linkfun(lres1)
-	  R <- suppressWarnings(chol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,
-	            qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[2]])+crossprod(E[,jj[[2]]]),pivot=TRUE))
+	  #lres1 <- family$linfo[[2]]$linkfun(lres1)
+	  R1 <- suppressWarnings(mchol(XWXd(x$Xd,w=rep(1,length(y)),k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,
+	            qc=x$qc,nthreads=1,drop=x$drop,lt=x$lpid[[2]])+crossprod(E[,jj[[2]]])))
 	  Xty <- XWyd(x$Xd,rep(1,length(y)),lres1,x$kd,x$ks,x$ts,x$dt,x$v,x$qc,x$drop,lt=x$lpid[[2]])
-	  piv <- attr(R,"pivot");startji <- rep(0,ncol(R));rrank <- attr(R,"rank")
-	  if (rrank<ncol(R)) {
-            R <- R[1:rrank,1:rrank]
-	    piv <- piv[1:rrank]
+	  piv1 <- attr(R1,"pivot");startji <- rep(0,ncol(R1));rrank <- attr(R1,"rank")
+	  if (rrank<ncol(R1)) {
+            R1 <- R1[1:rrank,1:rrank]
+	    piv1 <- piv1[1:rrank]
           }
-	  startji[piv] <- backsolve(R,forwardsolve(t(R),Xty[piv]))
+	  startji[piv1] <- backsolve(R1,forwardsolve(t(R1),Xty[piv1]))
           start[jj[[2]]] <- startji
+	  ## pass 2 at mean param...
+	  eta2 <- Xbd(x$Xd,start,k=x$kd,ks=x$ks,ts=x$ts,dt=x$dt,v=x$v,qc=x$qc,drop=x$drop,lt=x$lpid[[2]]) +
+	          if (is.null(offset[[2]])) 0 else offset[[2]] 
+	  yt1 <- yt1 - .57721*exp(family$linfo[[2]]$linkinv(eta2))
+	  Xty <- XWyd(x$Xd,rep(1,length(y)),yt1,x$kd,x$ks,x$ts,x$dt,x$v,x$qc,x$drop,lt=x$lpid[[1]])
+	  startji[piv] <- backsolve(R,forwardsolve(t(R),Xty[piv]))
+	  startji[!is.finite(startji)] <- 0
+	  start[jj[[1]]] <- startji
         } else { ## regular case
 	  start <- rep(0,ncol(x))
 	  x1 <- x[,jj[[1]],drop=FALSE]
           e1 <- E[,jj[[1]],drop=FALSE] ## square root of total penalty
           if (use.unscaled) {
             qrx <- qr(rbind(x1,e1))
-            x1 <- rbind(x1,e1)
-            startji <- qr.coef(qr(x1),c(yt1,rep(0,nrow(E))))
+            startji <- qr.coef(qrx,c(yt1,rep(0,nrow(E))))
             startji[!is.finite(startji)] <- 0       
           } else startji <- pen.reg(x1,e1,yt1)
           start[jj[[1]]] <- startji
           lres1 <- family$linfo[[2]]$linkfun(log((y-family$linfo[[1]]$linkinv(x[,jj[[1]],drop=FALSE]%*%start[jj[[1]]]))^2)/2 - .25)
 	  if (!is.null(offset[[2]])) lres1 <- lres1 - offset[[2]]
-	  lres1 <- family$linfo[[2]]$linkfun(lres1)
-          x1 <-  x[,jj[[2]],drop=FALSE];e1 <- E[,jj[[2]],drop=FALSE]
+	  #lres1 <- family$linfo[[2]]$linkfun(lres1)
+          x2 <-  x[,jj[[2]],drop=FALSE];e2 <- E[,jj[[2]],drop=FALSE]
           if (use.unscaled) {
-            x1 <- rbind(x1,e1)
-            startji <- qr.coef(qr(x1),c(lres1,rep(0,nrow(E))))   
+            x2 <- rbind(x2,e2)
+            startji <- qr.coef(qr(x2),c(lres1,rep(0,nrow(E))))   
             startji[!is.finite(startji)] <- 0
-          } else startji <- pen.reg(x1,e1,lres1)
+          } else startji <- pen.reg(x2,e2,lres1)
           start[jj[[2]]] <- startji
+	  ## pass 2 at mean parameter...
+	  eta2 <- x[,jj[[2]],drop=FALSE]%*%start[jj[[2]]] + if (is.null(offset[[2]])) 0 else offset[[2]] 
+	  yt1 <- yt1 - .57721*exp(family$linfo[[2]]$linkinv(eta2))
+	  if (use.unscaled) {
+            startji <- qr.coef(qrx,c(yt1,rep(0,nrow(E))))
+            startji[!is.finite(startji)] <- 0       
+          } else startji <- pen.reg(x1,e1,yt1)
+	  start[jj[[1]]] <- startji
 	}  
       }
   }) ## initialize gumbls

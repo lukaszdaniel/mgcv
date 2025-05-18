@@ -370,7 +370,7 @@ void magic(double *y,double *X,double *sp0,double *def_sp,double *S,double *H,do
  */
 { int *pi,*pivot,q,n,autoinit,ScS,m,mp,i,j,tp,k,use_sd=0,rank,converged,iter=0,ok,*cucS,
     gcv,try,fit_call=0,step_fail=0,max_half,*spok,def_supplied,use_dsyevd=0, // try 0 re MKL problem
-    L_exists,TRUE=1,FALSE=0;
+    L_exists,True=1,False=0;
   double *sp=NULL,*p,*p1,*p2,*tau,xx,*y1,*y0,yy,**Si=NULL,*work,score,*sd_step,*n_step,*U1,*V,*d,**M,**K,
          *VS,*U1U1,**My,**Ky,**yK,*dnorm,*ddelta,**d2norm,**d2delta,norm,delta,*grad,**hess,*nsp,
     min_score,*step,d_score=1e10,*ev=NULL,*u,msg=0.0,Xms,*rSms,*bag,*bsp,sign,*grad1,*u0,*R;
@@ -620,7 +620,7 @@ void magic(double *y,double *X,double *sp0,double *def_sp,double *S,double *H,do
           p = grad;grad=grad1;grad1=p;
         }
                
-        mgcv_symeig(u,ev,&mp,&use_dsyevd,&TRUE,&FALSE); /* columns of hess are now eigen-vectors */
+        mgcv_symeig(u,ev,&mp,&use_dsyevd,&True,&False); /* columns of hess are now eigen-vectors */
         use_sd=0;for (p=ev;p<ev+mp;p++) if (*p<0.0) {use_sd=1;break;} /* check hessian +ve def */
         if (!use_sd) /* get the Newton direction Hess^{-1}grad */
         { for (i=0;i<mp;i++) { for (xx=0.0,j=0;j<mp;j++) xx+=u[j+mp*i]*grad[j];sd_step[i]=xx/ev[i];}
@@ -697,7 +697,7 @@ void magic(double *y,double *X,double *sp0,double *def_sp,double *S,double *H,do
     for (j=i;j<q;j++) V[i + q * j] = R[i + q * j]; 
   }
 
-  pivoter(V,&q,&q,pivot,&TRUE,&TRUE); /* unpivoting the columns of R1 */
+  pivoter(V,&q,&q,pivot,&True,&True); /* unpivoting the columns of R1 */
   for (p1=X,p2=V,p=V+q*q;p2<p;p1++,p2++) *p1 = *p2; /* copy back to X */
 
   FREE(tau);FREE(pivot);FREE(work);FREE(y0);FREE(y1);

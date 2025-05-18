@@ -69,8 +69,7 @@ i.e. \eqn{ {\bf X}^\prime {\bf X}}{X'X} is not formed explicitly. See
 Gill et al. 1981.
 
 }
-\value{ The function returns an array containing the estimated parameter
-  vector. 
+\value{ The function returns a vector of the estimated parameter values. This has an attribute \code{active} giving the indices of the active constraints. If none are active this attribute will be of length 0. 
    
 }
 \references{

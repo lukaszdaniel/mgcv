@@ -542,7 +542,10 @@ void construct_tprs(double *x,int *d,int *n,double *knt,int *nk,int *m,int *k,do
     for (j=0;j<Xr;j++) *dum += XM[j][i];
     dum++;
   }
-  freemat(Xm);freemat(Sm);freemat(UZm);freemat(Xum);
+  freemat(Xm);
+  freemat(Sm);
+  freemat(UZm);
+  freemat(Xum);
   FREE(xx);if(*nk) FREE(kk);
 }
 

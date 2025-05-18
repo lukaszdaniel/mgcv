@@ -3,7 +3,7 @@
 %- Also NEED an `\alias' for EACH other topic documented here.
 \title{Smallest square root of matrix}
 \description{ Find a square root of a positive semi-definite matrix, 
-having as few columns as possible. Uses either pivoted choleski 
+having as few columns as possible. Uses either pivoted Cholesky
 decomposition or singular value decomposition to do this.  
 }
 \usage{
@@ -15,15 +15,15 @@ mroot(A,rank=NULL,method="chol")
 to be found.}
 \item{rank}{if the rank of the matrix \code{A} is known then it should 
 be supplied. \code{NULL} or <1 imply that it should be estimated.}
-\item{method}{ \code{"chol"} to use pivoted choloeski decompositon, 
+\item{method}{ \code{"chol"} to use pivoted Cholesky decompositon, 
 which is fast but tends to over-estimate rank. \code{"svd"} to use 
-singular value decomposition, which is slow, but is the most accurate way 
+singular value decomposition, which is slower, but is the most accurate way 
 to estimate rank.}
 }
 
-\details{ The function uses SVD, or a pivoted 
-Choleski routine. It is primarily of use for turning penalized regression 
-problems into ordinary regression problems.} 
+\details{ The function is primarily of use for turning penalized regression problems into ordinary regression problems. Given that \code{A} is positive semi-definite the SVD option actually uses a symmetric eigen routine, which gives the same result more efficiently.
+
+} 
 \value{ A matrix, \eqn{ {\bf B}}{B} with as many columns as the rank of 
 \eqn{ {\bf A}}{A}, and such that \eqn{ {\bf A} = {\bf BB}^\prime}{A=BB'}.}
  

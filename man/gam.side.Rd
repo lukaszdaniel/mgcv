@@ -14,7 +14,7 @@
   applied to models constructed using any smooths, including user defined smooths.
 }
 \usage{
-gam.side(sm,Xp,tol=.Machine$double.eps^.5,with.pen=FALSE)
+gam.side(sm,Xp,tol=.Machine$double.eps^.5,with.pen=TRUE)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{

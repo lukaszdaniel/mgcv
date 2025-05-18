@@ -101,6 +101,8 @@ mvn <- function(d=2) {
       #offs <- attr(G$X,"offset")
       XX <- crossprod(G$X)
       G$X <- cbind(G$X,matrix(0,nrow(G$X),ntheta)) ## add dummy columns to G$X
+      if (!is.null(G$C)) G$C <- cbind(G$C,matrix(0,nrow(G$C),ntheta))
+      if (!is.null(G$Ain)) G$Ain <- cbind(G$Ain,matrix(0,nrow(G$Ain),ntheta))
       #G$cmX <- c(G$cmX,rep(0,ntheta)) ## and corresponding column means
       G$term.names <- c(G$term.names,paste("R",1:ntheta,sep="."))
       attr(G$X,"lpi") <- lpi
@@ -121,7 +123,11 @@ mvn <- function(d=2) {
         G$family$ibeta[nbeta+1] <- -.5*log(um$scale) ## initial log root precision
         nbeta <- nbeta + ydim - k + 1
       }
-      list(X=G$X,term.names=G$term.names,family=G$family)
+      if (!is.null(G$beta0)) {
+        beta0 <- G$family$ibeta
+	beta0[1:length(G$beta0)] <- G$beta0
+      } else beta0 <- NULL
+      list(X=G$X,term.names=G$term.names,family=G$family,C=G$C,Ain=G$Ain,beta0=beta0)
    } ## preinitialize
 
 

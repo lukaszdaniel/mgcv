@@ -1,6 +1,23 @@
 ## (c) Simon N. Wood 2011-2023
 ## Many of the following are simple wrappers for C functions
 
+mchol <- function(A) {
+## Simple wrapper for Matrix sparse Cholesky routine. Basically restores the
+## functionality of Matrix::chol that vanished when the maintainers decided
+## not to return the pivot sequence from Matrix::chol(foo, pivot=TRUE) (?!)
+  if (inherits(A,"matrix")) suppressWarnings(return(chol(A,pivot=TRUE)))
+  cha <- suppressWarnings(try(Matrix::Cholesky(A,perm=TRUE,super=NA),silent=TRUE))
+  if (inherits(cha,"try-error")) {
+    R <- -1;attr(R,"rank") <- -1 ## signal rank deficient
+  } else { 
+    R <- Matrix::triu(Matrix::expand1(cha,"L."))
+    p <- ncol(A);
+    attr(R,"pivot") <- if (length(cha@perm)==0) 1:p else cha@perm+1
+    attr(R,"rank") <- p
+  }  
+  R ## R'R = H[pivot,pivot]
+} ## mchol
+
 dpnorm <- function(x0,x1) {
   ## Cancellation avoiding evaluation of pnorm(x1)-pnorm(x0) 
   ## first avoid 1-1 problems by exchanging and changing sign of double +ve
@@ -216,7 +233,7 @@ XWXd <- function(X,w,k,ks,ts,dt,v,qc,nthreads=1,drop=NULL,ar.stop=-1,ar.row=-1,a
       XWX <- Dl[-ldrop,] %*% XWX %*% t(Dl[-rdrop,])
     }
     return(XWX) ## note that this is sparse
-  }
+  } ## sparse case 
   ## block oriented code...
   if (is.null(lt)&&is.null(lt)) {
     # old .C code - can't handle long vector k
@@ -236,9 +253,9 @@ XWXd <- function(X,w,k,ks,ts,dt,v,qc,nthreads=1,drop=NULL,ar.stop=-1,ar.row=-1,a
     lpip <- attr(X,"lpip") ## list of coefs for each term
     rpi <- unlist(lpip[rt])
     lpi <- unlist(lpip[lt])
-    if (is.null(lt)) {
+    if (is.null(lt)) { ## note nrs and ncs not used in current code 
       lpi <- rpi
-      nrs <- lt <- 0
+      nrs <- lt <- 0 ## currently lt == 0 signals nrs = 0 !
       ncs <- length(rt)
     } else {
       nrs <- length(lt)
@@ -268,6 +285,28 @@ XWXd <- function(X,w,k,ks,ts,dt,v,qc,nthreads=1,drop=NULL,ar.stop=-1,ar.row=-1,a
   }
   XWX
 } ## XWXd
+
+
+XVXd <- function(X,e,k,ks,ts,dt,v,qc,nthreads=1,a,ma) {
+## e is a residual vector. a[ma[i-1]+1:ma[i]] contains the indices of the neighbours of point i
+## (ma[-1]=-1, by convention - C indexing assumed).
+## This routine computes X'VX where V[i,j] = e[i]*e[j] if i is a neighbour of j and 0 otherwise.
+  m <- unlist(lapply(X,nrow));p <- unlist(lapply(X,ncol))
+  nx <- length(X);nt <- length(ts)
+  n <- length(e);ptfull <- pt <- 0;
+  for (i in 1:nt) {
+    fullsize <- prod(p[ts[i]:(ts[i]+dt[i]-1)])
+    ptfull <- ptfull + fullsize
+    pt <- pt + fullsize - if (qc[i]>0) 1 else if (qc[i]<0) v[[i]][v[[i]][1]+2] else 0
+  }
+  XVX <- numeric(ptfull^2)
+  .Call(C_CXVXd0,XVX,as.double(unlist(X)),e,k-1L,as.integer(ks-1L),as.integer(m),as.integer(p),
+          as.integer(ts-1L), as.integer(dt),as.double(unlist(v)),as.integer(qc),as.integer(nthreads),
+	  as.integer(a),ma)
+  XVX <- matrix(XVX[1:pt^2],pt,pt)
+  XVX
+} ## XVXd
+
 
 XWyd <- function(X,w,y,k,ks,ts,dt,v,qc,drop=NULL,ar.stop=-1,ar.row=-1,ar.w=-1,lt=NULL) {
 ## X'Wy...
@@ -376,6 +415,21 @@ Xbd <- function(X,beta,k,ks,ts,dt,v,qc,drop=NULL,lt=NULL) {
 
 diagXVXd <- function(X,V,k,ks,ts,dt,v,qc,drop=NULL,nthreads=1,lt=NULL,rt=NULL) {
 ## discrete computation of diag(XVX')
+  workXVXd(X,V,k,k1=NULL,ks,ts,dt,v,qc,drop,nthreads,lt,rt)
+} ## diagXVXd
+
+ijXVXd <- function(i,j,X,V,k,ks,ts,dt,v,qc,drop=NULL,nthreads=1,lt=NULL,rt=NULL) {
+## discrete computation of scattered elements XVX'[i,j]. i and j are vectors of indices
+  if (is.matrix(k)) {
+    ki <- k[i,];kj <- k[j,]
+  } else {
+    ki <- k[i];kj <- k[j]
+  }
+  workXVXd(X,V,ki,kj,ks,ts,dt,v,qc,drop,nthreads,lt,rt)
+} ## ijXVXd
+
+workXVXd <- function(X,V,k,k1,ks,ts,dt,v,qc,drop=NULL,nthreads=1,lt=NULL,rt=NULL) {
+## discrete computation of diag(XVX') or scattered elements of XWX'
 
   n <- if (is.matrix(k)) nrow(k) else length(k)
   m <- unlist(lapply(X,nrow));p <- unlist(lapply(X,ncol))
@@ -385,6 +439,7 @@ diagXVXd <- function(X,V,k,ks,ts,dt,v,qc,drop=NULL,nthreads=1,lt=NULL,rt=NULL) {
   }  
   if (is.null(rt)) rt <- 1:nt
   if (inherits(X[[1]],"dgCMatrix")) { ## the marginals are sparse
+    if (!is.null(k1)) stop("scattered XVX computation not yet implemented") 
     ## create list for passing to C
     m <- list(Xd=X,kd=k,ks=ks,v=v,ts=ts,dt=dt,qc=qc)
     m$off <- attr(X,"off"); m$r <- attr(X,"r")
@@ -423,18 +478,16 @@ diagXVXd <- function(X,V,k,ks,ts,dt,v,qc,drop=NULL,nthreads=1,lt=NULL,rt=NULL) {
       rpi <- unlist(lpip[rt])
       V <- V[lpi,rpi,drop=FALSE] ## select part of V required in correct order
     }
-#   oo <- .C(C_diagXVXt,diag=as.double(rep(0,n)),V=as.double(V),X=as.double(unlist(X)),k=as.integer(k-1), 
-#           ks=as.integer(ks-1),m=as.integer(m),p=as.integer(p), n=as.integer(n), nx=as.integer(nx),
-#	   ts=as.integer(ts-1), as.integer(dt), as.integer(nt),as.double(unlist(v)),as.integer(qc),as.integer(nrow(V)),
-#           as.integer(ncol(V)),as.integer(nthreads),as.integer(lt-1),as.integer(length(lt)),as.integer(rt-1),as.integer(length(rt)))
-#    D <- oo$diag
     D <- numeric(n)
-    .Call(C_CdiagXVXt,D,V,as.double(unlist(X)),k-1L,as.integer(ks-1L),as.integer(m),as.integer(p),
+    if (is.null(k1)) .Call(C_CdiagXVXt,D,V,as.double(unlist(X)),k-1L,as.integer(ks-1L),as.integer(m),as.integer(p),
           as.integer(ts-1L), as.integer(dt),as.double(unlist(v)),as.integer(qc),as.integer(nthreads),
-	  as.integer(lt-1L),as.integer(rt-1L))
+	  as.integer(lt-1L),as.integer(rt-1L)) else
+    .Call(C_CijXVXt,D,V,as.double(unlist(X)),k-1L,k1-1L,as.integer(ks-1L),as.integer(m),as.integer(p),
+          as.integer(ts-1L), as.integer(dt),as.double(unlist(v)),as.integer(qc),as.integer(nthreads),
+	  as.integer(lt-1L),as.integer(rt-1L))	  
   }
   D
-} ## diagXVXd
+} ## workXVXd
 
 dchol <- function(dA,R) {
 ## if dA contains matrix dA/dx where R is chol factor s.t. R'R = A
@@ -517,7 +570,7 @@ pqr2 <- function(x,nt=1,nb=30) {
   ## by .Call *in environment from which function is called*
   x <- x*1  
   rank <- .Call(C_mgcv_Rpiqr,x,beta,piv,nt,nb)
-  ret <- list(qr=x,rank=rank,qraux=beta,pivot=piv+1)
+  ret <- list(qr=x,rank=rank,qraux=beta[1:rank],pivot=piv+1)
   attr(ret,"useLAPACK") <- TRUE
   class(ret) <- "qr"
   ret
@@ -828,13 +881,15 @@ minres <- function(R,u,b) {
   oo$x
 }
 
-neicov <- function(Dd,nei) {
+neicov <- function(Dd,D1=NULL,nei) {
 ## wrapper for nei_cov. Dd is n by p matrix of leave one out perturbations to
-## coef vectors. nei is neighbourhood structure. 
+## coef vectors. nei is neighbourhood structure. If D1 is not NULL then it is
+## perturbation matrix to be used on RHS of computation - used for correction
+## terms.
   p <- ncol(Dd)
   V <- matrix(0,p,p)
-  k <- nei$k-1
-  .Call(C_nei_cov,V,Dd,nei$m,k)
+  a <- nei$a-1
+  if (is.null(D1)) .Call(C_nei_cov,V,Dd,Dd,nei$ma,a) else .Call(C_nei_cov,V,Dd,D1,nei$ma,a)
   (V+t(V))/2
 } ## neicov
 

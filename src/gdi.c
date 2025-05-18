@@ -261,7 +261,7 @@ double qr_ldet_inv(double *X,int *r,double *Xi,int *get_inv)
    X is overwritten in the process
 */
 { double *tau,ldet,*p,*Qt;
-  int *pivot,i,TRUE=1,j,FALSE=0;
+  int *pivot,i,True=1,j,False=0;
   /* Allocated working storage ...*/
   pivot = (int *)CALLOC((size_t)*r,sizeof(int));
   tau = (double *)CALLOC((size_t)*r,sizeof(double));
@@ -275,9 +275,9 @@ double qr_ldet_inv(double *X,int *r,double *Xi,int *get_inv)
   /* Now get the inverse of X. X^{-1} = R^{-1}Q' */
     Qt = (double *)CALLOC((size_t)*r * *r,sizeof(double));
     for (p=Qt,i=0;i<*r;i++,p += *r+1) *p = 1.0;
-    mgcv_qrqy(Qt,X,tau,r,r,r,&TRUE,&TRUE); /* Extracting the orthogonal factor Q' */
+    mgcv_qrqy(Qt,X,tau,r,r,r,&True,&True); /* Extracting the orthogonal factor Q' */
 
-    mgcv_backsolve(X,r,r,Qt,Xi,r,&FALSE); /* Now Xi contains the row pivoted inverse of X */
+    mgcv_backsolve(X,r,r,Qt,Xi,r,&False); /* Now Xi contains the row pivoted inverse of X */
 
     /* Finally unpivot Xi. 
        pivot[i] is the unpivoted row that pivoted row i should end up in  
@@ -584,7 +584,7 @@ void get_stableS(double *S,double *Qf,double *sp,double *sqrtS, int *rSncol, int
    
 */
 { double *rS, *Un, *U, *Si,*Sb,*B,*C,*Sg,*p,*p1,*p2,*p3,*frob,*ev,max_frob,x,*spf;
-  int iter,i,j,k,bt,ct,rSoff,K,Q,Qr,*gamma,*gamma1,*alpha,TRUE=1,FALSE=0,r,max_col,Mf,n_gamma1;
+  int iter,i,j,k,bt,ct,rSoff,K,Q,Qr,*gamma,*gamma1,*alpha,True=1,False=0,r,max_col,Mf,n_gamma1;
 
   if (*fixed_penalty) { 
     Mf = *M + 1;  /* total number of components, including fixed one */
@@ -659,7 +659,7 @@ void get_stableS(double *S,double *Qf,double *sp,double *sqrtS, int *rSncol, int
         x = frob[i];
         for (p1=p,p2=Sb,p3=p+Q*Q;p1<p3;p1++,p2++) *p2 += *p1 / x;
       } 
-      mgcv_symeig(Sb,ev,&Q,&FALSE,&FALSE,&FALSE); /* get eigenvalues (ascending) of scaled sum over alpha */
+      mgcv_symeig(Sb,ev,&Q,&False,&False,&False); /* get eigenvalues (ascending) of scaled sum over alpha */
       
       r=1;
       while(r<Q&&(ev[Q-r-1]>ev[Q-1] * *r_tol)) r++;
@@ -691,7 +691,7 @@ void get_stableS(double *S,double *Qf,double *sp,double *sqrtS, int *rSncol, int
       for (p1=p,p2=Sb,p3=p+Q*Q;p1<p3;p1++,p2++) *p2 += *p1 * x;
     } 
 
-    mgcv_symeig(Sb,ev,&Q,&FALSE,&TRUE,&TRUE); /* get eigen decomposition of dominant term (ev descending) */
+    mgcv_symeig(Sb,ev,&Q,&False,&True,&True); /* get eigen decomposition of dominant term (ev descending) */
     
   /* .... U points to Sb, which now contains eigenvectors */
     if (iter==1) for (p=U,p1=Qf,p2 = p+Q*Q;p<p2;p++,p1++) *p1 = *p;
@@ -1555,7 +1555,7 @@ double *R,double *Q, int *nind,double *sp,double *rS,int *rSncol,int *q,int *n,
 
   double *RU1,*tau,*work,*Ri,*Qb=NULL,*K,*P,*IQ,*IQQ,*Vt,*XU1=NULL,
          *d,*p0,*p1,*p2,*p3,ldetXWXS,ldetI2D=0.0;
-  int ScS,bt,ct,qM,*pivot,i,j,k,left,tp,n_drop=0,*drop,FALSE=0; 
+  int ScS,bt,ct,qM,*pivot,i,j,k,left,tp,n_drop=0,*drop,False=0; 
 
   drop = (int *)CALLOC((size_t)*Ms,sizeof(int));
   for (i=0;i < *q;i++) if (nulli[i]>0.0) { drop[n_drop] = i;n_drop++; }
@@ -1665,7 +1665,7 @@ double *R,double *Q, int *nind,double *sp,double *rS,int *rSncol,int *q,int *n,
   /* rS also needs to have null space parts dropped, and to be pivoted... */
 
   drop_rows(rS,*q,ScS,drop,n_drop);   /* rS now rank by ScS */ 
-  pivoter(rS,&qM,&ScS,pivot,&FALSE,&FALSE); /* row pivot of rS */
+  pivoter(rS,&qM,&ScS,pivot,&False,&False); /* row pivot of rS */
   
   if (*type==0||*neg_w) FREE(Qb); else FREE(XU1);
   FREE(pivot);
@@ -1698,7 +1698,7 @@ void gdiPK(double *work,double *X,double *E,double *Es,double *rS,double *U1,dou
    z must contain Wz on entry.
    X is n by q. E is Enrow by q. On exit rank is rank of penalized problem (rank <= q)
 */
-{ int i,j,k,*pivot,nt1,nr,left,tp,bt,ct,TRUE=1,FALSE=0,one=1,rr;
+{ int i,j,k,*pivot,nt1,nr,left,tp,bt,ct,True=1,False=0,one=1,rr;
   double *zz=NULL,*WX,*tau,*R1,Rnorm,Enorm,Rcond,*Q=NULL,*tau1,*Ri,ldetI2D,*IQ,*d,*p0,*p1,*p2,*p3,*p4,xx,norm1,norm2;
   nt1 = *nt;
   
@@ -1734,7 +1734,7 @@ void gdiPK(double *work,double *X,double *E,double *Es,double *rS,double *U1,dou
  
   getRpqr(R1,WX,n,q,&rr,&nt1);
 
-  pivoter(R1,&rr,q,pivot,&TRUE,&TRUE); /* unpivoting the columns of R1 */
+  pivoter(R1,&rr,q,pivot,&True,&True); /* unpivoting the columns of R1 */
  
   /* Form a nicely scaled version of [R',Es']' for rank determination */ 
   Rnorm = frobenius_norm(R1,&rr,q);
@@ -1788,10 +1788,10 @@ void gdiPK(double *work,double *X,double *E,double *Es,double *rS,double *U1,dou
    
   mgcv_qr(R,&nr,rank,pivot1,tau1); /* The final QR decomposition */ 
   
-  i=1;pivoter(nulli,rank,&i,pivot1,&FALSE,&FALSE); /* pivoting the rows of nulli */
+  i=1;pivoter(nulli,rank,&i,pivot1,&False,&False); /* pivoting the rows of nulli */
 
   if (deriv2) { /* get first bit of X'WX (hessian of the deviance)*/
-    pivoter(R1,&rr,rank,pivot1,&TRUE,&FALSE); /* pivot the columns of R1 */
+    pivoter(R1,&rr,rank,pivot1,&True,&False); /* pivot the columns of R1 */
     getXtX(dev_hess,R1,&rr,rank);    
   } 
     
@@ -1907,11 +1907,11 @@ void gdiPK(double *work,double *X,double *E,double *Es,double *rS,double *U1,dou
      pivot1[i] gives the unpivoted position of the ith pivoted parameter.
   */
 
-  pivoter(rS,rank,&ScS,pivot1,&FALSE,&FALSE); /* row pivot of rS */
+  pivoter(rS,rank,&ScS,pivot1,&False,&False); /* row pivot of rS */
   
-  pivoter(E,Enrow,rank,pivot1,&TRUE,&FALSE);  /* column pivot of E */  
+  pivoter(E,Enrow,rank,pivot1,&True,&False);  /* column pivot of E */  
 
-  pivoter(X,n,rank,pivot1,&TRUE,&FALSE);  /* column pivot of X */ 
+  pivoter(X,n,rank,pivot1,&True,&False);  /* column pivot of X */ 
  
   if (*type==1) { /* create K = XP... */
     applyP(K,X,R,Vt,neg_w,nr,*rank,*n,1);
@@ -2054,7 +2054,7 @@ void gdi2(double *X,double *E,double *Es,double *rS,double *U1,
     *dev_hess=NULL,*R,*Rh,*raw,*Q1,*Q,*nulli,*WX,*tau,*R1;
   int i,j,k,*pivot1,ScS,*pi,rank,*pivot,
     ntot,n_2dCols=0,n_drop,*drop,tp,
-    n_work,deriv2,neg_w=0,*nind,nr,TRUE=1,FALSE=0,ML=0; 
+    n_work,deriv2,neg_w=0,*nind,nr,True=1,False=0,ML=0; 
  
   #ifdef OPENMP_ON
   int m;
@@ -2110,7 +2110,7 @@ void gdi2(double *X,double *E,double *Es,double *rS,double *U1,
         nind,pivot1,drop,
         n,q,Mp,neg_w,nt,Enrow,
         &rank,&n_drop,
-        deriv2,ScS,&TRUE,
+        deriv2,ScS,&True,
       rank_tol,ldet,type);
        
   FREE(raw);
@@ -2284,7 +2284,7 @@ void gdi2(double *X,double *E,double *Es,double *rS,double *U1,
   tp=0;mgcv_pqrqy(Q,WX,tau,&nr,&rank,&rank,&tp,nt);
   for (p1=Q,p0=K,j=0;j<rank;j++,p1 += *Enrow) for (i=0;i<*n;i++,p1++,p0++) *p0 = *p1;
   FREE(Q);FREE(WX);FREE(tau);
-  pivoter(P,&rank,&rank,pivot,&FALSE,&TRUE); /* unpivoting the rows of P */
+  pivoter(P,&rank,&rank,pivot,&False,&True); /* unpivoting the rows of P */
   FREE(pivot);
   for (p1=P,i=0;i < rank; i++) for (j=0;j<rank;j++,p1++) rV[pivot1[j] + i * rank] = *p1;
   undrop_rows(rV,*q,rank,drop,n_drop); /* zero rows inserted */
@@ -2318,7 +2318,7 @@ void gdi2(double *X,double *E,double *Es,double *rS,double *U1,
   FREE(work);FREE(R);FREE(Rh);FREE(pivot1);FREE(K);
   FREE(P);FREE(Q1);
 
-} /* gdi2 */
+} /* gdi2*/
 
 
 
@@ -2440,7 +2440,7 @@ void gdi1(double *X,double *E,double *Es,double *rS,double *U1,
     *alpha1,*alpha2,*raw,*Q1,*nulli;
   int i,j,k,*pivot=NULL,*pivot1,ScS,*pi,rank,tp,bt,ct,iter=0,m,one=1,
     n_2dCols=0,n_b2,n_drop,*drop,nt1,
-      n_eta1=0,n_eta2=0,n_work,deriv2,neg_w=0,*nind,nr,TRUE=1,FALSE=0; 
+      n_eta1=0,n_eta2=0,n_work,deriv2,neg_w=0,*nind,nr,True=1,False=0; 
   
   #ifdef OPENMP_ON
   m = omp_get_num_procs(); /* detected number of processors */
@@ -2495,7 +2495,7 @@ void gdi1(double *X,double *E,double *Es,double *rS,double *U1,
         n,q,Mp,neg_w,nt,Enrow,
         &rank,&n_drop,
         deriv2,ScS,REML,
-        rank_tol,&ldetXWXS,&FALSE);
+        rank_tol,&ldetXWXS,&False);
        
   /************************************************************************************/
   /* free some memory */                    
@@ -2683,7 +2683,7 @@ void gdi1(double *X,double *E,double *Es,double *rS,double *U1,
      Store bSb in bSb, bSb1 in trA1 and bSb2 in trA2.
   */
   if (*REML) {
-    get_bSb(&bSb,trA1,trA2,sp,E,rS,rSncol,Enrow,&rank,M,&FALSE,PKtz,b1,b2,deriv);
+    get_bSb(&bSb,trA1,trA2,sp,E,rS,rSncol,Enrow,&rank,M,&False,PKtz,b1,b2,deriv);
     if (*deriv) for (p2=D2,p1=trA2,i = 0; i< *M;i++) { /* penalized deviance derivs needed */
         D1[i] += trA1[i];
         if (deriv2) for (j=0;j<*M;j++,p1++,p2++) *p2 += *p1;   
@@ -2729,7 +2729,7 @@ void gdi1(double *X,double *E,double *Es,double *rS,double *U1,
   if (*REML>0) { /* It's REML */
     /* Now deal with log|X'WX+S| */   
     reml_penalty = ldetXWXS;
-    get_ddetXWXpS(trA1,trA2,P,K,sp,rS,rSncol,Tk,Tkm,n,&rank,&rank,M,&FALSE,deriv,*nt); /* trA1/2 really contain det derivs */
+    get_ddetXWXpS(trA1,trA2,P,K,sp,rS,rSncol,Tk,Tkm,n,&rank,&rank,M,&False,deriv,*nt); /* trA1/2 really contain det derivs */
   } /* So trA1 and trA2 actually contain the derivatives for reml_penalty */
 
   if (*REML<0) { /* it's ML, and more complicated */
@@ -2737,7 +2737,7 @@ void gdi1(double *X,double *E,double *Es,double *rS,double *U1,
     /* get derivs of ML log det in trA1 and trA2... */
 
     reml_penalty =  MLpenalty1(trA1,trA2,Tk,Tkm,nulli,X,R,Q1,nind,sp,rS,rSncol,
-			       &rank,n,Mp,M,&FALSE,&neg_w,rank_tol,deriv,nt,&FALSE);
+			       &rank,n,Mp,M,&False,&neg_w,rank_tol,deriv,nt,&False);
     
     FREE(R);FREE(Q1);FREE(nind);
   } /* note that rS scrambled from here on... */
@@ -2802,7 +2802,7 @@ void gdi1(double *X,double *E,double *Es,double *rS,double *U1,
 
     for (p1=Q,p0=K,j=0;j<rank;j++,p1 += *Enrow) for (i=0;i<*n;i++,p1++,p0++) *p0 = *p1;
     FREE(Q);FREE(WX);FREE(tau);
-    if (*deriv)  pivoter(rS,&rank,&ScS,pivot,&FALSE,&FALSE); /* apply the latest pivoting to rows of rS */
+    if (*deriv)  pivoter(rS,&rank,&ScS,pivot,&False,&False); /* apply the latest pivoting to rows of rS */
     
   }
 
@@ -2815,7 +2815,7 @@ void gdi1(double *X,double *E,double *Es,double *rS,double *U1,
   /* note that PP' and hence rV rV' are propto the cov matrix. */
 
   if (!*fisher) { /* first unpivot rows of P */
-    pivoter(P,&rank,&rank,pivot,&FALSE,&TRUE); /* unpivoting the rows of P */
+    pivoter(P,&rank,&rank,pivot,&False,&True); /* unpivoting the rows of P */
     FREE(pivot);
   }
 
@@ -2932,7 +2932,7 @@ void pls_fit1(double *y,double *X,double *w,double *wy,double *E,double *Es,int 
 
 */
 
-{ int i,j,k,rank,one=1,*pivot,*pivot1,left,tp,neg_w=0,*nind,bt,ct,nr,rr,n_drop=0,*drop,TRUE=1,FALSE=0,nz;
+{ int i,j,k,rank,one=1,*pivot,*pivot1,left,tp,neg_w=0,*nind,bt,ct,nr,rr,n_drop=0,*drop,True=1,False=0,nz;
   double *z,*WX,*tau,Rcond,xx,zz,zz1,*work,*Q,*Q1,*IQ,*raw,*d,*Vt,*p0,*p1,
     *R1,*tau1,Rnorm,Enorm,*R,*Xp;
   #ifdef OPENMP_ON
@@ -2990,7 +2990,7 @@ void pls_fit1(double *y,double *X,double *w,double *wy,double *E,double *Es,int 
   /* st for (i=0;i<*q;i++) for (j=i;j<*q;j++) R1[i + *q * j] = WX[i + *n * j]; */ 
   getRpqr(R1,WX,n,q,&rr,nt);
   
-  pivoter(R1,&rr,q,pivot,&TRUE,&TRUE); /* unpivoting the columns of R1 */
+  pivoter(R1,&rr,q,pivot,&True,&True); /* unpivoting the columns of R1 */
  
   /* Form a nicely scaled version of [R',Es']' for rank determination */ 
   Rnorm = frobenius_norm(R1,&rr,q);
@@ -3116,7 +3116,7 @@ void pls_fit1(double *y,double *X,double *w,double *wy,double *E,double *Es,int 
   /* form X'Wz, drop any entries in drop and pivot... */
   bt=1;ct=0;mgcv_mmult(work,X,wy,&bt,&ct,q,&one,n);     
   drop_rows(work,*q,1,drop,n_drop);
-  pivoter(work,&rank,&one,pivot1,&FALSE,&FALSE);  
+  pivoter(work,&rank,&one,pivot1,&False,&False);  
   
   if (!*use_wy) { /* Test R'Q'wz = X'Wz - not equal implies stability loss */ 
     for (zz=zz1=0,i=0;i<rank;i++) {

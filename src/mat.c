@@ -458,6 +458,18 @@ void mgcv_mmult(double *A,double *B,double *C,int *bt,int *ct,int *r,int *c,int 
 		B, &lda,C, &ldb,&beta, A, &ldc FCONE FCONE);
 } /* end mgcv_mmult */
 
+SEXP wdiag(SEXP a,SEXP IND,SEXP B) {
+/* diag(A)[ind] <- b by direct overwriting */
+  int r,k,*ind,*ik;
+  double *A,*b;
+  A = REAL(a); b = REAL(B); ind = INTEGER(IND);
+  r = nrows(a); k = length(B);
+  for (ik = ind + k;ind < ik;ind++, b++) {
+    k = *ind - 1; A[k+k*r] = *b;
+  }
+  return(R_NilValue);
+} /* wdiag */  
+
 SEXP mrow_sum(SEXP x,SEXP M, SEXP K) {
 /* X is n by p matrix, m and k are integer vectors   
    B is m[length(m)-1] by p output matrix.
@@ -979,7 +991,7 @@ int bpqr(double *A,int n,int p,double *tau,int *piv,int nb,int nt) {
    strategy is only described in words). 
    A is n by p.
 */ 
-  int jb,pb,i,j,k=0,m,*p0,nb0,q,one=1,ok_norm=1,*mb,*kb,rt,nth;
+  int jb,pb,i,j,k=0,m,*p0,nb0,q,one=1,ok_norm=1,*mb,*kb,rt,nth,min_np;
   double *cn,*icn,x,*a0,*a1,*F,*Ak,*Aq,*work,tol,xx,done=1.0,dmone=-1.0,dzero=0.0; 
   char trans='T',nottrans='N';
 #ifdef OMP_REPORT
@@ -1002,7 +1014,8 @@ int bpqr(double *A,int n,int p,double *tau,int *piv,int nb,int nt) {
   jb=0; /* start column of current block */
   pb = p; /* columns left to process */
   F = (double *)CALLOC((size_t) p * nb0,sizeof(double));
-  while (jb < p) {
+  if (n<p)  min_np = n; else min_np = p;
+  while (jb < min_np) { // was jb<p
     nb = p-jb;if (nb>nb0) nb = nb0;/* attempted block size */
     for (a0=F,a1=F+nb*pb;a0<a1;a0++) *a0 = 0.0; /* F[1:pb,1:nb] = 0 - i.e. clear F */
     for (j=0;j<nb;j++) { /* loop through cols of this block */
@@ -1040,7 +1053,6 @@ int bpqr(double *A,int n,int p,double *tau,int *piv,int nb,int nt) {
 	    /* Only 10th argument (of 11) changed on exit... */ 
             F77_CALL(dgemv)(&nottrans, mb+i, &j,&dmone,A+jb*(ptrdiff_t)n+kb[i],&n,F+j,&pb,&done,
 	                    A + (ptrdiff_t)n*k + kb[i], &one FCONE);
-            //F77_CALL(dgemv)(&nottrans, &m, &j,&dmone,A+jb*n+k,&n,F+j,&pb,&done,Ak, &one);
           }
         }
       }
@@ -1053,26 +1065,20 @@ int bpqr(double *A,int n,int p,double *tau,int *piv,int nb,int nt) {
       /* F[j+1:pb-1,j] = tau[k] * A[k:n-1,k+1:p-1]'v */ 
       
       if (k<p-1) { /* up to O(np) step - most expensive after block */
-        // i=p-k-1;
         q = p - k - 1 ; /* total number of rows to split between threads */
         rt = q/nt;if (rt*nt < q) rt++; /* rows per thread */
         nth = nt; while (nth>1&&(nth-1)*rt>q) nth--; /* reduce number of threads if some empty */
         kb[0] = j+1;
         for (i=0;i<nth-1;i++) { mb[i] = rt;kb[i+1]=kb[i]+rt;}
         mb[nth-1]=q-(nth-1)*rt;
-	//  #ifdef OPENMP_ON
-        //#pragma omp parallel private(i) num_threads(nth)
-        //#endif 
         { /* start of parallel section */
           #ifdef OPENMP_ON
           #pragma omp parallel for private(i) num_threads(nth)
           #endif
           for (i=0;i<nth;i++) {
-            //#pragma flush(trans,m,mb,tau,k,A,kb,jb,n,Ak,one,dzero,F,pb)
-	  F77_CALL(dgemv)(&trans, &m, mb+i,tau+k,A+(kb[i]+jb) * (ptrdiff_t) n+k,&n,
+        	  F77_CALL(dgemv)(&trans, &m, mb+i,tau+k,A+(kb[i]+jb) * (ptrdiff_t) n+k,&n,
                           Ak,&one,&dzero,F+kb[i]+(ptrdiff_t)j*pb, &one FCONE);
           }
-          //F77_CALL(dgemv)(&trans, &m, &i,tau+k,A+(k+1)*n+k,&n,Ak,&one,&dzero,F+j+1+j*pb, &one);
         } /* end of parallel section */
       } 
       /* F[0:pb-1,j] -= tau[k] F[0:pb-1,0:j-1] A[k:n-1,jb:k-1]'v */
@@ -1093,8 +1099,7 @@ int bpqr(double *A,int n,int p,double *tau,int *piv,int nb,int nt) {
           for (i=0;i<nth;i++) {
   	    F77_CALL(dgemv)(&trans, &m, mb+i,&dmone,A+kb[i]* (ptrdiff_t)n+k,&n,Ak,&one,
 			    &dzero,work+kb[i]-jb, &one FCONE);
-          // F77_CALL(dgemv)(&trans, &m, &j,&dmone,A+jb*n+k,&n,Ak,&one,&dzero,work, &one);
-          }
+           }
         }
         q = pb ; /* total number of rows to split between threads */
         rt = q/nt;if (rt*nt < q) rt++; /* rows per thread */
@@ -1104,7 +1109,6 @@ int bpqr(double *A,int n,int p,double *tau,int *piv,int nb,int nt) {
         mb[nth-1]=q-(nth-1)*rt;
         for (i=0;i<nth;i++) { 
 	  F77_CALL(dgemv)(&nottrans, mb+i, &j,tau+k,F+kb[i],&pb,work,&one,&done,F+(ptrdiff_t)j*pb+kb[i], &one FCONE);
-	  // F77_CALL(dgemv)(&nottrans, &pb, &j,tau+k,F,&pb,work,&one,&done,F+j*pb, &one);
         }
       }
       /* update pivot row A[k,k+1:p-1] -= A[k,jb:k]F(j+1:pb-1,1:j)' */
@@ -1128,8 +1132,6 @@ int bpqr(double *A,int n,int p,double *tau,int *piv,int nb,int nt) {
 	                    &n,&done,A+(kb[i]+jb)*(ptrdiff_t)n+k, &n FCONE); 
           }
         }
-        //m=pb-j-1;i=j+1;
-        //F77_CALL(dgemv)(&nottrans, &m, &i,&dmone,F+j+1,&pb,A + jb * n + k,&n,&done,Ak+n, &n);
       }
       *Ak = xx; /* restore A[k,k] */
       /* Now down date the column norms */
@@ -1150,18 +1152,18 @@ int bpqr(double *A,int n,int p,double *tau,int *piv,int nb,int nt) {
     } /* for j */
     j--; /* make compatible with current k */
 
-    /* now the block update - about half the work is here*/    
-    if (k<p-1) {
+    /* now the block update - about half the work is here*/
+    m = n - k - 1 ;
+    if (m>0 && k<p-1) { // m>0 is new
       /* A[k+1:n,k+1:p] -= A[k+1:n,jb:k]F[j+1:pb,0:nb-1]'
          dgemm (TRANSA, TRANSB, M, N, K, ALPHA, A, LDA, B, LDB, BETA, C, LDC)*/ 
-      m = n - k - 1 ;
+      //m = n - k - 1 ;
       rt = m/nt;if (rt*nt < m) rt++; /* rows per thread */
       nth = nt; while (nth>1&&(nth-1)*rt>m) nth--; /* reduce number of threads if some empty */
       kb[0] = k+1;
       for (i=0;i<nth-1;i++) { mb[i] = rt;kb[i+1]=kb[i]+rt;}
       mb[nth-1]=m-(nth-1)*rt;
       rt = p - k - 1;  
-      //Rprintf("nth = %d  nt = %d\n",nth,nt);   
       #ifdef OPENMP_ON
       #pragma omp parallel private(i,Ak,Aq) num_threads(nth)
       #endif 
@@ -1173,8 +1175,6 @@ int bpqr(double *A,int n,int p,double *tau,int *piv,int nb,int nt) {
           Ak = A + (k+1)*(ptrdiff_t) n + kb[i];Aq = A + jb * (ptrdiff_t) n + kb[i];
           /* Argument 12 changed on exit... */
           F77_CALL(dgemm)(&nottrans,&trans,mb+i,&rt,&nb,&dmone,Aq,&n,F+j+1,&pb,&done,Ak,&n FCONE FCONE);
-          // Ak = A + (k+1)*n + k + 1;Aq = A + jb * n + k + 1;
-          // F77_CALL(dgemm)(&nottrans,&trans,&m,&rt,&nb,&dmone,Aq,&n,F+j+1,&pb,&done,Ak,&n);
         }
       } /* end of parallel section */
     }
@@ -1192,7 +1192,7 @@ int bpqr(double *A,int n,int p,double *tau,int *piv,int nb,int nt) {
     }
     pb -= nb;
     jb += nb;
-  } /* end while (jb<p) */
+  } /* end while (jb<min_np) */
   FREE(F); FREE(mb); FREE(kb);
   FREE(cn);
   FREE(icn);
@@ -1200,7 +1200,7 @@ int bpqr(double *A,int n,int p,double *tau,int *piv,int nb,int nt) {
 #ifdef OMP_REPORT
   Rprintf("done\n");
 #endif
-  return(p); /* NOTE: not really rank!! */
+  return(min_np); /* NOTE: not really rank!! */
 } /* bpqr */
 
 int mgcv_piqr(double *x,int n, int p, double *beta, int *piv, int nt) {
@@ -1317,7 +1317,7 @@ SEXP mgcv_Rpiqr(SEXP X, SEXP BETA,SEXP PIV,SEXP NT, SEXP NB) {
 /* routine to QR decompose N by P matrix X with pivoting.
    Work is done by bpqr.
 
-   Designed for use with .call rather than .C
+   Designed for use with .Call rather than .C
    Return object is as 'qr' in R.
 
 */
@@ -1338,7 +1338,123 @@ SEXP mgcv_Rpiqr(SEXP X, SEXP BETA,SEXP PIV,SEXP NT, SEXP NB) {
   UNPROTECT(1);
   return(rr);
 
-} /* mgcv_piqr */
+} /* mgcv_Rpiqr */
+
+
+void qradd(double *Q,double *R,double *a,int n,int p) {
+/* A = QR where A is n-1 by p. Q is supplied as n by n with Q factor in 
+   upper left n-1 by n-1 part. R is supplied as the p by p upper triangular 
+   part of the R factor. 'a' is the row to append to A, making it n by p.
+   Returns Q and R factors of updated A, using Givens based method somewhat 
+   similar to Golub and Van Loan 5.1.3 p240 and 6.5.3 p337. Difference is 
+   that a is added as final, not initial row.  
+
+   Not designed for n<p.
+*/
+  double *p0,*p1,*Rjj,*Rji,tau,s,c,ai,Qj;
+  int i,j;
+  /* ensure last row and col of Q are zero, except for final element
+     which is 1... */
+  for (p0=Q+n-1,p1=Q+n*n;p0<p1;p0+=n) *p0=0.0;
+  for (p0=Q+n*(n-1);p0<p1;p0++) *p0=0.0;
+  p1--;*p1=1.0;Rjj = R;
+  for (j=0;j<p;j++,a++,Rjj+=p+1) if (*a) { /* zero a[j] into R[j,j] */
+    if (fabs(*a)>fabs(*Rjj)) { /* compute Givens rotation */
+      tau = - *Rjj / *a; s = 1/sqrt(1+tau*tau); c = s*tau;
+    } else {
+      tau = - *a / *Rjj; c = 1/sqrt(1+tau*tau); s = c*tau;
+    }
+    *Rjj = c * *Rjj - s * *a; *a = 0.0;
+    Rji = Rjj + p;p0 = a + 1;
+    for (i=j+1;i<p;i++,Rji+=p,p0++) { /* work over remaining cols of R */
+      ai = c * *p0 + s * *Rji;
+      *Rji = c * *Rji - s * *p0;
+      *p0 = ai; /* *p0 is a[i] */
+    }
+    p0 = Q + n*j;p1 = Q + n*(n-1); /* cols j and n-1 of Q */
+    for (i=0;i<n;i++,p0++,p1++) { /* apply transposed Givens to Q */
+      Qj = *p0 * c - *p1 * s;
+      *p1 = *p1 * c + *p0 * s;
+      *p0 = Qj;
+    }  
+  } /* j loop over cols of R */   
+} /* qradd */  
+
+
+void qrdrop(double *Q,double *R,int k,int n,int p) {
+/* A = QR where A is n by p. Q is supplied as n by n. R is supplied as 
+   the p by p upper triangular part of the R factor. Row k of A is to 
+   be dropped. Returns updated Q factor in upper left n-1 by n-1 block of 
+   Q and updated R. Givens based method - see Golub and Van Loan 5.1.3 p240 
+   and 6.5.3 p337 - but operates by first moving row k to end.
+
+   Not designed for n<p (n==p fine).
+*/
+  double qk,*p0,*p1,*p2,*rn,*qn,*qj,tau,s,c,Qj,Rji,rnp=0.0;
+  int i,j;
+  /* first move the rows of Q up */
+  for (j=0;j<n;j++) {
+    p0 = Q + n * j;p2 = p0 + n;p0 += k; p1 = p0 + 1;
+    qk = *p0; /* Q[k,j] */
+    for (;p1<p2;p0++,p1++) *p0 = *p1; /* Q[i-1,j] = Q[i,j] i>k */
+    p2--; *p2 = qk; /* Q[n-1,j] = Q[k,j] */
+  }
+  rn = R + 1; /* storage for notional nth row of R (first p-1) */
+  if (n==p) rnp = R[p*p-1];
+  qn = Q + n * n - 1; qj = qn - n; /* nth and jth elements of q=Q[n-1,] */
+  for (j=n-2;j>=0;j--,qj -= n) if (*qj) { /* zero col j of q to col n */
+    if (fabs(*qn)>fabs(*qj)) { /* compute Givens rotation */
+      tau = - *qj / *qn; s = 1/sqrt(1+tau*tau); c = s*tau;
+    } else {
+      tau = - *qn / *qj; c = 1/sqrt(1+tau*tau); s = c*tau;
+    }
+    //*qn = *qj * c - *qn * s; *qj = 0; - not needed done in loop below
+    /* apply to columns of Q */
+    p0 = Q + j * n; p1 = Q + (n-1)*n; p2 = p1 + n;
+    for (;p1<p2;p0++,p1++) {
+      Qj = *p0 * s + *p1 * c;
+      *p1 = *p0 * c - *p1 * s;
+      *p0 = Qj;
+    }
+    /* and now apply to the rows of R... */
+    if (j<p) {
+      p1 = R + (p-1) * p + j; // R[j,p-1]
+      Rji = rnp * c + *p1 * s;
+      rnp = *p1 * c - rnp * s;
+      *p1 = Rji;p1 -= p;p0 = rn + p-2;
+      for (i=p-2;i>=j;i--,p1 -= p,p0--) {
+        Rji = *p0 * c + *p1 * s;
+	*p0 = *p1 * c - *p0 * s;
+	*p1 = Rji;
+      }
+    } /* R update */
+  }
+  for (i=0;i<p-1;i++) rn[i] = 0.0;
+  if (n==p) R[p*p-1] = 0.0;
+} /* qrdrop */  
+
+
+SEXP QRdrop(SEXP q,SEXP r,SEXP K) {
+/* .Call wrapper for qrdrop */
+  int n,p,*k;
+  double *Q,*R;
+  n = nrows(q); p = nrows(r);
+  k = INTEGER(K);Q = REAL(q); R = REAL(r);
+  qrdrop(Q,R,*k,n,p);
+  return(R_NilValue);
+} /* QRdrop */  
+
+SEXP QRadd(SEXP q,SEXP r,SEXP A) {
+/* .Call wrapper for qrdrop */
+  int n,p;
+  double *Q,*R,*a;
+  n = nrows(q); p = nrows(r);
+  a = REAL(A);Q = REAL(q); R = REAL(r);
+  qradd(Q,R,a,n,p);
+  return(R_NilValue);
+} /* QRdrop */  
+
+
 
 void mgcv_pmmult(double *A,double *B,double *C,int *bt,int *ct,int *r,int *c,int *n,int *nt) {
   /* 
@@ -1987,6 +2103,112 @@ void mroot(double *A,int *rank,int *n)
   FREE(pivot);FREE(B);
 }
 
+
+void mtrf(double *A, double *B,int *n,int *rank,int *psd,double *tol,double *work,int *iwork) {
+/* Obtain minimum rank factors of possibly rank deficient matrix A. If psd then A = LL'
+   otherwise A=LU.
+
+   A [in,out] is n by n matrix. It is symmetric and posiive semi-definite unless psd is zero. 
+     on exit it is the L factor of A.
+   B [out] unused if psd, otherwise n by rank or n by n. Contains U' on exit if !psd.
+   n [in] dimension of A.
+   rank [in,out] if psd and >0 it is the rank of A. Otherwise rank determined numerically and
+        returned in this.
+   psd [in] 0 for an indefinte matrix, non zero for positive semi definite.
+   tol [in] tolerance for rank determination if !psd.
+   double [in, out] 2*n workspace array.
+   iwork [in,out] n workspace array.   
+
+   In psd case uses pivoted Cholesky, removing the trailing zero block of L and then unpivoting.
+   Otherwise uses pivoted LU decomposition A = PLU where the leading diagonal elements of L are 1. 
+   Zero rows of U are dropped, with corresponding columns of L. Remaining columns of L are unpivoted. 
+
+   LAPACK routines dpstrf and dgetrf are used. Note that they return pivot sequence using different 
+   conventions. Dropped columns of A and B are not zeroed on return.
+ 
+   mtrf must be in init.c for this to work - note no 'C_'
+
+   library(mgcv)
+   set.seed(1)
+   p <- 4;r<- 3
+   X <- matrix(rnorm(p*r),p,r);D <- X%*%t(X)
+   rank <- 0
+   er<-.C("mtrf",A=as.double(D),B=as.double(D),n=as.integer(p),rank=as.integer(rank),psd=as.integer(1),
+          tol=as.double(.Machine$double.eps),work=as.double(numeric(2*p)),iwork=as.integer(integer(4)),PACKAGE="mgcv")
+   rank <- er$rank
+   L <- matrix(er$A[1:(rank*p)],p,rank)
+   D;L%*%t(L);rank;range(D-L%*%t(L))
+   er<-.C("mtrf",A=as.double(D),B=as.double(D),n=as.integer(p),rank=as.integer(0),psd=as.integer(0),
+          tol=as.double(.Machine$double.eps),work=as.double(numeric(2*p)),iwork=as.integer(integer(4)),PACKAGE="mgcv")
+   rank <- er$rank
+   L <- matrix(er$A[1:(rank*p)],p,rank)
+   U <- t(matrix(er$B[1:(rank*p)],p,rank))
+   L%*%U;D;rank;range(D-L%*%U)
+   p <- 7
+   X <- matrix(rnorm(p*p),p,p); D <- X+t(X)
+   D[,1] <- D[1,] <- D[,4] <- D[4,] <- D[,6] <- D[6,] <- 3
+   er<-.C("mtrf",A=as.double(D),B=as.double(D),n=as.integer(p),rank=as.integer(0),psd=as.integer(0),
+          tol=as.double(.Machine$double.eps),work=as.double(numeric(2*p)),iwork=as.integer(integer(p)),PACKAGE="mgcv")
+   rank <- er$rank
+   L <- matrix(er$A[1:(rank*p)],p,rank)
+   U <- t(matrix(er$B[1:(rank*p)],p,rank))
+   L%*%U;D;rank;range(D-L%*%U)
+ 
+   D <- matrix(runif(p*r),p,r) %*%  matrix(runif(p*r),r,p)
+   er<-.C("mtrf",A=as.double(D),B=as.double(D),n=as.integer(p),rank=as.integer(0),psd=as.integer(0),
+          tol=as.double(.Machine$double.eps),work=as.double(numeric(2*p)),iwork=as.integer(integer(p)),PACKAGE="mgcv")
+   rank <- er$rank
+   L <- matrix(er$A[1:(rank*p)],p,rank)
+   U <- t(matrix(er$B[1:(rank*p)],p,rank))
+   L%*%U;D;rank;range(D-L%*%U)
+*/  
+  int info=1,i,j,*piv;
+  char uplo='L';
+  double *p,*p1,max=0.0,row_max,x;
+  
+  piv=iwork;
+  if (*psd) { /* positive semidefinite - use Cholesky pivoted A = LL'*/
+    x = -1.0; /* auto-tolerance */
+    F77_CALL(dpstrf)(&uplo,n,A,n,piv,&j,&x,work,&info FCONE); /* LAPACK pivoted Cholesky*/
+    if (*rank<=0) *rank=j;
+    for (i=0;i<*n;i++,piv++) *piv += -1;
+    piv=iwork;
+    /* zero columns between rank detected by Cholesky and supplied rank, if needed... */
+    if (j < *rank) for (p = A + j* *n,p1 = A + *rank * *n;p<p1;p++) *p = 0.0;
+    /* zero upper triangle and unpivot L factor */
+    for (j=0;j<*rank;j++) {
+      for (i=0;i<j;i++) work[i] = 0.0;
+      for (p=A+j * *n,i=j;i<*n;i++) work[i] = p[i];
+      for (i=0;i<*n;i++) p[piv[i]] = work[i];
+    } 
+  } else { /* indefinite - use LU*/
+    F77_CALL(dgetrf)(n,n,A,n,piv,&info); /* LAPACK pivoted LU */
+    /* dgetrf returns the sequence of row interchanges - not the pivots themselves. piv[i] is 
+       the row that row i was swapped with. Have to apply this shuffling to 1:n to get pivots */
+    for (i=0;i<*n;i++) { work[i] = (double) piv[i];piv[i]=i;}
+    for (i=0;i<*n;i++) { j = (int) work[i]-1;info = piv[j];piv[j]=piv[i];piv[i]=info;}
+    
+    *rank = 0;
+    for (p=A,p1=A+ *n * *n;p<p1;p++) { x=fabs(*p); if (x > max) max=x;}
+    for (i=0;i<*n;i++) { /* work through rows of U factor */
+      row_max=0.0;
+      for (p=A+i* *n+i,j=i;j<*n;j++,p += *n) { /* get row max */
+        x = fabs(*p); if (x > row_max) row_max=x;
+      }
+      if (row_max > max * *tol) { /* is row non-zero? */
+	/* copy U' to B */
+	for (j=0;j<i;j++,B++) *B = 0.0;
+	for (p1=p=A+i* *n + i, j=i;j<*n;j++,B++,p+= *n) *B = *p;
+        *p1 = 1.0; /* LD element of L added in explicitly */
+	/*  zero upper triangle and unpivot L factor */
+	for (j=0;j<i;j++) work[j] = 0.0;
+        for (p=A+i * *n,j=i;j<*n;j++) work[j] = p[j];
+        for (p=A+ *rank * *n,j=0;j<*n;j++) p[piv[j]] = work[j];
+	(*rank)++;
+      } 	
+    } /* rank determination */
+  }
+} /* mtrf */  
 
 void mgcv_svd_full(double *x,double *vt,double *d,int *r,int *c)
 /* call LA_PACK svd routine to form x=UDV'. U returned in x. V' returned in vt.
@@ -2782,7 +3004,7 @@ void mgcv_pqrqy0(double *b,double *a,double *tau,int *r,int *c,int *cb,int *tp,i
 
    This version matches mgcv_pqr0, which scales less well than current code. 
 */
-  int i,j,k,l,left=1,n,nb,nbf,nq,TRUE=1,FALSE=0;
+  int i,j,k,l,left=1,n,nb,nbf,nq,True=1,False=0;
   double *x0,*x1,*Qb;  
   #ifdef OMP_REPORT
   Rprintf("mgcv_pqrqy0...");
@@ -2819,7 +3041,7 @@ void mgcv_pqrqy0(double *b,double *a,double *tau,int *r,int *c,int *cb,int *tp,i
   if (*tp) { /* Q'b */
     /* first the component Q matrices are applied to the blocks of b */
     if (*cb > 1) { /* matrix case - repacking needed */
-      row_block_reorder(b,r,cb,&nb,&FALSE);
+      row_block_reorder(b,r,cb,&nb,&False);
     }
     #ifdef OPENMP_ON
     #pragma omp parallel private(i,j,l,n,x1) num_threads(k)
@@ -2880,13 +3102,13 @@ void mgcv_pqrqy0(double *b,double *a,double *tau,int *r,int *c,int *cb,int *tp,i
       }
     } /* end of parallel section */
     /* now need to unscramble separate blocks back into b as regular matrix */
-    if (*cb>1) row_block_reorder(b,r,cb,&nb,&TRUE);
+    if (*cb>1) row_block_reorder(b,r,cb,&nb,&True);
   } 
   #ifdef OMP_REPORT
   Rprintf("done\n");
   #endif
   FREE(Qb);
-}  /* mgcv_pqrqy0 */
+}  /* mgcv_pqrqy0*/
 
 
 void mgcv_pqrqy(double *b,double *a,double *tau,int *r,int *c,int *cb,int *tp,int *nt) {
@@ -2988,7 +3210,7 @@ void mgcv_pqr0(double *x,int *r, int *c,int *pivot, double *tau, int *nt) {
    - this is old code, which is uniformly less efficient than replacement.
 */
 
-  int i,j,k,l,*piv,nb,nbf,n,TRUE=1,FALSE=0,nr; 
+  int i,j,k,l,*piv,nb,nbf,n,True=1,False=0,nr; 
   double *R,*R1,*xi; 
   #ifdef OMP_REPORT
   Rprintf("mgcv_pqr0...");
@@ -2999,7 +3221,7 @@ void mgcv_pqr0(double *x,int *r, int *c,int *pivot, double *tau, int *nt) {
     nb = (int)ceil(*r/(double)k); /* block size */
     nbf = *r - (k-1)*nb; /* end block size */
     /* need to re-arrange row blocks so that they can be split between qr calls */
-    row_block_reorder(x,r,c,&nb,&FALSE); 
+    row_block_reorder(x,r,c,&nb,&False); 
     piv = (int *)CALLOC((size_t) (k * *c),sizeof(int));
     R = x + *r * *c ; /* pointer to combined unpivoted R matrix */
     nr = *c * k; /* number of rows in R */
@@ -3018,7 +3240,7 @@ void mgcv_pqr0(double *x,int *r, int *c,int *pivot, double *tau, int *nt) {
         R1 = (double *)CALLOC((size_t)(*c * *c),sizeof(double));
         for (l=0;l<*c;l++) for (j=l;j<*c;j++) R1[l + *c * j] = xi[l + n * j]; 
         /* What if final nbf is less than c? - can't happen  */
-        pivoter(R1,c,c,piv + i * *c,&TRUE,&TRUE); /* unpivoting the columns of R1 */
+        pivoter(R1,c,c,piv + i * *c,&True,&True); /* unpivoting the columns of R1 */
         for (l=0;l<*c;l++) for (j=0;j<*c;j++) R[i * *c +l + nr *j] = R1[l+ *c * j];
         FREE(R1);
       }

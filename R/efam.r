@@ -1,5 +1,5 @@
-## (c) Simon N. Wood & Natalya Pya (scat, beta), 
-## 2013-2023. Released under GPL2.
+## (c) Simon N. Wood,  Natalya Pya (scat, beta), Chris Shen (clog), 
+## 2013-2025. Released under GPL2.
 ## See gam.fit4.r for testing functions fmud.test and fetad.test.
 
 estimate.theta <- function(theta,family,y,mu,scale=1,wt=1,tol=1e-7,attachH=FALSE) {
@@ -16,7 +16,7 @@ estimate.theta <- function(theta,family,y,mu,scale=1,wt=1,tol=1e-7,attachH=FALSE
     nth <- length(theta) - if (scale<0) 1 else 0
     if (scale < 0) {
       scale <- exp(theta[nth+1])
-      theta <- theta[1:nth]
+      theta <- theta[-(nth+1)]
       get.scale <- TRUE
     } else get.scale <- FALSE
     dev <- sum(family$dev.resids(y, mu, wt,theta))/scale
@@ -29,7 +29,6 @@ estimate.theta <- function(theta,family,y,mu,scale=1,wt=1,tol=1e-7,attachH=FALSE
       g <- if (get.scale) c(g1,-dev/2) else g1
       ind <- 1:length(g)
       g <- g - ls$lsth1[ind]
-      ## g <- if (deriv>0) colSums(as.matrix(Dd$Dth))/(2*scale) - ls$lsth1[1:nth] else NULL
     } else g <- NULL
     if (deriv>1) {
       x <- colSums(as.matrix(Dd$Dth2))/(2*scale)
@@ -41,7 +40,6 @@ estimate.theta <- function(theta,family,y,mu,scale=1,wt=1,tol=1e-7,attachH=FALSE
       }
       if (get.scale) Dth2 <- rbind(cbind(Dth2,-g1),c(-g1,dev/2))
       H <- Dth2 - as.matrix(ls$lsth2)[ind,ind]
-      # H <- Dth2 - as.matrix(ls$lsth2)[1:nth,1:nth]
     } else H <- NULL
     list(nll=nll,g=g,H=H)
   } ## nlogl
@@ -54,26 +52,26 @@ estimate.theta <- function(theta,family,y,mu,scale=1,wt=1,tol=1e-7,attachH=FALSE
   g <- if (family$n.theta==0) nll$g[-del.ind] else nll$g
   H <- if (family$n.theta==0) nll$H[-del.ind,-del.ind,drop=FALSE] else nll$H
   step.failed <- FALSE
-  for (i in 1:100) { ## main Newton loop
-    #H <- if (family$n.theta==0) nll$H[-del.ind,-del.ind,drop=FALSE] else nll$H
-    #g <- if (family$n.theta==0) nll$g[-del.ind] else nll$g
-    eh <- eigen(H,symmetric=TRUE)
+  uconv <- abs(g) > tol*(abs(nll$nll)+1)
+  if (sum(uconv)) for (i in 1:100) { ## main Newton loop
+    eh <- eigen(H[uconv,uconv,drop=FALSE],symmetric=TRUE)
     pdef <- sum(eh$values <= 0)==0
     if (!pdef) { ## Make the Hessian pos def
       eh$values <- abs(eh$values)
-      thresh <- max(eh$values) * 1e-7
+      thresh <- max(eh$values) * 1e-5
       eh$values[eh$values<thresh] <- thresh
     }
     ## compute step = -solve(H,g) (via eigen decomp)...
-    step <- - drop(eh$vectors %*% ((t(eh$vectors) %*% g)/eh$values))
-    if (family$n.theta==0) step <- c(rep(0,n.theta),step)
+    step0 <- - drop(eh$vectors %*% ((t(eh$vectors) %*% g[uconv])/eh$values))
+    if (family$n.theta==0) step0 <- c(rep(0,n.theta),step0)
     ## limit the step length...
-    ms <- max(abs(step))
-    if (ms>4) step <- step*4/ms
-
+    ms <- max(abs(step0))
+    if (ms>4) step0 <- step0*4/ms
+    step <- theta*0;step[uconv] <- step0
+    
     nll1 <- nlogl(theta+step,family,y,mu,scale,wt,2)
     iter <- 0
-    while (nll1$nll > nll$nll) { ## step halving 
+    while (nll1$nll - nll$nll > .Machine$double.eps^.75*abs(nll$nll)) { ## step halving 
       step <- step/2; iter <- iter + 1
       if (sum(theta!=theta+step)==0||iter>25) {
         step.failed <- TRUE
@@ -88,10 +86,11 @@ estimate.theta <- function(theta,family,y,mu,scale=1,wt=1,tol=1e-7,attachH=FALSE
     g <- if (family$n.theta==0) nll$g[-del.ind] else nll$g
     H <- if (family$n.theta==0) nll$H[-del.ind,-del.ind,drop=FALSE] else nll$H
     ## convergence checking...
-    if (sum(abs(g) > tol*abs(nll$nll))==0) break 
+    uconv <- abs(g) > tol*(abs(nll$nll)+1)
+    if (sum(uconv)==0) break 
   } ## main Newton loop
   if (step.failed) warning("step failure in theta estimation")
-  if (attachH) attr(theta,"H") <- H#nll$H
+  if (attachH) attr(theta,"H") <- H #nll$H
   theta
 } ## estimate.theta
 
@@ -163,18 +162,21 @@ nb <- function (theta = NULL, link = "log") {
 ## as part of REML optimization. Currently the template for extended family objects.
   linktemp <- substitute(link)
   if (!is.character(linktemp)) linktemp <- deparse(linktemp)
-  if (linktemp %in% c("log", "identity", "sqrt")) stats <- make.link(linktemp)
-  else if (is.character(link)) {
-    stats <- make.link(link)
-    linktemp <- link
-  } else {
-    if (inherits(link, "link-glm")) {
-       stats <- link
-            if (!is.null(stats$name))
-                linktemp <- stats$name
-        }
-        else stop(gettextf("\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp)) 
-  }
+  okLinks <- c("log", "identity", "sqrt")
+  if (linktemp %in% okLinks) stats <- make.link(linktemp) else 
+  stop(gettextf("link \"%s\" not available for nb family; available links are %s", 
+                linktemp, paste(sQuote(okLinks), collapse = ", ")),domain = NA)
+  #else if (is.character(link)) {
+  #  stats <- make.link(link)
+  #  linktemp <- link
+  #} else {
+  #  if (inherits(link, "link-glm")) {
+  #     stats <- link
+  #          if (!is.null(stats$name))
+  #              linktemp <- stats$name
+  #      }
+  #      else stop(linktemp, " link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"")
+  #}
   ## Theta <-  NULL;
   n.theta <- 1
   if (!is.null(theta)&&theta!=0) {
@@ -306,28 +308,213 @@ nb <- function (theta = NULL, link = "log") {
         class = c("extended.family","family"))
 } ## nb
 
+##########################
+## Censored Poisson family
+##########################
+
+cpois <- function (link = "log") { 
+## Extended family object for censored Poisson
+  linktemp <- substitute(link)
+  if (!is.character(linktemp)) linktemp <- deparse(linktemp)
+  okLinks <- c("log", "identity", "sqrt")
+  if (linktemp %in% okLinks) stats <- make.link(linktemp) else 
+  stop(gettextf("link \"%s\" not available for cnorm family; available links are %s", 
+                linktemp, paste(sQuote(okLinks), collapse = ", ")),domain = NA)
+
+  n.theta <- 0
+ 
+  env <- new.env(parent = .GlobalEnv)
+  getTheta <- function(trans=FALSE) {} # get(".Theta")
+  putTheta <- function(theta) {}
+
+  validmu <- if (link=="identity") function(mu) all(is.finite(mu)) else
+             if (link=="log") function(mu) all(mu>0) else function(mu) all(mu>=0)
+
+  dev.resids <- function(y, mu, wt,theta=NULL) { ## cpois
+    
+      yat <- attr(y,"censor") ## determines censoring type as below
+      if (is.null(yat)) yat <- y 
+
+      ii <- which(yat==y) ## uncensored observations
+      d <- rep(0,length(y))
+      if (length(ii)) d[ii] <- 2*(dpois(y[ii],y[ii],log=TRUE)-dpois(y[ii],mu[ii],log=TRUE))
+
+      ii <- which(is.finite(yat)&yat!=y) ## interval censored
+      if (length(ii)) {
+        y1 <- pmax(yat[ii],y[ii]); y0 <- pmin(yat[ii],y[ii])
+        ## get mu for saturated likelihood... 
+        musat <- exp((lgamma(floor(y1)+1)-lgamma(floor(y0)+1))/(floor(y1)-floor(y0)))
+        d[ii] <- 2*(log(ppois(y1,musat)-ppois(y0,musat))  - log(ppois(y1,mu[ii])-ppois(y0,mu[ii])))
+      }
+      
+      ii <- which(yat == -Inf) ## left censored (sat lik is 1)
+      if (length(ii)) d[ii] <- -2*ppois(y[ii],mu[ii],lower.tail=TRUE,log.p=TRUE)
+      
+      ii <- which(yat == Inf) ## right censored
+      if (length(ii)) d[ii] <- -2*ppois(y[ii],mu[ii],lower.tail=FALSE,log.p=TRUE)
+      d
+    } ## dev.resids cpoi
+    
+    Dd <- function(y, mu, theta, wt, level=0) {
+    ## derivatives of the cpois deviance...
+     
+      yat <- attr(y,"censor")
+      if (is.null(yat)) yat <- y
+      ## get case indices...
+      iu <- which(yat==y) ## uncensored observations
+      ii <- which(is.finite(yat*y)&yat!=y) ## interval censored
+      il <- which(yat == -Inf) ## left censored
+      ir <- which(yat == Inf) ## right censored
+      n <- length(mu)
+      f1 <- f2  <- rep(0,n)
+      if (level>0) f3 <- f1
+      if (level>1) f4 <- f1
+      
+      if (length(iu)) { ## uncensored
+        yiu <- y[iu]; miu <- mu[iu]
+	lf <- dpois(yiu,miu,log=TRUE)
+	f1[iu] <- exp(dpois(yiu-1,miu,log=TRUE)-lf)
+	f2[iu] <- exp(dpois(yiu-2,miu,log=TRUE)-lf)
+	if (level>0) f3[iu] <- exp(dpois(yiu-3,miu,log=TRUE)-lf)
+	if (level>1) f4[iu] <- exp(dpois(yiu-4,miu,log=TRUE)-lf)
+      } ## uncensored done
+      
+      if (length(ii)) { ## interval censored
+        y0 <- pmin(y[ii],yat[ii]); y1 <- pmax(y[ii],yat[ii])
+        mii <- mu[ii]
+        g <- ppois(y1,mii) - ppois(y0,mii)
+	f1[ii] <- (ppois(y1-1,mii) - ppois(y0-1,mii))/g
+	f2[ii] <- (ppois(y1-2,mii) - ppois(y0-2,mii))/g
+	if (level>0) f3[ii] <- (ppois(y1-3,mii) - ppois(y0-3,mii))/g
+	if (level>1) f4[ii] <- (ppois(y1-4,mii) - ppois(y0-4,mii))/g
+      } ## interval censored done
+
+      for (lt in c(TRUE,FALSE)) { ## do left then right censoring...
+        ii <- if (lt) il else ir # left or right censoring
+        if (length(ii)) {
+          yil <- y[ii]; mil <- mu[ii] 
+          lf <- ppois(yil,mil,lower.tail=lt,log.p=TRUE)
+	  f1[ii] <- exp(ppois(yil-1,mil,lower.tail=lt,log.p=TRUE)-lf)
+	  f2[ii] <- exp(ppois(yil-2,mil,lower.tail=lt,log.p=TRUE)-lf)
+	  if (level>0) f3[ii] <- exp(ppois(yil-3,mil,lower.tail=lt,log.p=TRUE)-lf)
+	  if (level>1) f4[ii] <- exp(ppois(yil-4,mil,lower.tail=lt,log.p=TRUE)-lf)
+        } 
+      } ## lt TRUE/FALSE
+      
+      r <- list(Dmu=-2*(f1-1),Dmu2=-2*(f2-f1^2)); r$EDmu2 = r$Dmu2
+      if (level>0) r$Dmu3 <-  -2*(f3 - 3*f1*f2 + 2*f1^3)
+      if (level>1) r$Dmu4 <- -2*(f4 - 4*f3*f1 + 12*f1^2*f2 - 3*f2^2 - 6*f1^4)
+      r
+    } ## Dd cpois
+
+    aic <- function(y, mu, theta=NULL, wt, dev) { ## cpois AIC
+      
+	yat <- attr(y,"censor")
+        if (is.null(yat)) yat <- y
+        ii <- which(is.na(yat)|yat==y) ## uncensored observations
+        d <- rep(0,length(y))
+        if (length(ii)) d[ii] <- dpois(y[ii],mu[ii],log=TRUE)
+	
+        ii <- which(is.finite(yat)&yat!=y) ## interval censored
+        if (length(ii)) {
+          y1 <- pmax(yat[ii],y[ii]); y0 <- pmin(yat[ii],y[ii])
+          d[ii] <- log(ppois(y1,mu[ii])-ppois(y0,mu[ii]))
+        }
+	
+        ii <- which(yat == -Inf) ## left censored
+        if (length(ii)) d[ii] <- ppois(y[ii],mu[ii],log.p=TRUE)
+        ii <- which(yat == Inf) ## right censored
+        if (length(ii)) d[ii] <- ppois(y[ii],mu[ii],lower.tail=FALSE,log.p=TRUE)
+        -2*sum(d) ## -2*log likelihood
+    } ## AIC cpois
+    
+    ls <- function(y,w,theta,scale) {
+       ## the cpois log saturated likelihood function.
+      
+       yat <- attr(y,"censor")
+       if (is.null(yat)) yat <- y
+
+       ii <- which(yat==y) ## uncensored observations
+       d2 <- d1 <- d <- rep(0,length(y))
+       if (length(ii)) {
+         d[ii] <- dpois(y[ii],y[ii],log=TRUE)
+       }
+       
+       ii <- which(is.finite(yat)&yat!=y) ## interval censored
+       if (length(ii)) {
+         y1 <- pmax(yat[ii],y[ii]); y0 <- pmin(yat[ii],y[ii])
+	 mus <- exp((lgamma(floor(y1)+1)-lgamma(floor(y0)+1))/(floor(y1)-floor(y0)))
+         d[ii] <- log(ppois(y1,mus)-ppois(y0,mus))  ## log saturated likelihood
+       }
+       ## right or left censored saturated log likelihoods are zero.
+       list(ls=sum(d), ## saturated log likelihood
+            lsth1=0, ## first deriv vector w.r.t theta - last element relates to scale, if free
+	    LSTH1=matrix(d1,ncol=1),
+            lsth2=0) ## Hessian w.r.t. theta, last row/col relates to scale, if free
+    } ## ls cpois
+
+    initialize <- expression({ ## cpois
+        if (is.matrix(y)) {
+	 .yat <- y[,2]
+	 y <- y[,1]
+	 attr(y,"censor") <- .yat
+	} 
+        mustart <- if (family$link=="identity") y else pmax(y,min(y>0))
+    })
+  
+    postproc <- function(family,y,prior.weights,fitted,linear.predictors,offset,intercept){
+      posr <- list()
+      if (is.matrix(y)) {
+	 .yat <- y[,2]
+	 y <- y[,1]
+	 attr(y,"censor") <- .yat
+      } 
+      posr$null.deviance <- find.null.dev(family,y,eta=linear.predictors,offset,prior.weights)
+      posr$family <- "cpois"
+      posr
+    } ## postproc cpoi
+
+    rd <- function(mu,wt,scale) { ## NOTE - not done
+      
+    }
+
+    qf <- function(p,mu,wt,scale) { ## NOTE - not done
+     
+    }
+
+    subsety <- function(y,ind) { ## function to subset response
+      if (is.matrix(y)) return(y[ind,])
+      yat <- attr(y,"censor")
+      y <- y[ind]
+      if (!is.null(yat)) attr(y,"censor") <- yat[ind]
+      y
+    } ## subsety
+
+     environment(dev.resids) <- environment(aic) <- 
+     environment(rd)<- environment(qf)<- environment(putTheta) <- env
+    structure(list(family = "cnorm", link = linktemp, linkfun = stats$linkfun,
+        linkinv = stats$linkinv, dev.resids = dev.resids,Dd=Dd,subsety=subsety,#variance=variance,
+        aic = aic, mu.eta = stats$mu.eta, initialize = initialize,postproc=postproc,ls=ls,
+        validmu = validmu, valideta = stats$valideta,n.theta=0,putTheta=putTheta,getTheta=getTheta),
+        class = c("extended.family","family"))
+} ## cpois
+
+
+
 #########################
 ## Censored normal family
 #########################
 
 cnorm <- function (theta = NULL, link = "identity") { 
 ## Extended family object for censored Gaussian, as required for Tobit regression or log-normal
-## Accelarated Failure Time models. 
+## Accelerated Failure Time models.
   linktemp <- substitute(link)
   if (!is.character(linktemp)) linktemp <- deparse(linktemp)
-  if (linktemp %in% c("log", "identity", "sqrt")) stats <- make.link(linktemp)
-  else if (is.character(link)) {
-    stats <- make.link(link)
-    linktemp <- link
-  } else {
-    if (inherits(link, "link-glm")) {
-       stats <- link
-            if (!is.null(stats$name))
-                linktemp <- stats$name
-        }
-        else stop(gettextf("\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
-  }
-  ## Theta <-  NULL;
+  okLinks <- c("log", "identity", "sqrt")
+  if (linktemp %in% okLinks) stats <- make.link(linktemp) else 
+  stop(gettextf("link \"%s\" not available for cnorm family; available links are %s", 
+                linktemp, paste(sQuote(okLinks), collapse = ", ")),domain = NA)
+
   n.theta <- 1
   if (!is.null(theta)&&theta!=0) {
       if (theta>0) { 
@@ -627,6 +814,447 @@ cnorm <- function (theta = NULL, link = "identity") {
 
 
 #################################################
+## censored logistic family (Chris Shen)
+#################################################
+    log1pexp <- function(x) { ## compute log(1+e^x) safely
+      result <- x
+      ii <- which(x<=37); result[ii] <- exp(x[ii])
+      ii <- which(-37<x & x<=18); result[ii] <- log1p(exp(x[ii]))
+      ii <- which(18<x & x<=33.3); result[ii] <- x[ii]+exp(-x[ii])
+      return(result)
+    } # log1pexp
+
+    log1mexp <- function(a) { ## compute log(1-e^(-a)) safely
+      result <- numeric(length(a))
+      ii <- which(0<a & a<=log(2)); result[ii] <- log(-expm1(-a[ii]))
+      ii <- which(a>log(2)); result[ii] <- log1p(-exp(-a[ii]))
+      return(result)
+    } # log1mexp
+
+
+clog <- function(theta=NULL, link="identity") {
+  # links
+  linktemp <- substitute(link)
+  if (!is.character(linktemp)) linktemp <- deparse(linktemp)
+  okLinks <- c("log", "identity", "sqrt")
+  if (linktemp %in% okLinks) stats <- make.link(linktemp) else 
+  stop(gettextf("link \"%s\" not available for clog family; available links are %s", 
+                linktemp, paste(sQuote(okLinks), collapse = ", ")),domain = NA)
+
+#  else if (is.character(link)) {
+#    stats <- make.link(link)
+#    linktemp <- link
+#  } else {
+#    if (inherits(link, "link-glm")) {
+#      stats <- link
+#      if (!is.null(stats$name)) linktemp <- stats$name
+#    }
+#    else stop(linktemp, "link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"")
+#  }
+  
+  # theta
+  n.theta <- 1
+  if (!is.null(theta) && theta!=0) {
+    # positive theta; implies fixed value
+    if (theta>0) {
+      iniTheta <- log(theta)
+      n.theta <- 0
+    }
+    # negative theta; theta is now estimated
+    else iniTheta <- log(-theta)
+  } else iniTheta <- 0 # initial theta value for estimation
+
+  env <- new.env(parent=.GlobalEnv)
+  assign(".Theta", iniTheta, envir=env)
+  getTheta <- function(trans=FALSE) if (trans) exp(get(".Theta")) else get(".Theta")
+  putTheta <- function(theta) assign(".Theta", theta, envir=environment(sys.function()))
+
+  validmu <- if (link=="identity") function(mu) all(is.finite(mu)) else function(mu) all(mu>0)
+
+  # deviance residuals squared
+  # basically the deviance
+  dev.resids <- function(y, mu, wt, theta=NULL) {
+    log1pexp <- function(x) { ## compute log(1+e^x) safely
+      result <- x
+      ii <- which(x<=37); result[ii] <- exp(x[ii])
+      ii <- which(-37<x & x<=18); result[ii] <- log1p(exp(x[ii]))
+      ii <- which(18<x & x<=33.3); result[ii] <- x[ii]+exp(-x[ii])
+      return(result)
+    } # log1pexp
+
+    log1mexp <- function(a) { ## compute log(1-e^(-a)) safely
+      result <- numeric(length(a))
+      ii <- which(0<a & a<=log(2)); result[ii] <- log(-expm1(-a[ii]))
+      ii <- which(a>log(2)); result[ii] <- log1p(-exp(-a[ii]))
+      return(result)
+    } # log1mexp
+    
+    if (is.null(theta)) theta <- get(".Theta")
+    yat <- attr(y,"censor")
+    if (is.null(yat)) yat <- y
+    d <- rep(0,length(y))
+
+    # get indices
+    iu <- which(yat==y) # uncensored
+    ii <- which(is.finite(yat*y) & yat!=y) # interval censored
+    il <- which(yat==-Inf) # left censored
+    ir <- which(yat==Inf) # right censored
+
+    # uncensored
+    if (length(iu)) {
+      si <- exp(theta)/sqrt(wt[iu])
+      mui <- mu[iu]
+      yi <- y[iu]
+      d[iu] <- 2*(-2*log(2)+((yi-mui)/si)+2*log1pexp(-(yi-mui)/si)) # prevents overflow
+    }
+
+    # interval censored
+    if (length(ii)) {
+      si <- exp(theta)/sqrt(wt[ii])
+      mui <- mu[ii]
+      yl <- pmin(y[ii], yat[ii])
+      yr <- pmax(y[ii], yat[ii])
+
+      lm <- ((yr-yl)/(2*si))+log1mexp((yr-yl)/(2*si))-log1pexp((yr-yl)/(2*si))
+      l <- log1mexp((yr-yl)/si)-log1pexp((yl-mui)/si)-log1pexp(-(yr-mui)/si) # prevents overflow
+      d[ii] <- 2*(lm-l)
+    }
+
+    # left censored
+    if (length(il)) {
+      si <- exp(theta)/sqrt(wt[il])
+      mui <- mu[il]
+      yr <- y[il]
+
+      lm <- 0
+      l <- -log1pexp(-(yr-mui)/si)
+      d[il] <- 2*(lm-l)
+    }
+
+    # right censored
+    if (length(ir)) {
+      si <- exp(theta)/sqrt(wt[ir])
+      mui <- mu[ir]
+      yl <- y[ir]
+      
+      lm <- 0
+      l <- (-(yl-mui)/si)-log1pexp(-(yl-mui)/si)
+      d[ir] <- 2*(lm-l)
+    }
+    return(d)
+  } ## dev.resids clogistic
+
+  # deviance derivatives
+  Dd <- function(y, mu, theta, wt, level=0) {
+    yat <- attr(y, "censor")
+    if (is.null(yat)) yat <- y
+
+    # get indices
+    iu <- which(yat==y) # uncensored
+    ii <- which(is.finite(yat*y) & yat!=y) # interval censored
+    il <- which(yat==-Inf) # left censored
+    ir <- which(yat==Inf) # right censored
+
+    # initialise variables
+    n <- length(mu)
+    Dmu <- Dmu2 <- rep(0,n)
+    if (level>0) Dth <- Dmuth <- Dmu3 <- Dmu2th <- Dmu
+    if (level>1) Dmu4 <- Dth2 <- Dmuth2 <- Dmu2th2 <- Dmu3th <- Dmu
+
+    # uncensored
+    if (length(iu)) {
+      si <- exp(theta)/sqrt(wt[iu])
+      yi <- y[iu]; mui <- mu[iu]
+      alphai <- 1/(2+expm1((yi-mui)/si)) # with precision
+
+      Dmu[iu] <- Dmui <- (2/si)*(2*alphai-1)
+      Dmu2[iu] <- Dmu2i <- (4/si^2)*alphai*(1-alphai)
+      if (level>0) {
+        Dmuth[iu] <- Dmuthi <- -Dmui+(yi-mui)*Dmu2i
+        Dth[iu] <- Dthi <- (yi-mui)*Dmui
+        Dmu3[iu] <- Dmu3i <- (-1/2)*Dmui*Dmu2i
+        Dmu2th[iu] <- Dmu2thi <- -2*Dmu2i+(1/2)*(mui-yi)*Dmui*Dmu2i
+      }
+      if (level>1) {
+        Dth2[iu] <- Dth2i <- (yi-mui)*Dmuthi
+        Dmuth2[iu] <- Dmuth2i <- -Dmuthi+(yi-mui)*Dmu2thi
+        Dmu4[iu] <- Dmu4i <- (-1/2)*(Dmu2i^2+Dmui*Dmu3i)
+        Dmu3th[iu] <- Dmu3thi <- (-1/2)*(Dmu2i*Dmuthi+Dmui*Dmu2thi)
+        Dmu2th2[iu] <- Dmu2th2i <- -2*Dmu2thi+(1/2)*(mui-yi)*(Dmui*Dmu2thi+Dmu2i*Dmuthi)
+      }
+    }
+
+    # interval censored
+    if (length(ii)) {
+      yl <- pmin(y[ii], yat[ii])
+      yr <- pmax(y[ii], yat[ii])
+      si <- exp(theta)/sqrt(wt[ii])
+      mui <- mu[ii]
+
+      alphai <- 1/(2+expm1(-(yr-mui)/si))
+      betai <- 1/(2+expm1(-(yl-mui)/si))
+
+      Dmu[ii] <- Dmui <- (2/si)*(1-alphai-betai)
+      Dmu2[ii] <- Dmu2i <- (2/si^2)*(alphai-alphai^2+betai-betai^2)
+      if (level>0) {
+        Dmuth[ii] <- Dmuthi <- -Dmui+(2/si^2)*((yr-mui)*(alphai-alphai^2)+(yl-mui)*(betai-betai^2))
+
+        lmth <- (yr-yl)*(1/si)*(1/(expm1(-(yr-yl)/(2*si))-expm1((yr-yl)/(2*si))))
+        lth <- (1/si)*(-(yr-yl)*(1/(expm1((yr-yl)/si)))+
+          (yl-mui)*(1/(expm1((mui-yl)/si)+2))-(yr-mui)*(1/(expm1((yr-mui)/si)+2)))
+        Dth[ii] <- Dthi <- 2*(lmth-lth)
+
+        Dmu3[ii] <- Dmu3i <- (4/si^2)*(alphai^2-alphai^3+betai^2-betai^3)-Dmu2i
+        Dmu2th[ii] <- Dmu2thi <- -2*Dmu2i+(-1/si)*(Dmuthi+Dmui)+
+          (4/si^3)*((yr-mui)*(alphai^2-alphai^3)+(yl-mui)*(betai^2-betai^3))
+      }
+      if (level>1) {
+        lmth2 <- -lmth-(1/2)*(yr-yl)^2*(1/si^2)*(1/(expm1(-(yr-yl)/(2*si))+
+          -expm1((yr-yl)/(2*si))))^2*(2+expm1(-(yr-yl)/(2*si))+expm1((yr-yl)/(2*si)))
+        lth2 <- -lth-(1/si^2)*((yr-yl)^2*(1/(expm1((yr-yl)/si)))*(1/(-expm1(-(yr-yl)/si)))+
+          (yl-mui)^2*(1/(expm1((mui-yl)/si)+2))*(1/(expm1((yl-mui)/si)+2))+
+          (yr-mui)^2*(1/(expm1((yr-mui)/si)+2))*(1/(expm1((mui-yr)/si)+2)))
+        Dth2[ii] <- Dth2i <- 2*(lmth2-lth2)
+
+        Dmuth2i <- -3*Dmuthi-2*Dmui+(-2/si^3)*((yr-mui)^2*(1-2*alphai)*(alphai-alphai^2)+
+          (yl-mui)^2*(1-2*betai)*(betai-betai^2))
+        Dmuth2[ii] <- Dmuth2i
+
+        Dmu4[ii] <- (-4/si^3)*((2*alphai-3*alphai^2)*(alphai-alphai^2)+
+          (2*betai-3*betai^2)*(betai-betai^2))-Dmu3i
+        Dmu3th[ii] <- -2*Dmu3i+2*(1/si^3)*((yr-mui)*(alphai-alphai^2)*(1-6*alphai+
+          6*alphai^2)+(yl-mui)*(betai-betai^2)*(1-6*betai+6*betai^2))
+        Dmu2th2[ii] <- -2*Dmu2thi+(1/si)*(Dmui-Dmuth2i)+(-12/si^3)*((yr-mui)*(alphai^2-alphai^3)+
+          (yl-mui)*(betai^2-betai^3))+(-4/si^4)*((yr-mui)^2*(2*alphai-3*alphai^2)*(alphai-alphai^2)+
+          (yl-mui)^2*(2*betai-3*betai^2)*(betai-betai^2))
+      }
+    }
+
+    # left censored
+    if (length(il)) {
+      si <- exp(theta)/sqrt(wt[il]) # array to number
+      yr <- y[il]
+      mui <- mu[il]
+      alphai <- 1/(2+expm1(-(yr-mui)/si))
+
+      Dmu[il] <- Dmui <- (2/si)*(1-alphai)
+      Dmu2[il] <- Dmu2i <- (2/si^2)*(alphai-alphai^2)
+      if (level>0) {
+        Dmuth[il] <- Dmuthi <- -Dmui+(yr-mui)*Dmu2i
+        Dth[il] <- Dthi <- (yr-mui)*Dmui
+        Dmu3[il] <- Dmu3i <- (1/si)*(2*alphai-1)*Dmu2i
+        Dmu2th[il] <- Dmu2thi <- -2*Dmu2i+(1/si)*(yr-mui)*(2*alphai-1)*Dmu2i
+      }
+      if (level>1) {
+        Dth2[il] <- Dth2i <- (yr-mui)*Dmuthi
+        Dmuth2[il] <- Dmuth2i <- -Dmuthi+(yr-mui)*Dmu2thi
+        Dmu4[il] <- Dmu4i <- -Dmu2i^2+(1/si)*(2*alphai-1)*Dmu3i
+        Dmu3th[il] <- Dmu3thi <- -(yr-mui)*Dmu2i^2+(1/si)*(2*alphai-1)*(Dmu2thi-Dmu2i)
+        Dmu2th2[il] <- -2*Dmu2thi-(yr-mui)^2*Dmu2i^2+
+          (1/si)*(yr-mui)*(2*alphai-1)*(Dmu2thi-Dmu2i)
+      }
+    }
+
+    # right censored
+    if (length(ir)) {
+      si <- exp(theta)/sqrt(wt[ir]) # array to number
+      yl <- y[ir]; mui <- mu[ir]
+      
+      betai <- 1/(2+expm1(-(yl-mui)/si))
+
+      #Dmu[ir] <- Dmui <- (2/si)*betai
+      Dmu[ir] <- Dmui <- -(2/si)*betai
+      #Dmu2[ir] <- Dmu2i <- (-2/si^2)*(betai-betai^2)
+      Dmu2[ir] <- Dmu2i <- (2/si^2)*(betai-betai^2)
+      if (level>0) {
+        #Dmuth[ir] <- Dmuthi <- (yl-mui)*Dmu2i
+        Dmuth[ir] <- Dmuthi <- -Dmui+(yl-mui)*Dmu2i
+        Dth[ir] <- Dthi <- (yl-mui)*Dmui
+        Dmu3[ir] <- Dmu3i <- (-1/si)*(1-2*betai)*Dmu2i
+        Dmu2th[ir] <- Dmu2thi <- -(2+(1/si)*(yl-mui)*(1-2*betai))*Dmu2i
+      }
+      if (level>1) {
+        Dth2[ir] <- Dth2i <- (yl-mui)*Dmuthi
+        #Dmuth2[ir] <- Dmuth2i <- (yl-mui)*Dmu2thi
+        Dmuth2[ir] <- Dmuth2i <- -Dmuthi+(yl-mui)*Dmu2thi
+        #Dmu4[ir] <- Dmu4i <- Dmu2i^2+(-1/si)*(1-2*betai)*Dmu3i
+        Dmu4[ir] <- Dmu4i <- -Dmu2i^2+(-1/si)*(1-2*betai)*Dmu3i
+        #Dmu3th[ir] <- Dmu3thi <- (1/si)*(1-2*betai)*(Dmu2i-Dmu2thi)+(yl-mui)*Dmu2i^2
+        Dmu3th[ir] <- Dmu3thi <- (1/si)*(1-2*betai)*(Dmu2i-Dmu2thi)-(yl-mui)*Dmu2i^2
+        #Dmu2th2[ir] <- -2*Dmu2thi-(mui-yl)*Dmu3thi ###
+        Dmu2th2[ir] <- (1/si)*(yl-mui)*(1-2*betai)*(Dmu2i-Dmu2thi)+
+          -(yl-mui)^2*Dmu2i^2-2*Dmu2thi
+      }
+    }
+    ip <- which(Dmu2<0); EDmu2t <- Dmu2
+    EDmu2t[ip] <- 0
+
+    r <- list(Dmu=Dmu, Dmu2=Dmu2, EDmu2=EDmu2t)
+    if (level>0) {
+      r$Dth <- Dth; r$Dmuth <- Dmuth; r$Dmu3 <- Dmu3
+      r$EDmu2th <- r$Dmu2th <- Dmu2th
+    }
+    if (level>1) {
+      r$Dmu4 <- Dmu4; r$Dth2 <- Dth2;  r$Dmuth2 <- Dmuth2;
+	    r$Dmu2th2 <- Dmu2th2; r$Dmu3th <- Dmu3th
+    }
+    return(r)
+  } ## Dd clogistic
+
+  # akaike information criterion
+  aic <- function(y, mu, theta=NULL, wt, dev) {
+    log1pexp <- function(x) { ## compute log(1+e^x) safely
+      result <- x
+      ii <- which(x<=37); result[ii] <- exp(x[ii])
+      ii <- which(-37<x & x<=18); result[ii] <- log1p(exp(x[ii]))
+      ii <- which(18<x & x<=33.3); result[ii] <- x[ii]+exp(-x[ii])
+      return(result)
+    } # log1pexp
+
+    log1mexp <- function(a) { ## compute log(1-e^(-a)) safely
+      result <- numeric(length(a))
+      ii <- which(0<a & a<=log(2)); result[ii] <- log(-expm1(-a[ii]))
+      ii <- which(a>log(2)); result[ii] <- log1p(-exp(-a[ii]))
+      return(result)
+    } # log1mexp
+    if (is.null(theta)) theta <- get(".Theta")
+    th <- theta-0.5*log(wt)
+    yat <- attr(y,"censor")
+    if (is.null(yat)) yat <- rep(NA,length(y))
+    a <- rep(0,length(y))
+
+    # get indices
+    iu <- which(yat==y) # uncensored
+    ii <- which(is.finite(yat*y) & yat!=y) # interval censored
+    il <- which(yat==-Inf) # left censored
+    ir <- which(yat==Inf) # right censored
+
+    # uncensored
+    if (length(iu)) {
+      si <- exp(theta)/sqrt(wt[iu])
+      lm <- -log1p(si-1)-2*log(2)
+      a[iu] <- -2*lm+2*th[iu]
+    }
+
+    # interval censored
+    if (length(ii)) {
+      si <- exp(theta)/sqrt(wt[ii])
+      yl <- pmin(y[ii], yat[ii])
+      yr <- pmax(y[ii], yat[ii])
+      lm <- ((yr-yl)/(2*si))+log1mexp((yr-yl)/(2*si))-log1pexp((yr-yl)/(2*si))
+      a[ii] <- -2*lm+2*th[ii]
+    }
+
+    # left censored
+    if (length(il)) {
+      a[il] <- 2*th[il]
+    }
+
+    # right censored
+    if (length(ir)) {
+      a[ir] <- 2*th[ir]
+    }
+    return(sum(a))
+  } ## AIC clogistic
+
+  # saturated log likelihood
+  ls <- function(y, w, theta, scale) {
+    log1pexp <- function(x) { ## compute log(1+e^x) safely
+      result <- x
+      ii <- which(x<=37); result[ii] <- exp(x[ii])
+      ii <- which(-37<x & x<=18); result[ii] <- log1p(exp(x[ii]))
+      ii <- which(18<x & x<=33.3); result[ii] <- x[ii]+exp(-x[ii])
+      return(result)
+    } # log1pexp
+
+    log1mexp <- function(a) { ## compute log(1-e^(-a)) safely
+      result <- numeric(length(a))
+      ii <- which(0<a & a<=log(2)); result[ii] <- log(-expm1(-a[ii]))
+      ii <- which(a>log(2)); result[ii] <- log1p(-exp(-a[ii]))
+      return(result)
+    } # log1mexp
+    yat <- attr(y, "censor")
+    if (is.null(yat)) yat <- y
+
+    # get indices
+    iu <- which(yat==y) # uncensored
+    ii <- which(is.finite(yat*y) & yat!=y) # interval censored
+    l2 <- l1 <- l <- rep(0, length(y))
+
+    # uncensored
+    if (length(iu)) {
+      si <- exp(theta)/sqrt(w[iu])
+      l[iu] <- -log1p(si-1)-2*log(2)
+      l1[iu] <- -1
+    }
+
+    # interval censored
+    if (length(ii)) {
+      si <- exp(theta)/sqrt(w[ii])
+      yl <- pmin(y[ii], yat[ii])
+      yr <- pmax(y[ii], yat[ii])
+
+      l[ii] <- ((yr-yl)/(2*si))+log1mexp((yr-yl)/(2*si))-log1pexp((yr-yl)/(2*si))
+      lmth <- (yr-yl)*(1/si)*(1/(expm1(-(yr-yl)/(2*si))-expm1((yr-yl)/(2*si))))
+      l1[ii] <- lmth
+      lmth2 <- -lmth-(1/2)*(yr-yl)^2*(1/si^2)*(1/(expm1(-(yr-yl)/(2*si))+
+        -expm1((yr-yl)/(2*si))))^2*(2+expm1(-(yr-yl)/(2*si))+expm1((yr-yl)/(2*si)))
+      l2[ii] <- lmth2
+    }
+    # right and left censored are zero
+    result <- list(ls=sum(l), lsth1=sum(l1), LSTH1=matrix(l1,ncol=1),lsth2=sum(l2))
+    return(result)
+  } ## ls clogistic
+
+  initialize <- expression({
+    if (is.matrix(y)) {
+      .yat <- y[,2]
+      y <- y[,1]
+      attr(y, "censor") <- .yat
+    }
+    mustart <- if (family$link=="identity") y else pmax(y, min(y>0))
+  })
+
+  postproc <- function(family, y, prior.weights, fitted, linear.predictors, offset, intercept) {
+    posr <- list()
+    if (is.matrix(y)) {
+      .yat <- y[,2]
+      y <- y[,1]
+      attr(y, "censor") <- .yat
+    }
+    posr$null.deviance <- find.null.dev(family, y, eta=linear.predictors, offset, prior.weights)
+    posr$family <- paste("clogistic(",round(family$getTheta(TRUE),3),")",sep="")
+    posr
+  } ## postproc clogistic
+
+  rd <- function(mu, wt, scale) { # incomplete
+    Theta <- exp(get(".Theta"))
+  }
+
+  qf <- function(p ,mu, wt, scale) { # incomplete
+    Theta <- exp(get(".Theta"))
+  }
+
+  subsety <- function(y, ind) {
+    if (is.matrix(y)) return(y[ind,])
+    yat <- attr(y, "censor")
+    y <- y[ind]
+    if (!is.null(yat)) attr(y, "censor") <- yat[ind]
+    y
+  } ## subsety
+
+  environment(dev.resids) <- environment(aic) <- environment(getTheta) <-
+    environment(rd) <- environment(qf) <- environment(putTheta) <- env
+
+  structure(list(family="clogistic", link=linktemp, linkfun=stats$linkfun,
+    linkinv=stats$linkinv, dev.resids=dev.resids, Dd=Dd, subsety=subsety,
+    aic=aic, mu.eta=stats$mu.eta, initialize=initialize, postproc=postproc,
+    ls=ls, validmu=validmu, valideta=stats$valideta, n.theta=n.theta, 
+    ini.theta=iniTheta, putTheta=putTheta, getTheta=getTheta),
+    class = c("extended.family","family"))
+} ## clog
+
+#################################################
 ## extended family object for ordered categorical
 #################################################
 
@@ -636,17 +1264,21 @@ ocat <- function(theta=NULL,link="identity",R=NULL) {
 ## weights are ignored. #! is stuff removed under re-definition of ls as 0
   linktemp <- substitute(link)
   if (!is.character(linktemp)) linktemp <- deparse(linktemp)
-  if (linktemp %in% c("identity")) stats <- make.link(linktemp)
-  else if (is.character(link)) {
-    stats <- make.link(link)
-    linktemp <- link
-  } else {
-    if (inherits(link, "link-glm")) {
-      stats <- link
-      if (!is.null(stats$name))
-            linktemp <- stats$name
-    } else stop(gettextf("\"%s\" link not available for ordered categorical family; available links are \"identity\"", linktemp))
-  }
+  okLinks <- c("identity")
+  if (linktemp %in% okLinks) stats <- make.link(linktemp) else 
+  stop(gettextf("link \"%s\" not available for ocat family; available links are %s", 
+                linktemp, paste(sQuote(okLinks), collapse = ", ")),domain = NA)
+
+#  else if (is.character(link)) {
+#    stats <- make.link(link)
+#    linktemp <- link
+#  } else {
+#    if (inherits(link, "link-glm")) {
+#      stats <- link
+#      if (!is.null(stats$name))
+#            linktemp <- stats$name
+#    } else stop(linktemp, " link not available for ordered categorical family; available links are \"identity\"")
+#  }
   if (is.null(theta)&&is.null(R)) stop("Must supply theta or R to ocat")
   if (!is.null(theta)) R <- length(theta) + 2 ## number of catergories
   ## Theta <-  NULL;
@@ -1104,22 +1736,25 @@ tw <- function (theta = NULL, link = "log",a=1.01,b=1.99) {
 ##       to cancellation error, which seems unavoidable. Furthermore 
 ##       there are known problems with spurious maxima in the likelihood 
 ##       w.r.t. p when the data are rounded. 
-  
   linktemp <- substitute(link)
   if (!is.character(linktemp)) linktemp <- deparse(linktemp)
-  if (linktemp %in% c("log", "identity", "sqrt","inverse")) stats <- make.link(linktemp)
-  else if (is.character(link)) {
-    stats <- make.link(link)
-    linktemp <- link
-  } else {
-    if (inherits(link, "link-glm")) {
-       stats <- link
-            if (!is.null(stats$name))
-                linktemp <- stats$name
-        }
-        else  stop(gettextf("link \"%s\" not available for Tweedie family.", 
-                linktemp, collapse = ""), domain = NA)
-  }
+  okLinks <- c("log", "identity", "sqrt","inverse")
+  if (linktemp %in% okLinks) stats <- make.link(linktemp) else 
+  stop(gettextf("link \"%s\" not available for tw family; available links are %s", 
+                linktemp, paste(sQuote(okLinks), collapse = ", ")),domain = NA)
+
+#  else if (is.character(link)) {
+#    stats <- make.link(link)
+#    linktemp <- link
+#  } else {
+#    if (inherits(link, "link-glm")) {
+#       stats <- link
+#            if (!is.null(stats$name))
+#                linktemp <- stats$name
+#        }
+#        else  stop(gettextf("link \"%s\" not available for Tweedie family.", 
+#                linktemp, collapse = ""), domain = NA)
+#  }
   ## Theta <-  NULL;
   n.theta <- 1
   if (!is.null(theta)&&theta!=0) {
@@ -1280,21 +1915,25 @@ betar <- function (theta = NULL, link = "logit",eps=.Machine$double.eps*100) {
 ## This serves as a prototype for working with -2logLik
 ## as deviance, and only dealing with saturated likelihood 
 ## at the end.
-## Written by Natalya Pya. 'saturated.ll' by Simon Wood 
+## Written by Natalya Pya. 'saturated.ll' by Simon Wood
   linktemp <- substitute(link)
   if (!is.character(linktemp)) linktemp <- deparse(linktemp)
-  if (linktemp %in% c("logit", "probit", "cloglog", "cauchit")) stats <- make.link(linktemp)
-  else if (is.character(link)) {
-    stats <- make.link(link)
-    linktemp <- link
-  } else {
-    if (inherits(link, "link-glm")) {
-       stats <- link
-            if (!is.null(stats$name))
-                linktemp <- stats$name
-        }
-        else stop(gettextf("\"%s\" link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\"", linktemp))
-    }
+  okLinks <- c("logit", "probit", "cloglog", "cauchit")
+  if (linktemp %in% okLinks) stats <- make.link(linktemp) else 
+  stop(gettextf("link \"%s\" not available for betar family; available links are %s", 
+                linktemp, paste(sQuote(okLinks), collapse = ", ")),domain = NA)
+
+#  else if (is.character(link)) {
+#    stats <- make.link(link)
+#    linktemp <- link
+#  } else {
+#    if (inherits(link, "link-glm")) {
+#       stats <- link
+#            if (!is.null(stats$name))
+#                linktemp <- stats$name
+#        }
+#        else stop(linktemp, " link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\"")
+#    }
    
     n.theta <- 1
     if (!is.null(theta)&&theta!=0) {
@@ -1388,25 +2027,11 @@ betar <- function (theta = NULL, link = "logit",eps=.Machine$double.eps*100) {
             lsth2=0) ##Hessian w.r.t. theta
      } ## ls betar
 
-   
-    ## preinitialization to reset G$y values of <=0 and >=1... 
-    ## code to evaluate in estimate.gam...
-    ## reset G$y values of <=0 and >= 1 to eps and 1-eps... 
-    #preinitialize <- NULL ## keep codetools happy
-    #eval(parse(text=paste("preinitialize <- expression({\n eps <- ",eps,
-    #     "\n G$y[G$y >= 1-eps] <- 1 - eps\n  G$y[G$y<= eps] <- eps })")))
-
     preinitialize <- function(y,family) {
       eps <- get(".betarEps")
       y[y >= 1-eps] <- 1 - eps;y[y<= eps] <- eps
       return(list(y=y))
     }
-
- #   preinitialize <- expression({
- #     eps <- 1e-7 
- #     G$y[G$y >= 1-eps] <- 1 - eps
- #     G$y[G$y<= eps] <- eps
- #   })
 
     saturated.ll <- function(y,wt,theta=NULL){
     ## function to find the saturated loglik by Newton method,
@@ -1573,18 +2198,22 @@ scat <- function (theta = NULL, link = "identity",min.df = 3) {
 ## Written by Natalya Pya.
   linktemp <- substitute(link)
   if (!is.character(linktemp)) linktemp <- deparse(linktemp)
-  if (linktemp %in% c("identity", "log", "inverse")) stats <- make.link(linktemp)
-  else if (is.character(link)) {
-    stats <- make.link(link)
-    linktemp <- link
-  } else {
-    if (inherits(link, "link-glm")) {
-       stats <- link
-            if (!is.null(stats$name))
-                linktemp <- stats$name
-        }
-        else stop(gettextf("\"%s\" link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\"", linktemp))
-    }
+  okLinks <- c("identity", "log", "inverse")
+  if (linktemp %in% okLinks) stats <- make.link(linktemp) else 
+  stop(gettextf("link \"%s\" not available for scat family; available links are %s", 
+                linktemp, paste(sQuote(okLinks), collapse = ", ")),domain = NA)
+
+#  else if (is.character(link)) {
+#    stats <- make.link(link)
+#    linktemp <- link
+#  } else {
+#    if (inherits(link, "link-glm")) {
+#       stats <- link
+#            if (!is.null(stats$name))
+#                linktemp <- stats$name
+#        }
+#        else stop(linktemp, " link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\"")
+#    }
     ## Theta <-  NULL;
     n.theta <- 2
     if (!is.null(theta)&&sum(theta==0)==0) {
@@ -1863,12 +2492,13 @@ ziP <- function (theta = NULL, link = "identity",b=0) {
 ## zero inflated Poisson parameterized in terms of the log Poisson parameter, gamma. 
 ## eta = theta[1] + exp(theta[2])*gamma), and 1-p = exp(-exp(eta)) where p is 
 ## probability of presence.
-
   linktemp <- substitute(link)
   if (!is.character(linktemp)) linktemp <- deparse(linktemp)
-  if (linktemp %in% c("identity")) { 
-    stats <- make.link(linktemp)
-  } else  stop(gettextf("\"%s\" link not available for zero inflated; available link for `lambda' is only  \"loga\"", linktemp))
+  okLinks <- c("identity")
+  if (linktemp %in% okLinks) stats <- make.link(linktemp) else 
+  stop(gettextf("link \"%s\" not available for ziP family; available links are %s", 
+                linktemp, paste(sQuote(okLinks), collapse = ", ")),domain = NA)
+	
   ## Theta <-  NULL;
   n.theta <- 2
   if (!is.null(theta)) {
