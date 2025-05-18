@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.8-4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-05 20:29+0200\n"
+"POT-Creation-Date: 2025-05-18 13:38+0200\n"
 "PO-Revision-Date: 2015-02-21 16:01-0600\n"
 "Last-Translator:Chel Hee Lee  <chl948@mail.usask.ca>\n"
 "Language-Team: Chel Hee Lee  <chl948@mail.usask.ca>\n"
@@ -39,45 +39,29 @@ msgid ""
 "file dim problem\n"
 msgstr ""
 
-#: mat.c:3345
+#: mat.c:3567
 #, c-format
 msgid "Non orthogonal eigenvectors %d %g\n"
 msgstr ""
 
-#: mat.c:3350
+#: mat.c:3572
 #, c-format
 msgid "Eigenvectors not normalized %d %g\n"
 msgstr ""
 
-#: matrix.c:82
-msgid "Failed to initialize memory for matrix."
-msgstr "행렬생성에 필요한 메모리 초기화에 실패했습니다."
-
-#: matrix.c:144 matrix.c:202
-msgid "An out of bound write to matrix has occurred!"
-msgstr ""
-
-#: matrix.c:150
-msgid "INTEGRITY PROBLEM in the extant matrix list."
-msgstr ""
-
-#: matrix.c:182
-msgid "You are trying to check matrix integrity without defining RANGECHECK."
-msgstr ""
-
-#: matrix.c:240
+#: matrix.c:116
 msgid "Target matrix too small in mcopy"
 msgstr ""
 
-#: matrix.c:260 matrix.c:268 matrix.c:281 matrix.c:289
+#: matrix.c:136 matrix.c:144 matrix.c:157 matrix.c:165
 msgid "Incompatible matrices in matmult."
 msgstr ""
 
-#: matrix.c:313
+#: matrix.c:189
 msgid "Attempt to invert() non-square matrix"
 msgstr ""
 
-#: matrix.c:335
+#: matrix.c:211
 msgid "Singular Matrix passed to invert()"
 msgstr "특이함수(singular matrix)가 invert()에 전달되었습니다."
 
@@ -86,11 +70,11 @@ msgstr "특이함수(singular matrix)가 invert()에 전달되었습니다."
 msgid "adjusting %d memory allocation\n"
 msgstr ""
 
-#: qp.c:59
+#: qp.c:65
 msgid "ERROR in addconQT."
 msgstr "addconQT 에서 에러가 발생했습니다."
 
-#: qp.c:463
+#: qp.c:473
 msgid "QPCLS - Rank deficiency in model"
 msgstr ""
 
@@ -127,6 +111,9 @@ msgstr ""
 #: tprs.c:378 tprs.c:386
 msgid "A term has fewer unique covariate combinations than specified maximum degrees of freedom"
 msgstr ""
+
+#~ msgid "Failed to initialize memory for matrix."
+#~ msgstr "행렬생성에 필요한 메모리 초기화에 실패했습니다."
 
 #~ msgid "Sort failed"
 #~ msgstr "정렬에 실패했습니다."

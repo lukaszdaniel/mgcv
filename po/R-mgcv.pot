@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: mgcv 1.9-1\n"
-"POT-Creation-Date: 2024-12-14 12:08\n"
+"Project-Id-Version: mgcv 1.9-3\n"
+"POT-Creation-Date: 2025-05-18 13:38\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,13 +23,6 @@ msgstr ""
 #. R/gamlss.r: gettextf("\"%s\" link not available for %s parameter of ziplss",     link[[i]], param.names[i])
 
 msgid "\"%s\" link not available for %s parameter of ziplss"
-msgstr ""
-
-
-#: R/efam.r: 0
-#. R/efam.r: gettextf("\"%s\" link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\"",     linktemp)
-
-msgid "\"%s\" link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\""
 msgstr ""
 
 
@@ -75,21 +68,6 @@ msgid "\"%s\" link not available for mu parameter of twlss"
 msgstr ""
 
 
-#: R/efam.r: 0
-#. R/efam.r: gettextf("\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"",     linktemp)
-#. R/efam.r: gettextf("\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"",     linktemp)
-
-msgid "\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\""
-msgstr ""
-
-
-#: R/efam.r: 0
-#. R/efam.r: gettextf("\"%s\" link not available for ordered categorical family; available links are \"identity\"",     linktemp)
-
-msgid "\"%s\" link not available for ordered categorical family; available links are \"identity\""
-msgstr ""
-
-
 #: R/gamlss.r: 0
 #. R/gamlss.r: gettextf("\"%s\" link not available for precision parameter of gaulss",     link[[2]])
 
@@ -101,20 +79,6 @@ msgstr ""
 #. R/gamlss.r: gettextf("\"%s\" link not available for scale parameter of shash",     link[[2]])
 
 msgid "\"%s\" link not available for scale parameter of shash"
-msgstr ""
-
-
-#: R/efam.r: 0
-#. R/efam.r: gettextf("\"%s\" link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\"",     linktemp)
-
-msgid "\"%s\" link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\""
-msgstr ""
-
-
-#: R/efam.r: 0
-#. R/efam.r: gettextf("\"%s\" link not available for zero inflated; available link for `lambda' is only  \"loga\"",     linktemp)
-
-msgid "\"%s\" link not available for zero inflated; available link for `lambda' is only  \"loga\""
 msgstr ""
 
 
@@ -237,6 +201,13 @@ msgid "AR1 parameter rho unused with generalized model"
 msgstr ""
 
 
+#: R/bam.r: 0
+#. R/bam.r: warning("AR1 residuals not available with NCV, resetting rho=0")
+
+msgid "AR1 residuals not available with NCV, resetting rho=0"
+msgstr ""
+
+
 #: R/mgcv.r: 0
 #. R/mgcv.r: warning("Algorithm did not converge")
 
@@ -274,6 +245,13 @@ msgstr ""
 #. R/smooth.r: stop("Basis only handles 1D smooths")
 
 msgid "Basis only handles 1D smooths"
+msgstr ""
+
+
+#: R/mgcv.r: 0
+#. R/mgcv.r: warning("Bi ignored when LP not in standard form")
+
+msgid "Bi ignored when LP not in standard form"
 msgstr ""
 
 
@@ -634,6 +612,13 @@ msgstr ""
 #. R/mgcv.r: stop("NAs in d(mu)/d(eta)")
 
 msgid "NAs in d(mu)/d(eta)"
+msgstr ""
+
+
+#: R/bam.r: 0
+#. R/bam.r: warning("NCV only available with discrete=TRUE - resetting")
+
+msgid "NCV only available with discrete=TRUE - resetting"
 msgstr ""
 
 
@@ -1056,13 +1041,6 @@ msgid "a parametric penalty has wrong dimension"
 msgstr ""
 
 
-#: R/mgcv.r: 0
-#. R/mgcv.r: stop("absorb.cons must be TRUE for multi-formula models")
-
-msgid "absorb.cons must be TRUE for multi-formula models"
-msgstr ""
-
-
 #: R/bam.r: 0
 #. R/bam.r: warning("algorithm did not converge")
 #. R/bam.r: warning("algorithm did not converge")
@@ -1422,9 +1400,9 @@ msgstr ""
 
 
 #: R/bam.r: 0
-#. R/bam.r: warning("discretization only available with fREML")
+#. R/bam.r: warning("discretization only available with fREML or NCV")
 
-msgid "discretization only available with fREML"
+msgid "discretization only available with fREML or NCV"
 msgstr ""
 
 
@@ -2067,12 +2045,67 @@ msgid "linear predictor labels out of range"
 msgstr ""
 
 
-#: R/efam.r: 0
 #: R/gam.fit3.r: 0
-#. R/efam.r: gettextf("link \"%s\" not available for Tweedie family.", linktemp,     collapse = "")
 #. R/gam.fit3.r: gettextf("link \"%s\" not available for Tweedie family.", linktemp,     collapse = "")
 
 msgid "link \"%s\" not available for Tweedie family."
+msgstr ""
+
+
+#: R/efam.r: 0
+#. R/efam.r: gettextf("link \"%s\" not available for betar family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+
+msgid "link \"%s\" not available for betar family; available links are %s"
+msgstr ""
+
+
+#: R/efam.r: 0
+#. R/efam.r: gettextf("link \"%s\" not available for clog family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+
+msgid "link \"%s\" not available for clog family; available links are %s"
+msgstr ""
+
+
+#: R/efam.r: 0
+#. R/efam.r: gettextf("link \"%s\" not available for cnorm family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#. R/efam.r: gettextf("link \"%s\" not available for cnorm family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+
+msgid "link \"%s\" not available for cnorm family; available links are %s"
+msgstr ""
+
+
+#: R/efam.r: 0
+#. R/efam.r: gettextf("link \"%s\" not available for nb family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+
+msgid "link \"%s\" not available for nb family; available links are %s"
+msgstr ""
+
+
+#: R/efam.r: 0
+#. R/efam.r: gettextf("link \"%s\" not available for ocat family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+
+msgid "link \"%s\" not available for ocat family; available links are %s"
+msgstr ""
+
+
+#: R/efam.r: 0
+#. R/efam.r: gettextf("link \"%s\" not available for scat family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+
+msgid "link \"%s\" not available for scat family; available links are %s"
+msgstr ""
+
+
+#: R/efam.r: 0
+#. R/efam.r: gettextf("link \"%s\" not available for tw family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+
+msgid "link \"%s\" not available for tw family; available links are %s"
+msgstr ""
+
+
+#: R/efam.r: 0
+#. R/efam.r: gettextf("link \"%s\" not available for ziP family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+
+msgid "link \"%s\" not available for ziP family; available links are %s"
 msgstr ""
 
 
@@ -2142,9 +2175,9 @@ msgstr ""
 
 
 #: R/bam.r: 0
-#. R/bam.r: warning("min.sp not supported with fast REML computation, and ignored.")
+#. R/bam.r: warning("min.sp not supported with fast REML and NCV computation, and ignored.")
 
-msgid "min.sp not supported with fast REML computation, and ignored."
+msgid "min.sp not supported with fast REML and NCV computation, and ignored."
 msgstr ""
 
 
@@ -2299,17 +2332,38 @@ msgid "nei indexes non-existent points"
 msgstr ""
 
 
-#: R/mgcv.r: 0
-#. R/mgcv.r: stop("nei$m faulty")
+#: R/bam.r: 0
+#. R/bam.r: stop("nei$d and nei$md must be supplied if number of neighbourhoods is not number of data")
 
-msgid "nei$m faulty"
+msgid "nei$d and nei$md must be supplied if number of neighbourhoods is not number of data"
+msgstr ""
+
+
+#: R/bam.r: 0
+#. R/bam.r: stop("nei$ma does not match nei$a")
+
+msgid "nei$ma does not match nei$a"
 msgstr ""
 
 
 #: R/mgcv.r: 0
-#. R/mgcv.r: stop("nei$mi faulty")
+#. R/mgcv.r: stop("nei$ma faulty")
 
-msgid "nei$mi faulty"
+msgid "nei$ma faulty"
+msgstr ""
+
+
+#: R/bam.r: 0
+#. R/bam.r: stop("nei$md does not match nei$d")
+
+msgid "nei$md does not match nei$d"
+msgstr ""
+
+
+#: R/mgcv.r: 0
+#. R/mgcv.r: stop("nei$md faulty")
+
+msgid "nei$md faulty"
 msgstr ""
 
 
@@ -2464,6 +2518,13 @@ msgstr ""
 #. R/efam.r: stop("not an extended family")
 
 msgid "not an extended family"
+msgstr ""
+
+
+#: R/mgcv.r: 0
+#. R/mgcv.r: stop("not converged")
+
+msgid "not converged"
 msgstr ""
 
 
@@ -2835,6 +2896,13 @@ msgid "reverse indices missing from sparse discrete marginals"
 msgstr ""
 
 
+#: R/bam.r: 0
+#. R/bam.r: warning("rho ignored with NCV")
+
+msgid "rho ignored with NCV"
+msgstr ""
+
+
 #: R/jagam.r: 0
 #. R/jagam.r: warning("rho missing from simulation data edf.type reset to 2")
 
@@ -2913,16 +2981,16 @@ msgstr ""
 
 
 #: R/misc.r: 0
-#. R/misc.r: stop("sd should have exactly one less entry than ld")
+#. R/misc.r: stop("scattered XVX computation not yet implemented")
 
-msgid "sd should have exactly one less entry than ld"
+msgid "scattered XVX computation not yet implemented"
 msgstr ""
 
 
-#: R/fast-REML.r: 0
-#. R/fast-REML.r: stop("second derivs not available for non-linear penalties")
+#: R/misc.r: 0
+#. R/misc.r: stop("sd should have exactly one less entry than ld")
 
-msgid "second derivs not available for non-linear penalties"
+msgid "sd should have exactly one less entry than ld"
 msgstr ""
 
 
@@ -2965,13 +3033,6 @@ msgstr ""
 #. R/mgcv.r: warning("single linear predictor indices are ignored")
 
 msgid "single linear predictor indices are ignored"
-msgstr ""
-
-
-#: R/mgcv.r: 0
-#. R/mgcv.r: stop("singular values not returned in order")
-
-msgid "singular values not returned in order"
 msgstr ""
 
 
@@ -3091,6 +3152,13 @@ msgid "supplied dist negative"
 msgstr ""
 
 
+#: R/bam.r: 0
+#. R/bam.r: stop("supplied nei index out of range")
+
+msgid "supplied nei index out of range"
+msgstr ""
+
+
 #: R/smooth.r: 0
 #. R/smooth.r: stop("supplied penalty not square!")
 
@@ -3158,6 +3226,13 @@ msgid "too few knots"
 msgstr ""
 
 
+#: R/mgcv.r: 0
+#. R/mgcv.r: stop("too many active constraints!")
+
+msgid "too many active constraints!"
+msgstr ""
+
+
 #: R/bam.r: 0
 #. R/bam.r: warning("too many cluster nodes to use all efficiently")
 #. R/bam.r: warning("too many cluster nodes to use all efficiently")
@@ -3187,10 +3262,24 @@ msgid "type must be \"link\" or \"response\""
 msgstr ""
 
 
+#: R/bam.r: 0
+#. R/bam.r: stop("un-supported smoothness selection method")
+
+msgid "un-supported smoothness selection method"
+msgstr ""
+
+
 #: R/mgcv.r: 0
 #. R/mgcv.r: stop("un-supported test")
 
 msgid "un-supported test"
+msgstr ""
+
+
+#: R/mgcv.r: 0
+#. R/mgcv.r: stop("unbounded")
+
+msgid "unbounded"
 msgstr ""
 
 
@@ -3269,13 +3358,6 @@ msgstr ""
 #. R/gam.fit3.r: stop("unsupported order of differentiation requested of gam.fit3")
 
 msgid "unsupported order of differentiation requested of gam.fit3"
-msgstr ""
-
-
-#: R/bam.r: 0
-#. R/bam.r: stop("unsupported smoothness selection method")
-
-msgid "unsupported smoothness selection method"
 msgstr ""
 
 

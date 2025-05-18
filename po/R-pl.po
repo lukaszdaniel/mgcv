@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.7-28\n"
 "Report-Msgid-Bugs-To: bugs@r-project.org\n"
-"POT-Creation-Date: 2024-12-14 12:08\n"
+"POT-Creation-Date: 2025-05-18 13:38\n"
 "PO-Revision-Date: 2024-12-14 12:13+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -29,14 +29,6 @@ msgstr "połączenie \"%s\" nie jest dostępne dla rozkładów z rodziny rozkła
 #, fuzzy
 msgid "\"%s\" link not available for %s parameter of ziplss"
 msgstr "połączenie \"%s\" nie jest dostępne dla rozkładów z rodziny rozkładów poissona"
-
-# mgcv/R/gam.fit3.r: 2093
-# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
-#. R/efam.r: gettextf("\"%s\" link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\"",     linktemp)
-#: R/efam.r:0
-#, fuzzy
-msgid "\"%s\" link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\""
-msgstr "połączenie niedostępne dla regresji beta; dostępne linki to \"logit\", \"probit\", \"cloglog\" oraz \"cauchit\""
 
 # mgcv/R/gam.fit3.r: 2093
 # stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
@@ -85,23 +77,6 @@ msgstr "połączenie \"%s\" nie jest dostępne dla parametru mu rozkładu gaulss
 msgid "\"%s\" link not available for mu parameter of twlss"
 msgstr "połączenie \"%s\" nie jest dostępne dla rozkładów z rodziny rozkładów poissona"
 
-# mgcv/R/gam.fit3.r: 2093
-# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
-#. R/efam.r: gettextf("\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"",     linktemp)
-#. R/efam.r: gettextf("\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"",     linktemp)
-#: R/efam.r:0
-#, fuzzy
-msgid "\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\""
-msgstr "połączenie %s nie jest dostępne dla rodziny rozkładu Pascala; dostępne połączenia to \"identity\", \"log\" oraz \"sqrt\""
-
-# mgcv/R/gam.fit3.r: 2093
-# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
-#. R/efam.r: gettextf("\"%s\" link not available for ordered categorical family; available links are \"identity\"",     linktemp)
-#: R/efam.r:0
-#, fuzzy
-msgid "\"%s\" link not available for ordered categorical family; available links are \"identity\""
-msgstr "połączenie nie jest dostępne dla uporządkowanej rodziny kategorii; Dostępne linki to \"identity\""
-
 # mgcv/R/gam.fit3.r: 2300
 # stop(gettextf("link \"%s\" is not available for Tweedie family.", linktemp), domain = "R-mgcv")
 #. R/gamlss.r: gettextf("\"%s\" link not available for precision parameter of gaulss",     link[[2]])
@@ -117,22 +92,6 @@ msgstr "połączenie \"%s\" nie jest dostępne dla rozkładów z rodziny rozkła
 #, fuzzy
 msgid "\"%s\" link not available for scale parameter of shash"
 msgstr "połączenie \"%s\" nie jest dostępne dla rozkładów z rodziny rozkładów poissona"
-
-# mgcv/R/gam.fit3.r: 2093
-# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
-#. R/efam.r: gettextf("\"%s\" link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\"",     linktemp)
-#: R/efam.r:0
-#, fuzzy
-msgid "\"%s\" link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\""
-msgstr "połączenie nie jest dostępne dla skalowanego rozkładu t; dostępne połączenia to \"identity\", \"log\", oraz \"inverse\""
-
-# mgcv/R/gam.fit3.r: 2093
-# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
-#. R/efam.r: gettextf("\"%s\" link not available for zero inflated; available link for `lambda' is only  \"loga\"",     linktemp)
-#: R/efam.r:0
-#, fuzzy
-msgid "\"%s\" link not available for zero inflated; available link for `lambda' is only  \"loga\""
-msgstr "połączenie nie jest dostępne dla rozkładu z zerowym zawyżeniem; dostępne połączenia dla 'lambda' to tylko \"loga\""
 
 # mgcv/R/smooth.r: 1632
 # stop("\"fs\" smooth cannot use a multiply penalized basis (wrong basis in xt)")
@@ -269,6 +228,11 @@ msgstr "argument 'AR.start' musi być wartością logiczną"
 msgid "AR1 parameter rho unused with generalized model"
 msgstr "parametr rho AR1 jest nieużywany z uogólnionym modelem"
 
+#. R/bam.r: warning("AR1 residuals not available with NCV, resetting rho=0")
+#: R/bam.r:0
+msgid "AR1 residuals not available with NCV, resetting rho=0"
+msgstr ""
+
 # mgcv/R/gam.fit3.r: 663
 # warning("Algorithm did not converge")
 # mgcv/R/mgcv.r: 2004
@@ -321,6 +285,11 @@ msgstr "Co najmniej trzy węzły są wymagane w wywołaniu przekazywanym do funk
 #: R/smooth.r:0
 msgid "Basis only handles 1D smooths"
 msgstr "Podstawa obsługuje jedynie jednowymiarowe wygładzania"
+
+#. R/mgcv.r: warning("Bi ignored when LP not in standard form")
+#: R/mgcv.r:0
+msgid "Bi ignored when LP not in standard form"
+msgstr ""
 
 # mgcv/R/gamm.r: 663
 # stop("Can not convert this smooth class to a random effect")
@@ -713,6 +682,11 @@ msgstr "wartości NA w 'V(mu)'"
 #: R/gam.fit3.r:0 R/mgcv.r:0
 msgid "NAs in d(mu)/d(eta)"
 msgstr "wartości NA w 'd(mu)/d(eta)'"
+
+#. R/bam.r: warning("NCV only available with discrete=TRUE - resetting")
+#: R/bam.r:0
+msgid "NCV only available with discrete=TRUE - resetting"
+msgstr ""
 
 # mgcv/R/gamm.r: 1553
 # stop("Nested smooths must be fully random")
@@ -1130,13 +1104,6 @@ msgstr "argument 'a' ma niepoprawną liczbę wierszy"
 msgid "a parametric penalty has wrong dimension"
 msgstr "parametryczna kara ma niepoprawny wymiar"
 
-# mgcv/R/mgcv.r: 570
-# stop("First argument is no sort of formula!")
-#. R/mgcv.r: stop("absorb.cons must be TRUE for multi-formula models")
-#: R/mgcv.r:0
-msgid "absorb.cons must be TRUE for multi-formula models"
-msgstr "'absorb.cons' musi mieć wartość TRUE dla modeli z wieloma formułami"
-
 # mgcv/R/gam.fit3.r: 663
 # warning("Algorithm did not converge")
 # mgcv/R/mgcv.r: 2004
@@ -1513,9 +1480,9 @@ msgstr "wymiary dostarczonego argumentu 'w' są niepoprawne."
 msgid "discrete method does not use parallel cluster - use nthreads instead"
 msgstr ""
 
-#. R/bam.r: warning("discretization only available with fREML")
+#. R/bam.r: warning("discretization only available with fREML or NCV")
 #: R/bam.r:0
-msgid "discretization only available with fREML"
+msgid "discretization only available with fREML or NCV"
 msgstr ""
 
 # mgcv/R/gam.fit3.r: 1923
@@ -2163,11 +2130,75 @@ msgstr "argument 'x' jest poza zakresem"
 
 # mgcv/R/gam.fit3.r: 2300
 # stop(gettextf("link \"%s\" is not available for Tweedie family.", linktemp), domain = "R-mgcv")
-#. R/efam.r: gettextf("link \"%s\" not available for Tweedie family.", linktemp,     collapse = "")
 #. R/gam.fit3.r: gettextf("link \"%s\" not available for Tweedie family.", linktemp,     collapse = "")
-#: R/efam.r:0 R/gam.fit3.r:0
+#: R/gam.fit3.r:0
 msgid "link \"%s\" not available for Tweedie family."
 msgstr "link \"%s\" nie jest dostępny dla rodziny Tweedie."
+
+# mgcv/R/gam.fit3.r: 2093
+# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
+#. R/efam.r: gettextf("link \"%s\" not available for betar family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#: R/efam.r:0
+#, fuzzy
+msgid "link \"%s\" not available for betar family; available links are %s"
+msgstr "połączenie nie jest dostępne dla uporządkowanej rodziny kategorii; Dostępne linki to \"identity\""
+
+# mgcv/R/gam.fit3.r: 2093
+# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
+#. R/efam.r: gettextf("link \"%s\" not available for clog family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#: R/efam.r:0
+#, fuzzy
+msgid "link \"%s\" not available for clog family; available links are %s"
+msgstr "połączenie nie jest dostępne dla rodziny 'coxph'; dostępne połączenia to \"identity\""
+
+# mgcv/R/gam.fit3.r: 2093
+# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
+#. R/efam.r: gettextf("link \"%s\" not available for cnorm family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#. R/efam.r: gettextf("link \"%s\" not available for cnorm family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#: R/efam.r:0
+#, fuzzy
+msgid "link \"%s\" not available for cnorm family; available links are %s"
+msgstr "połączenie nie jest dostępne dla rodziny 'coxph'; dostępne połączenia to \"identity\""
+
+# mgcv/R/gam.fit3.r: 2093
+# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
+#. R/efam.r: gettextf("link \"%s\" not available for nb family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#: R/efam.r:0
+#, fuzzy
+msgid "link \"%s\" not available for nb family; available links are %s"
+msgstr "połączenie nie jest dostępne dla rodziny 'coxph'; dostępne połączenia to \"identity\""
+
+# mgcv/R/gam.fit3.r: 2093
+# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
+#. R/efam.r: gettextf("link \"%s\" not available for ocat family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#: R/efam.r:0
+#, fuzzy
+msgid "link \"%s\" not available for ocat family; available links are %s"
+msgstr "połączenie nie jest dostępne dla rodziny 'coxph'; dostępne połączenia to \"identity\""
+
+# mgcv/R/gam.fit3.r: 2093
+# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
+#. R/efam.r: gettextf("link \"%s\" not available for scat family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#: R/efam.r:0
+#, fuzzy
+msgid "link \"%s\" not available for scat family; available links are %s"
+msgstr "połączenie nie jest dostępne dla rodziny 'coxph'; dostępne połączenia to \"identity\""
+
+# mgcv/R/gam.fit3.r: 2093
+# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
+#. R/efam.r: gettextf("link \"%s\" not available for tw family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#: R/efam.r:0
+#, fuzzy
+msgid "link \"%s\" not available for tw family; available links are %s"
+msgstr "połączenie nie jest dostępne dla rodziny 'coxph'; dostępne połączenia to \"identity\""
+
+# mgcv/R/gam.fit3.r: 2093
+# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
+#. R/efam.r: gettextf("link \"%s\" not available for ziP family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#: R/efam.r:0
+#, fuzzy
+msgid "link \"%s\" not available for ziP family; available links are %s"
+msgstr "połączenie nie jest dostępne dla rodziny 'coxph'; dostępne połączenia to \"identity\""
 
 #. R/gam.fit3.r: stop("link not implemented for extended families")
 #: R/gam.fit3.r:0
@@ -2232,9 +2263,10 @@ msgstr "metoda nie została rozpoznana."
 
 # mgcv/R/bam.r: 1082
 # warning("min.sp not supported with fast REML computation, and ignored.")
-#. R/bam.r: warning("min.sp not supported with fast REML computation, and ignored.")
+#. R/bam.r: warning("min.sp not supported with fast REML and NCV computation, and ignored.")
 #: R/bam.r:0
-msgid "min.sp not supported with fast REML computation, and ignored."
+#, fuzzy
+msgid "min.sp not supported with fast REML and NCV computation, and ignored."
 msgstr "'min.sp' nie jest wspierane dla szybkich obliczeń REML, parametr został zignorowany."
 
 # mgcv/R/smooth.r: 2102
@@ -2377,14 +2409,29 @@ msgstr "wartości ujemne nie są dozwolone dla rodziny Poissona zawyżonej o zer
 msgid "nei indexes non-existent points"
 msgstr ""
 
-#. R/mgcv.r: stop("nei$m faulty")
-#: R/mgcv.r:0
-msgid "nei$m faulty"
+#. R/bam.r: stop("nei$d and nei$md must be supplied if number of neighbourhoods is not number of data")
+#: R/bam.r:0
+msgid "nei$d and nei$md must be supplied if number of neighbourhoods is not number of data"
 msgstr ""
 
-#. R/mgcv.r: stop("nei$mi faulty")
+#. R/bam.r: stop("nei$ma does not match nei$a")
+#: R/bam.r:0
+msgid "nei$ma does not match nei$a"
+msgstr ""
+
+#. R/mgcv.r: stop("nei$ma faulty")
 #: R/mgcv.r:0
-msgid "nei$mi faulty"
+msgid "nei$ma faulty"
+msgstr ""
+
+#. R/bam.r: stop("nei$md does not match nei$d")
+#: R/bam.r:0
+msgid "nei$md does not match nei$d"
+msgstr ""
+
+#. R/mgcv.r: stop("nei$md faulty")
+#: R/mgcv.r:0
+msgid "nei$md faulty"
 msgstr ""
 
 # mgcv/R/mgcv.r: 2127
@@ -2537,6 +2584,20 @@ msgstr "nie wszystkie wymagane zmienne zostały dostarczone w \"newdata\"!"
 #: R/efam.r:0
 msgid "not an extended family"
 msgstr ""
+
+# mgcv/R/fast-REML.r: 643
+# gettext("full convergence", domain = "R-mgcv")
+# mgcv/R/gam.fit3.r: 1249
+# gettext("full convergence", domain = "R-mgcv")
+# mgcv/R/gam.fit3.r: 1426
+# gettext("full convergence", domain = "R-mgcv")
+# mgcv/R/gam.fit3.r: 1689
+# gettext("full convergence", domain = "R-mgcv")
+#. R/mgcv.r: stop("not converged")
+#: R/mgcv.r:0
+#, fuzzy
+msgid "not converged"
+msgstr "pełna zbieżność"
 
 # mgcv/R/gam.fit3.r: 314
 # stop("Not enough informative observations.")
@@ -2902,6 +2963,11 @@ msgstr ""
 msgid "reverse indices missing from sparse discrete marginals"
 msgstr ""
 
+#. R/bam.r: warning("rho ignored with NCV")
+#: R/bam.r:0
+msgid "rho ignored with NCV"
+msgstr ""
+
 #. R/jagam.r: warning("rho missing from simulation data edf.type reset to 2")
 #: R/jagam.r:0
 msgid "rho missing from simulation data edf.type reset to 2"
@@ -2975,14 +3041,14 @@ msgstr ""
 msgid "scale parameter must be positive"
 msgstr "parametr skali musi być dodatni"
 
+#. R/misc.r: stop("scattered XVX computation not yet implemented")
+#: R/misc.r:0
+msgid "scattered XVX computation not yet implemented"
+msgstr ""
+
 #. R/misc.r: stop("sd should have exactly one less entry than ld")
 #: R/misc.r:0
 msgid "sd should have exactly one less entry than ld"
-msgstr ""
-
-#. R/fast-REML.r: stop("second derivs not available for non-linear penalties")
-#: R/fast-REML.r:0
-msgid "second derivs not available for non-linear penalties"
 msgstr ""
 
 #. R/mgcv.r: stop("shared offsets not allowed")
@@ -3024,13 +3090,6 @@ msgstr "głupia wartość dostarczona do 'rank.tol': ustawianie pierwiastka kwad
 #, fuzzy
 msgid "single linear predictor indices are ignored"
 msgstr "Niepoprawne wartości liniowej zmiennej niezależnej w pustym modelu"
-
-# mgcv/R/mgcv.r: 3319
-# stop("singular values not returned in order")
-#. R/mgcv.r: stop("singular values not returned in order")
-#: R/mgcv.r:0
-msgid "singular values not returned in order"
-msgstr "osobliwe wartości nie zostały zwrócone w w sposób uporządkowany"
 
 # mgcv/R/gam.fit3.r: 2219
 # stop("p must be in [1,2]")
@@ -3155,6 +3214,14 @@ msgstr "dostarczone macierze S mają niepoprawne wymiary"
 msgid "supplied dist negative"
 msgstr "dostarczona odległość jest ujemna"
 
+# mgcv/R/smooth.r: 177
+# stop("'x' out of range")
+#. R/bam.r: stop("supplied nei index out of range")
+#: R/bam.r:0
+#, fuzzy
+msgid "supplied nei index out of range"
+msgstr "argument 'x' jest poza zakresem"
+
 # mgcv/R/smooth.r: 2116
 # stop("supplied penalty not square!")
 #. R/smooth.r: stop("supplied penalty not square!")
@@ -3223,6 +3290,11 @@ msgstr "zakres węzła jest tak szeroki, że *brak* informacji o niektórych pod
 msgid "too few knots"
 msgstr "zbyt mało węzłów"
 
+#. R/mgcv.r: stop("too many active constraints!")
+#: R/mgcv.r:0
+msgid "too many active constraints!"
+msgstr ""
+
 #. R/bam.r: warning("too many cluster nodes to use all efficiently")
 #. R/bam.r: warning("too many cluster nodes to use all efficiently")
 #: R/bam.r:0
@@ -3249,10 +3321,23 @@ msgstr ""
 msgid "type must be \"link\" or \"response\""
 msgstr "'type' musi mieć wartość \"link\" lub \"response\""
 
+# mgcv/R/bam.r: 1079
+# stop("unsupported smoothness selection method")
+#. R/bam.r: stop("un-supported smoothness selection method")
+#: R/bam.r:0
+#, fuzzy
+msgid "un-supported smoothness selection method"
+msgstr "niewspierana metoda wyboru wygładzania"
+
 #. R/mgcv.r: stop("un-supported test")
 #: R/mgcv.r:0
 msgid "un-supported test"
 msgstr "niewspierany test"
+
+#. R/mgcv.r: stop("unbounded")
+#: R/mgcv.r:0
+msgid "unbounded"
+msgstr ""
 
 #. R/mgcv.r: stop("unclear which points NCV neighbourhoods belong to")
 #: R/mgcv.r:0
@@ -3325,13 +3410,6 @@ msgstr "nierozpoznane (wektorowe?) połączenie"
 #: R/gam.fit3.r:0
 msgid "unsupported order of differentiation requested of gam.fit3"
 msgstr "niewspierany porządek różniczkowania zażądany od 'gam.fit3()'"
-
-# mgcv/R/bam.r: 1079
-# stop("unsupported smoothness selection method")
-#. R/bam.r: stop("unsupported smoothness selection method")
-#: R/bam.r:0
-msgid "unsupported smoothness selection method"
-msgstr "niewspierana metoda wyboru wygładzania"
 
 # mgcv/R/mgcv.r: 3463
 # stop(gettextf("S[[%d]] matrix is not +ve definite.", i))
@@ -3479,6 +3557,40 @@ msgid_plural "there should be %d knots supplied"
 msgstr[0] "powinien być dostarczony %d węzeł"
 msgstr[1] "powinny być dostarczone %d węzły"
 msgstr[2] "powinno być dostarczonych %d węzłów"
+
+# mgcv/R/gam.fit3.r: 2093
+# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
+#, fuzzy
+#~ msgid "\"%s\" link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\""
+#~ msgstr "połączenie niedostępne dla regresji beta; dostępne linki to \"logit\", \"probit\", \"cloglog\" oraz \"cauchit\""
+
+# mgcv/R/gam.fit3.r: 2093
+# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
+#, fuzzy
+#~ msgid "\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\""
+#~ msgstr "połączenie %s nie jest dostępne dla rodziny rozkładu Pascala; dostępne połączenia to \"identity\", \"log\" oraz \"sqrt\""
+
+# mgcv/R/gam.fit3.r: 2093
+# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
+#, fuzzy
+#~ msgid "\"%s\" link not available for scaled t distribution; available links are \"identity\", \"log\",  and \"inverse\""
+#~ msgstr "połączenie nie jest dostępne dla skalowanego rozkładu t; dostępne połączenia to \"identity\", \"log\", oraz \"inverse\""
+
+# mgcv/R/gam.fit3.r: 2093
+# stop(gettextf("%s link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\"", linktemp))
+#, fuzzy
+#~ msgid "\"%s\" link not available for zero inflated; available link for `lambda' is only  \"loga\""
+#~ msgstr "połączenie nie jest dostępne dla rozkładu z zerowym zawyżeniem; dostępne połączenia dla 'lambda' to tylko \"loga\""
+
+# mgcv/R/mgcv.r: 570
+# stop("First argument is no sort of formula!")
+#~ msgid "absorb.cons must be TRUE for multi-formula models"
+#~ msgstr "'absorb.cons' musi mieć wartość TRUE dla modeli z wieloma formułami"
+
+# mgcv/R/mgcv.r: 3319
+# stop("singular values not returned in order")
+#~ msgid "singular values not returned in order"
+#~ msgstr "osobliwe wartości nie zostały zwrócone w w sposób uporządkowany"
 
 # mgcv/R/gam.fit3.r: 2300
 # stop(gettextf("link \"%s\" is not available for Tweedie family.", linktemp), domain = "R-mgcv")
@@ -3673,17 +3785,6 @@ msgstr[2] "powinno być dostarczonych %d węzłów"
 # gettext("no convergence in 200 iterations", domain = "R-mgcv")
 #~ msgid "no convergence in 200 iterations"
 #~ msgstr "brak zbieżności w 200 iteracjach"
-
-# mgcv/R/fast-REML.r: 643
-# gettext("full convergence", domain = "R-mgcv")
-# mgcv/R/gam.fit3.r: 1249
-# gettext("full convergence", domain = "R-mgcv")
-# mgcv/R/gam.fit3.r: 1426
-# gettext("full convergence", domain = "R-mgcv")
-# mgcv/R/gam.fit3.r: 1689
-# gettext("full convergence", domain = "R-mgcv")
-#~ msgid "full convergence"
-#~ msgstr "pełna zbieżność"
 
 # mgcv/R/gam.fit3.r: 284
 # stop("NA values in V(mu)")

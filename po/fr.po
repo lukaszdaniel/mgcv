@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.3-10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-05 20:29+0200\n"
+"POT-Creation-Date: 2025-05-18 13:38+0200\n"
 "PO-Revision-Date: 2021-02-06 16:28+0100\n"
 "Last-Translator: Philippe Grosjean <phgrosjean@sciviews.org>\n"
 "Language-Team: French <R-core@r-project.org>\n"
@@ -38,45 +38,29 @@ msgid ""
 "file dim problem\n"
 msgstr ""
 
-#: mat.c:3345
+#: mat.c:3567
 #, c-format
 msgid "Non orthogonal eigenvectors %d %g\n"
 msgstr ""
 
-#: mat.c:3350
+#: mat.c:3572
 #, c-format
 msgid "Eigenvectors not normalized %d %g\n"
 msgstr ""
 
-#: matrix.c:82
-msgid "Failed to initialize memory for matrix."
-msgstr "L'initialisation de la mémoire pour une matrice a échoué."
-
-#: matrix.c:144 matrix.c:202
-msgid "An out of bound write to matrix has occurred!"
-msgstr "Une écrite hors des limites de la matrice s'est produite !"
-
-#: matrix.c:150
-msgid "INTEGRITY PROBLEM in the extant matrix list."
-msgstr "PROBLEME D'INTEGRITE dans la liste de la matrice étendue."
-
-#: matrix.c:182
-msgid "You are trying to check matrix integrity without defining RANGECHECK."
-msgstr "Vous essayez de vérifier l'intégrité de la matrice sans avoir défini RANGECHECK."
-
-#: matrix.c:240
+#: matrix.c:116
 msgid "Target matrix too small in mcopy"
 msgstr "Matrice cible trop petite dans mcopy"
 
-#: matrix.c:260 matrix.c:268 matrix.c:281 matrix.c:289
+#: matrix.c:136 matrix.c:144 matrix.c:157 matrix.c:165
 msgid "Incompatible matrices in matmult."
 msgstr "Matrices incompatibles dans matmult."
 
-#: matrix.c:313
+#: matrix.c:189
 msgid "Attempt to invert() non-square matrix"
 msgstr "Tentative d'inversion d'une matrice non carrée"
 
-#: matrix.c:335
+#: matrix.c:211
 msgid "Singular Matrix passed to invert()"
 msgstr "Matrice singulière passée à invert()"
 
@@ -85,11 +69,11 @@ msgstr "Matrice singulière passée à invert()"
 msgid "adjusting %d memory allocation\n"
 msgstr ""
 
-#: qp.c:59
+#: qp.c:65
 msgid "ERROR in addconQT."
 msgstr "ERREUR dans addconQT."
 
-#: qp.c:463
+#: qp.c:473
 msgid "QPCLS - Rank deficiency in model"
 msgstr "QPCLS - Déficience de rang dans le modèle"
 
@@ -126,6 +110,18 @@ msgstr "Vous devez avoir 2m > d pour une 'thin plate spline’."
 #: tprs.c:378 tprs.c:386
 msgid "A term has fewer unique covariate combinations than specified maximum degrees of freedom"
 msgstr "Un terme a moins de combinaisons de covariables uniques que le degré de liberté maximum spécifié"
+
+#~ msgid "Failed to initialize memory for matrix."
+#~ msgstr "L'initialisation de la mémoire pour une matrice a échoué."
+
+#~ msgid "An out of bound write to matrix has occurred!"
+#~ msgstr "Une écrite hors des limites de la matrice s'est produite !"
+
+#~ msgid "INTEGRITY PROBLEM in the extant matrix list."
+#~ msgstr "PROBLEME D'INTEGRITE dans la liste de la matrice étendue."
+
+#~ msgid "You are trying to check matrix integrity without defining RANGECHECK."
+#~ msgstr "Vous essayez de vérifier l'intégrité de la matrice sans avoir défini RANGECHECK."
 
 #~ msgid "svd() not converged"
 #~ msgstr "svd() n'a pas convergé"

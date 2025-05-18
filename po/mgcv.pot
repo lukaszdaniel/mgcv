@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: mgcv 1.9-1\n"
+"Project-Id-Version: mgcv 1.9-3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-05 20:29+0200\n"
+"POT-Creation-Date: 2025-05-18 13:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,45 +37,29 @@ msgid ""
 "file dim problem\n"
 msgstr ""
 
-#: mat.c:3345
+#: mat.c:3567
 #, c-format
 msgid "Non orthogonal eigenvectors %d %g\n"
 msgstr ""
 
-#: mat.c:3350
+#: mat.c:3572
 #, c-format
 msgid "Eigenvectors not normalized %d %g\n"
 msgstr ""
 
-#: matrix.c:82
-msgid "Failed to initialize memory for matrix."
-msgstr ""
-
-#: matrix.c:144 matrix.c:202
-msgid "An out of bound write to matrix has occurred!"
-msgstr ""
-
-#: matrix.c:150
-msgid "INTEGRITY PROBLEM in the extant matrix list."
-msgstr ""
-
-#: matrix.c:182
-msgid "You are trying to check matrix integrity without defining RANGECHECK."
-msgstr ""
-
-#: matrix.c:240
+#: matrix.c:116
 msgid "Target matrix too small in mcopy"
 msgstr ""
 
-#: matrix.c:260 matrix.c:268 matrix.c:281 matrix.c:289
+#: matrix.c:136 matrix.c:144 matrix.c:157 matrix.c:165
 msgid "Incompatible matrices in matmult."
 msgstr ""
 
-#: matrix.c:313
+#: matrix.c:189
 msgid "Attempt to invert() non-square matrix"
 msgstr ""
 
-#: matrix.c:335
+#: matrix.c:211
 msgid "Singular Matrix passed to invert()"
 msgstr ""
 
@@ -84,11 +68,11 @@ msgstr ""
 msgid "adjusting %d memory allocation\n"
 msgstr ""
 
-#: qp.c:59
+#: qp.c:65
 msgid "ERROR in addconQT."
 msgstr ""
 
-#: qp.c:463
+#: qp.c:473
 msgid "QPCLS - Rank deficiency in model"
 msgstr ""
 
