@@ -1,13 +1,13 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.9-3\n"
-"POT-Creation-Date: 2025-05-18 13:38\n"
+"POT-Creation-Date: 2025-06-05 16:22\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
@@ -119,14 +119,12 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: stop("'by' variable must be same dimension as smooth arguments")
-#. R/smooth.r: stop("'by' variable must be same dimension as smooth arguments")
 
 msgid "'by' variable must be same dimension as smooth arguments"
 msgstr ""
 
 
 #: R/bam.r: 0
-#. R/bam.r: stop("'family' argument seems not to be a valid family object")
 #. R/bam.r: stop("'family' argument seems not to be a valid family object")
 
 msgid "'family' argument seems not to be a valid family object"
@@ -143,7 +141,6 @@ msgstr ""
 #: R/gam.fit3.r: 0
 #: R/mgcv.r: 0
 #. R/gam.fit3.r: stop("0s in V(mu)")
-#. R/gam.fit3.r: stop("0s in V(mu)")
 #. R/mgcv.r: stop("0s in V(mu)")
 
 msgid "0s in V(mu)"
@@ -151,7 +148,6 @@ msgstr ""
 
 
 #: R/gam.fit3.r: 0
-#. R/gam.fit3.r: stop("1<a<b<2 (strict) required")
 #. R/gam.fit3.r: stop("1<a<b<2 (strict) required")
 
 msgid "1<a<b<2 (strict) required"
@@ -173,7 +169,6 @@ msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: stop("A term has fewer unique covariate combinations than specified maximum degrees of freedom")
 #. R/smooth.r: stop("A term has fewer unique covariate combinations than specified maximum degrees of freedom")
 
 msgid "A term has fewer unique covariate combinations than specified maximum degrees of freedom"
@@ -209,13 +204,6 @@ msgstr ""
 
 
 #: R/mgcv.r: 0
-#. R/mgcv.r: warning("Algorithm did not converge")
-
-msgid "Algorithm did not converge"
-msgstr ""
-
-
-#: R/mgcv.r: 0
 #. R/mgcv.r: warning("Algorithm stopped at boundary value")
 
 msgid "Algorithm stopped at boundary value"
@@ -238,10 +226,6 @@ msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: stop("Basis only handles 1D smooths")
-#. R/smooth.r: stop("Basis only handles 1D smooths")
-#. R/smooth.r: stop("Basis only handles 1D smooths")
-#. R/smooth.r: stop("Basis only handles 1D smooths")
 #. R/smooth.r: stop("Basis only handles 1D smooths")
 
 msgid "Basis only handles 1D smooths"
@@ -277,8 +261,6 @@ msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: stop("Can't find by variable")
-#. R/smooth.r: stop("Can't find by variable")
 #. R/smooth.r: stop("Can't find by variable")
 
 msgid "Can't find by variable"
@@ -317,14 +299,12 @@ msgstr ""
 
 #: R/gamm.r: 0
 #. R/gamm.r: stop("Cannot extract the matrix from an uninitialized pdMat object")
-#. R/gamm.r: stop("Cannot extract the matrix from an uninitialized pdMat object")
 
 msgid "Cannot extract the matrix from an uninitialized pdMat object"
 msgstr ""
 
 
 #: R/gamm.r: 0
-#. R/gamm.r: stop("Cannot extract the matrix with uninitialized dimensions")
 #. R/gamm.r: stop("Cannot extract the matrix with uninitialized dimensions")
 
 msgid "Cannot extract the matrix with uninitialized dimensions"
@@ -334,7 +314,6 @@ msgstr ""
 #: R/bam.r: 0
 #: R/gam.fit3.r: 0
 #: R/mgcv.r: 0
-#. R/bam.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
 #. R/bam.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
 #. R/gam.fit3.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
 #. R/mgcv.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
@@ -380,7 +359,6 @@ msgstr ""
 
 #: R/gam.fit3.r: 0
 #. R/gam.fit3.r: stop("H has wrong dimension")
-#. R/gam.fit3.r: stop("H has wrong dimension")
 
 msgid "H has wrong dimension"
 msgstr ""
@@ -417,8 +395,6 @@ msgstr ""
 #: R/gam.fit3.r: 0
 #: R/mgcv.r: 0
 #. R/gam.fit3.r: stop("L has inconsistent dimensions.")
-#. R/gam.fit3.r: stop("L has inconsistent dimensions.")
-#. R/gam.fit3.r: stop("L has inconsistent dimensions.")
 #. R/mgcv.r: stop("L has inconsistent dimensions.")
 
 msgid "L has inconsistent dimensions."
@@ -435,8 +411,6 @@ msgstr ""
 #: R/gam.fit3.r: 0
 #: R/mgcv.r: 0
 #. R/gam.fit3.r: stop("L must be a matrix.")
-#. R/gam.fit3.r: stop("L must be a matrix.")
-#. R/gam.fit3.r: stop("L must be a matrix.")
 #. R/mgcv.r: stop("L must be a matrix.")
 
 msgid "L must be a matrix."
@@ -445,8 +419,6 @@ msgstr ""
 
 #: R/gam.fit3.r: 0
 #: R/mgcv.r: 0
-#. R/gam.fit3.r: stop("L must have at least as many rows as columns.")
-#. R/gam.fit3.r: stop("L must have at least as many rows as columns.")
 #. R/gam.fit3.r: stop("L must have at least as many rows as columns.")
 #. R/mgcv.r: stop("L must have at least as many rows as columns.")
 
@@ -533,7 +505,6 @@ msgstr ""
 
 #: R/mgcv.r: 0
 #. R/mgcv.r: stop("Model seems to contain no terms")
-#. R/mgcv.r: stop("Model seems to contain no terms")
 
 msgid "Model seems to contain no terms"
 msgstr ""
@@ -598,7 +569,6 @@ msgstr ""
 #: R/gam.fit3.r: 0
 #: R/mgcv.r: 0
 #. R/gam.fit3.r: stop("NAs in V(mu)")
-#. R/gam.fit3.r: stop("NAs in V(mu)")
 #. R/mgcv.r: stop("NAs in V(mu)")
 
 msgid "NAs in V(mu)"
@@ -607,7 +577,6 @@ msgstr ""
 
 #: R/gam.fit3.r: 0
 #: R/mgcv.r: 0
-#. R/gam.fit3.r: stop("NAs in d(mu)/d(eta)")
 #. R/gam.fit3.r: stop("NAs in d(mu)/d(eta)")
 #. R/mgcv.r: stop("NAs in d(mu)/d(eta)")
 
@@ -630,7 +599,6 @@ msgstr ""
 
 
 #: R/mgcv.r: 0
-#. R/mgcv.r: stop("No data supplied to gam.setup")
 #. R/mgcv.r: stop("No data supplied to gam.setup")
 
 msgid "No data supplied to gam.setup"
@@ -695,14 +663,12 @@ msgstr ""
 
 #: R/gam.fit3.r: 0
 #. R/gam.fit3.r: stop("Non-finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'")
-#. R/gam.fit3.r: stop("Non-finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'")
 
 msgid "Non-finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'"
 msgstr ""
 
 
 #: R/bam.r: 0
-#. R/bam.r: stop("Non-finite deviance")
 #. R/bam.r: stop("Non-finite deviance")
 
 msgid "Non-finite deviance"
@@ -794,15 +760,12 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: stop("Repeated variables as arguments of a smooth are not permitted")
-#. R/smooth.r: stop("Repeated variables as arguments of a smooth are not permitted")
-#. R/smooth.r: stop("Repeated variables as arguments of a smooth are not permitted")
 
 msgid "Repeated variables as arguments of a smooth are not permitted"
 msgstr ""
 
 
 #: R/inla.r: 0
-#. R/inla.r: stop("Requires a gam or bam prefit object")
 #. R/inla.r: stop("Requires a gam or bam prefit object")
 
 msgid "Requires a gam or bam prefit object"
@@ -855,14 +818,12 @@ msgstr ""
 
 #: R/plots.r: 0
 #. R/plots.r: stop("Something wrong with zlim")
-#. R/plots.r: stop("Something wrong with zlim")
 
 msgid "Something wrong with zlim"
 msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: stop("Sorry, tensor products of smooths with multiple penalties are not supported.")
 #. R/smooth.r: stop("Sorry, tensor products of smooths with multiple penalties are not supported.")
 
 msgid "Sorry, tensor products of smooths with multiple penalties are not supported."
@@ -926,7 +887,6 @@ msgstr ""
 
 
 #: R/bam.r: 0
-#. R/bam.r: stop("This family should not have a matrix response")
 #. R/bam.r: stop("This family should not have a matrix response")
 
 msgid "This family should not have a matrix response"
@@ -1026,9 +986,6 @@ msgstr ""
 
 #: R/misc.r: 0
 #. R/misc.r: stop("a has wrong number of rows")
-#. R/misc.r: stop("a has wrong number of rows")
-#. R/misc.r: stop("a has wrong number of rows")
-#. R/misc.r: stop("a has wrong number of rows")
 
 msgid "a has wrong number of rows"
 msgstr ""
@@ -1042,8 +999,9 @@ msgstr ""
 
 
 #: R/bam.r: 0
+#: R/mgcv.r: 0
 #. R/bam.r: warning("algorithm did not converge")
-#. R/bam.r: warning("algorithm did not converge")
+#. R/mgcv.r: warning("algorithm did not converge")
 
 msgid "algorithm did not converge"
 msgstr ""
@@ -1114,12 +1072,6 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: stop("arguments of smooth not same dimension")
-#. R/smooth.r: stop("arguments of smooth not same dimension")
-#. R/smooth.r: stop("arguments of smooth not same dimension")
-#. R/smooth.r: stop("arguments of smooth not same dimension")
-#. R/smooth.r: stop("arguments of smooth not same dimension")
-#. R/smooth.r: stop("arguments of smooth not same dimension")
-#. R/smooth.r: stop("arguments of smooth not same dimension")
 
 msgid "arguments of smooth not same dimension"
 msgstr ""
@@ -1141,14 +1093,12 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: stop("attempt to use unsuitable marginal smooth class")
-#. R/smooth.r: stop("attempt to use unsuitable marginal smooth class")
 
 msgid "attempt to use unsuitable marginal smooth class"
 msgstr ""
 
 
 #: R/bam.r: 0
-#. R/bam.r: stop("bam can not discretize with this nesting structure")
 #. R/bam.r: stop("bam can not discretize with this nesting structure")
 
 msgid "bam can not discretize with this nesting structure"
@@ -1164,14 +1114,12 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: warning("basis dimension is larger than number of unique covariates")
-#. R/smooth.r: warning("basis dimension is larger than number of unique covariates")
 
 msgid "basis dimension is larger than number of unique covariates"
 msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: warning("basis dimension reset to minimum possible")
 #. R/smooth.r: warning("basis dimension reset to minimum possible")
 
 msgid "basis dimension reset to minimum possible"
@@ -1180,16 +1128,12 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: stop("basis dimension too small for b-spline order")
-#. R/smooth.r: stop("basis dimension too small for b-spline order")
-#. R/smooth.r: stop("basis dimension too small for b-spline order")
 
 msgid "basis dimension too small for b-spline order"
 msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: warning("basis dimension, k, increased to minimum possible\n")
-#. R/smooth.r: warning("basis dimension, k, increased to minimum possible\n")
 #. R/smooth.r: warning("basis dimension, k, increased to minimum possible\n")
 
 msgid "basis dimension, k, increased to minimum possible"
@@ -1205,8 +1149,6 @@ msgstr ""
 
 #: R/soap.r: 0
 #. R/soap.r: stop("bnd must be a list of boundary loops")
-#. R/soap.r: stop("bnd must be a list of boundary loops")
-#. R/soap.r: stop("bnd must be a list of boundary loops")
 
 msgid "bnd must be a list of boundary loops"
 msgstr ""
@@ -1220,7 +1162,6 @@ msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: warning("bs wrong length and ignored.")
 #. R/smooth.r: warning("bs wrong length and ignored.")
 
 msgid "bs wrong length and ignored."
@@ -1257,8 +1198,6 @@ msgstr ""
 
 #: R/soap.r: 0
 #. R/soap.r: stop("can't soap smooth without a boundary")
-#. R/soap.r: stop("can't soap smooth without a boundary")
-#. R/soap.r: stop("can't soap smooth without a boundary")
 
 msgid "can't soap smooth without a boundary"
 msgstr ""
@@ -1266,14 +1205,12 @@ msgstr ""
 
 #: R/bam.r: 0
 #. R/bam.r: stop("cannot find valid starting values: please specify some")
-#. R/bam.r: stop("cannot find valid starting values: please specify some")
 
 msgid "cannot find valid starting values: please specify some"
 msgstr ""
 
 
 #: R/bam.r: 0
-#. R/bam.r: gettextf("chunk.size < number of coefficients. Reset to %d",     chunk.size)
 #. R/bam.r: gettextf("chunk.size < number of coefficients. Reset to %d",     chunk.size)
 
 msgid "chunk.size < number of coefficients. Reset to %d"
@@ -1302,9 +1239,6 @@ msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: stop("components of knots relating to a single smooth must be of same length")
-#. R/smooth.r: stop("components of knots relating to a single smooth must be of same length")
-#. R/smooth.r: stop("components of knots relating to a single smooth must be of same length")
 #. R/smooth.r: stop("components of knots relating to a single smooth must be of same length")
 
 msgid "components of knots relating to a single smooth must be of same length"
@@ -1347,8 +1281,6 @@ msgstr ""
 
 
 #: R/soap.r: 0
-#. R/soap.r: stop("data outside soap boundary")
-#. R/soap.r: stop("data outside soap boundary")
 #. R/soap.r: stop("data outside soap boundary")
 
 msgid "data outside soap boundary"
@@ -1485,11 +1417,7 @@ msgstr ""
 
 #: R/gam.fit3.r: 0
 #: R/plots.r: 0
-#: R/plots.r: 0
 #. R/gam.fit3.r: stop("fam not a family object")
-#. R/gam.fit3.r: stop("fam not a family object")
-#. R/gam.fit3.r: stop("fam not a family object")
-#. R/plots.r: stop("fam not a family object")
 #. R/plots.r: stop("fam not a family object")
 
 msgid "fam not a family object"
@@ -1533,7 +1461,6 @@ msgstr ""
 
 #: R/gam.fit3.r: 0
 #. R/gam.fit3.r: stop("family not recognised")
-#. R/gam.fit3.r: stop("family not recognised")
 
 msgid "family not recognised"
 msgstr ""
@@ -1563,11 +1490,6 @@ msgstr ""
 
 #: R/soap.r: 0
 #. R/soap.r: stop("faulty bnd")
-#. R/soap.r: stop("faulty bnd")
-#. R/soap.r: stop("faulty bnd")
-#. R/soap.r: stop("faulty bnd")
-#. R/soap.r: stop("faulty bnd")
-#. R/soap.r: stop("faulty bnd")
 
 msgid "faulty bnd"
 msgstr ""
@@ -1575,7 +1497,6 @@ msgstr ""
 
 #: R/bam.r: 0
 #: R/mgcv.r: 0
-#. R/bam.r: warning("fitted probabilities numerically 0 or 1 occurred")
 #. R/bam.r: warning("fitted probabilities numerically 0 or 1 occurred")
 #. R/mgcv.r: warning("fitted probabilities numerically 0 or 1 occurred")
 
@@ -1585,7 +1506,6 @@ msgstr ""
 
 #: R/bam.r: 0
 #: R/mgcv.r: 0
-#. R/bam.r: warning("fitted rates numerically 0 occurred")
 #. R/bam.r: warning("fitted rates numerically 0 occurred")
 #. R/mgcv.r: warning("fitted rates numerically 0 occurred")
 
@@ -1721,14 +1641,12 @@ msgstr ""
 
 #: R/gamlss.r: 0
 #. R/gamlss.r: stop("gevlss requires 3 links specified as character strings")
-#. R/gamlss.r: stop("gevlss requires 3 links specified as character strings")
 
 msgid "gevlss requires 3 links specified as character strings"
 msgstr ""
 
 
 #: R/gfam.r: 0
-#. R/gfam.r: stop("gfam mixed response scale prediction not possible here")
 #. R/gfam.r: stop("gfam mixed response scale prediction not possible here")
 
 msgid "gfam mixed response scale prediction not possible here"
@@ -1801,7 +1719,6 @@ msgstr ""
 
 
 #: R/mgcv.r: 0
-#. R/mgcv.r: stop("incorrect number of smoothing parameters supplied for a smooth term")
 #. R/mgcv.r: stop("incorrect number of smoothing parameters supplied for a smooth term")
 
 msgid "incorrect number of smoothing parameters supplied for a smooth term"
@@ -1941,8 +1858,6 @@ msgstr ""
 
 #: R/soap.r: 0
 #. R/soap.r: stop("k and bnd lengths are inconsistent")
-#. R/soap.r: stop("k and bnd lengths are inconsistent")
-#. R/soap.r: stop("k and bnd lengths are inconsistent")
 
 msgid "k and bnd lengths are inconsistent"
 msgstr ""
@@ -1957,8 +1872,6 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: stop("knot range does not include data")
-#. R/smooth.r: stop("knot range does not include data")
-#. R/smooth.r: stop("knot range does not include data")
 
 msgid "knot range does not include data"
 msgstr ""
@@ -1972,8 +1885,6 @@ msgstr ""
 
 
 #: R/soap.r: 0
-#. R/soap.r: stop("knots must be specified for soap")
-#. R/soap.r: stop("knots must be specified for soap")
 #. R/soap.r: stop("knots must be specified for soap")
 
 msgid "knots must be specified for soap"
@@ -2007,13 +1918,6 @@ msgstr ""
 #. R/mgcv.r: stop("length of sp must be number of free smoothing parameters in original model")
 
 msgid "length of sp must be number of free smoothing parameters in original model"
-msgstr ""
-
-
-#: R/mgcv.r: 0
-#. R/mgcv.r: stop("length(M$w) != length(M$y)")
-
-msgid "length(M$w) != length(M$y)"
 msgstr ""
 
 
@@ -2067,7 +1971,6 @@ msgstr ""
 
 
 #: R/efam.r: 0
-#. R/efam.r: gettextf("link \"%s\" not available for cnorm family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
 #. R/efam.r: gettextf("link \"%s\" not available for cnorm family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
 
 msgid "link \"%s\" not available for cnorm family; available links are %s"
@@ -2139,14 +2042,12 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: warning("m wrong length and ignored.")
-#. R/smooth.r: warning("m wrong length and ignored.")
 
 msgid "m wrong length and ignored."
 msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: stop("matrices must be all class dgCMatrix or all class matrix")
 #. R/smooth.r: stop("matrices must be all class dgCMatrix or all class matrix")
 
 msgid "matrices must be all class dgCMatrix or all class matrix"
@@ -2232,7 +2133,6 @@ msgstr ""
 
 #: R/misc.r: 0
 #. R/misc.r: stop("mu dimensions wrong")
-#. R/misc.r: stop("mu dimensions wrong")
 
 msgid "mu dimensions wrong"
 msgstr ""
@@ -2281,20 +2181,6 @@ msgstr ""
 
 
 #: R/mgcv.r: 0
-#. R/mgcv.r: stop("ncol(M$C) != length(M$p)")
-
-msgid "ncol(M$C) != length(M$p)"
-msgstr ""
-
-
-#: R/mgcv.r: 0
-#. R/mgcv.r: stop("ncol(M$X) != length(M$p)")
-
-msgid "ncol(M$X) != length(M$p)"
-msgstr ""
-
-
-#: R/mgcv.r: 0
 #. R/mgcv.r: stop("ncv.threads must be a positive integer")
 
 msgid "ncv.threads must be a positive integer"
@@ -2302,7 +2188,6 @@ msgstr ""
 
 
 #: R/soap.r: 0
-#. R/soap.r: stop("need at least one interior knot")
 #. R/soap.r: stop("need at least one interior knot")
 
 msgid "need at least one interior knot"
@@ -2397,8 +2282,6 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: stop("no data to predict at")
-#. R/smooth.r: stop("no data to predict at")
-#. R/smooth.r: stop("no data to predict at")
 
 msgid "no data to predict at"
 msgstr ""
@@ -2487,7 +2370,6 @@ msgstr ""
 
 #: R/bam.r: 0
 #. R/bam.r: gettextf("non-finite coefficients at iteration %d", iter)
-#. R/bam.r: gettextf("non-finite coefficients at iteration %d", iter)
 
 msgid "non-finite coefficients at iteration %d"
 msgstr ""
@@ -2544,7 +2426,6 @@ msgstr ""
 
 #: R/misc.r: 0
 #. R/misc.r: stop("not positive definite")
-#. R/misc.r: stop("not positive definite")
 
 msgid "not positive definite"
 msgstr ""
@@ -2561,27 +2442,6 @@ msgstr ""
 #. R/mgcv.r: stop("nothing to do for this model")
 
 msgid "nothing to do for this model"
-msgstr ""
-
-
-#: R/mgcv.r: 0
-#. R/mgcv.r: stop("nrow(M$Ain) != length(M$bin)")
-
-msgid "nrow(M$Ain) != length(M$bin)"
-msgstr ""
-
-
-#: R/mgcv.r: 0
-#. R/mgcv.r: stop("nrow(M$Ain) != length(M$p)")
-
-msgid "nrow(M$Ain) != length(M$p)"
-msgstr ""
-
-
-#: R/mgcv.r: 0
-#. R/mgcv.r: stop("nrow(M$X) != length(M$y)")
-
-msgid "nrow(M$X) != length(M$y)"
 msgstr ""
 
 
@@ -2622,7 +2482,6 @@ msgstr ""
 
 #: R/gamm.r: 0
 #. R/gamm.r: stop("object does not appear to be of class lme")
-#. R/gamm.r: stop("object does not appear to be of class lme")
 
 msgid "object does not appear to be of class lme"
 msgstr ""
@@ -2651,7 +2510,6 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: warning("one or more supplied k too small - reset to default")
-#. R/smooth.r: warning("one or more supplied k too small - reset to default")
 
 msgid "one or more supplied k too small - reset to default"
 msgstr ""
@@ -2665,7 +2523,6 @@ msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: warning("only first element of 'id' used")
 #. R/smooth.r: warning("only first element of 'id' used")
 
 msgid "only first element of 'id' used"
@@ -2737,7 +2594,6 @@ msgstr ""
 
 #: R/gam.fit3.r: 0
 #. R/gam.fit3.r: stop("p must be in [1,2]")
-#. R/gam.fit3.r: stop("p must be in [1,2]")
 
 msgid "p must be in [1,2]"
 msgstr ""
@@ -2765,7 +2621,6 @@ msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: stop("penalty basis too large for smoothing basis")
 #. R/smooth.r: stop("penalty basis too large for smoothing basis")
 
 msgid "penalty basis too large for smoothing basis"
@@ -2823,7 +2678,6 @@ msgstr ""
 
 #: R/inla.r: 0
 #. R/inla.r: stop("rank deficient re-parameterization")
-#. R/inla.r: stop("rank deficient re-parameterization")
 
 msgid "rank deficient re-parameterization"
 msgstr ""
@@ -2859,7 +2713,6 @@ msgstr ""
 
 #: R/mgcv.r: 0
 #. R/mgcv.r: stop("requires an object of class gam")
-#. R/mgcv.r: stop("requires an object of class gam")
 
 msgid "requires an object of class gam"
 msgstr ""
@@ -2887,9 +2740,6 @@ msgstr ""
 
 
 #: R/misc.r: 0
-#. R/misc.r: stop("reverse indices missing from sparse discrete marginals")
-#. R/misc.r: stop("reverse indices missing from sparse discrete marginals")
-#. R/misc.r: stop("reverse indices missing from sparse discrete marginals")
 #. R/misc.r: stop("reverse indices missing from sparse discrete marginals")
 
 msgid "reverse indices missing from sparse discrete marginals"
@@ -3066,8 +2916,6 @@ msgstr ""
 
 #: R/soap.r: 0
 #. R/soap.r: stop("soap films are bivariate only")
-#. R/soap.r: stop("soap films are bivariate only")
-#. R/soap.r: stop("soap films are bivariate only")
 
 msgid "soap films are bivariate only"
 msgstr ""
@@ -3082,14 +2930,12 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: warning("something wrong with argument d.")
-#. R/smooth.r: warning("something wrong with argument d.")
 
 msgid "something wrong with argument d."
 msgstr ""
 
 
 #: R/misc.r: 0
-#. R/misc.r: stop("something wrong with inputs to LAPACK routine")
 #. R/misc.r: stop("something wrong with inputs to LAPACK routine")
 
 msgid "something wrong with inputs to LAPACK routine"
@@ -3175,8 +3021,6 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: stop("supply a value for each variable for a point constraint")
-#. R/smooth.r: stop("supply a value for each variable for a point constraint")
-#. R/smooth.r: stop("supply a value for each variable for a point constraint")
 
 msgid "supply a value for each variable for a point constraint"
 msgstr ""
@@ -3212,14 +3056,12 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: warning("there is *no* information about some basis coefficients")
-#. R/smooth.r: warning("there is *no* information about some basis coefficients")
 
 msgid "there is *no* information about some basis coefficients"
 msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: stop("too few knots")
 #. R/smooth.r: stop("too few knots")
 
 msgid "too few knots"
@@ -3234,7 +3076,6 @@ msgstr ""
 
 
 #: R/bam.r: 0
-#. R/bam.r: warning("too many cluster nodes to use all efficiently")
 #. R/bam.r: warning("too many cluster nodes to use all efficiently")
 
 msgid "too many cluster nodes to use all efficiently"
@@ -3384,7 +3225,6 @@ msgstr ""
 
 #: R/soap.r: 0
 #. R/soap.r: stop("variable names don't match boundary names")
-#. R/soap.r: stop("variable names don't match boundary names")
 
 msgid "variable names don't match boundary names"
 msgstr ""
@@ -3441,7 +3281,6 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: stop("x is null")
-#. R/smooth.r: stop("x is null")
 
 msgid "x is null"
 msgstr ""
@@ -3456,14 +3295,12 @@ msgstr ""
 
 #: R/smooth.r: 0
 #. R/smooth.r: stop("xt argument is faulty.")
-#. R/smooth.r: stop("xt argument is faulty.")
 
 msgid "xt argument is faulty."
 msgstr ""
 
 
 #: R/gam.fit3.r: 0
-#. R/gam.fit3.r: stop("y must be an integer multiple of phi for Tweedie(p=1)")
 #. R/gam.fit3.r: stop("y must be an integer multiple of phi for Tweedie(p=1)")
 
 msgid "y must be an integer multiple of phi for Tweedie(p=1)"
@@ -3472,14 +3309,12 @@ msgstr ""
 
 #: R/gam.fit3.r: 0
 #. R/gam.fit3.r: stop("y must be strictly positive for a Gamma density")
-#. R/gam.fit3.r: stop("y must be strictly positive for a Gamma density")
 
 msgid "y must be strictly positive for a Gamma density"
 msgstr ""
 
 
 #: R/mgcv.r: 0
-#. R/mgcv.r: stop("y must be univariate unless binomial")
 #. R/mgcv.r: stop("y must be univariate unless binomial")
 
 msgid "y must be univariate unless binomial"
@@ -3494,7 +3329,6 @@ msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: ngettext(nk, "there should be %d knot supplied", "there should be %d knots supplied")
 #. R/smooth.r: ngettext(nk, "there should be %d knot supplied", "there should be %d knots supplied")
 #. R/smooth.r: ngettext(nk + 2 * m[1] + 2, "there should be %d knot supplied",     "there should be %d knots supplied")
 #. R/smooth.r: ngettext(nk + 2 * m[1], "there should be %d knot supplied", "there should be %d knots supplied")

@@ -196,12 +196,12 @@ pcls <- function(M)
 #
 { nar<-c(length(M$y),length(M$p),dim(M$Ain)[1],dim(M$C)[1])
   ## sanity checking ...
-  if (nrow(M$X)!=nar[1]) stop("nrow(M$X) != length(M$y)") 
-  if (ncol(M$X)!=nar[2]) stop("ncol(M$X) != length(M$p)")
-  if (length(M$w)!=nar[1]) stop("length(M$w) != length(M$y)")
-  if (nar[3]!=length(M$bin)) stop("nrow(M$Ain) != length(M$bin)")
+  if (nrow(M$X)!=nar[1]) stop("nrow(M$X) != length(M$y)", domain = NA)
+  if (ncol(M$X)!=nar[2]) stop("ncol(M$X) != length(M$p)", domain = NA)
+  if (length(M$w)!=nar[1]) stop("length(M$w) != length(M$y)", domain = NA)
+  if (nar[3]!=length(M$bin)) stop("nrow(M$Ain) != length(M$bin)", domain = NA)
   if (nrow(M$Ain)>0) {
-    if (ncol(M$Ain)!=nar[2]) stop("nrow(M$Ain) != length(M$p)") 
+    if (ncol(M$Ain)!=nar[2]) stop("nrow(M$Ain) != length(M$p)", domain = NA)
     res <- as.numeric(M$Ain%*%M$p) - as.numeric(M$bin)
     if (min(res)< -max(c(abs(M$bin),norm(M$Ain,"M")))*.Machine$double.eps^.8) stop("initial parameters not feasible")
 
@@ -218,7 +218,7 @@ pcls <- function(M)
     M$bin <- -1; nar[3] <- 1
   }
   
-  if (nrow(M$C)>0) if (ncol(M$C)!=nar[2]) stop("ncol(M$C) != length(M$p)")  
+  if (nrow(M$C)>0) if (ncol(M$C)!=nar[2]) stop("ncol(M$C) != length(M$p)", domain = NA)
   if (length(M$S)!=length(M$off)) stop("M$S and M$off have different lengths")
   if (length(M$S)!=length(M$sp)) stop("M$sp has different length to M$S and M$off")
   
@@ -2909,7 +2909,7 @@ gam.fit <- function (G, start = NULL, etastart = NULL,
         }
     }
     if (!conv) 
-    { warning("Algorithm did not converge") 
+    { warning("algorithm did not converge") 
     }
     if (boundary) 
         warning("Algorithm stopped at boundary value")
