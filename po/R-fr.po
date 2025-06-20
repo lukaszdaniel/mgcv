@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.3-10\n"
 "Report-Msgid-Bugs-To: bugs@r-project.org\n"
-"POT-Creation-Date: 2025-06-05 16:22\n"
+"POT-Creation-Date: 2025-06-19 14:24\n"
 "PO-Revision-Date: 2021-04-12 20:02+0200\n"
 "Last-Translator: Philippe Grosjean <phgrosjean@sciviews.org>\n"
 "Language-Team: French <R-core@r-project.org>\n"
@@ -329,13 +329,9 @@ msgstr "L doit avoir au moins autant de lignes que de colonnes."
 msgid "Later terms sharing an `id' can not have more smoothing parameters than the first such term"
 msgstr "Les termes ultérieurs partageant un `id' ne peuvent pas avoir plus de paramètres de lissage que le premier de ces termes"
 
-#. R/gam.fit4.r: stop("Length of start should equal ", nvars, " and correspond to initial coefs for ",     deparse(xnames))
-#: R/gam.fit4.r:0
-msgid "Length of start should equal"
-msgstr "La longueur de start doit être égale"
-
 #. R/gam.fit3.r: gettextf("Length of start should equal %d and correspond to initial coefs for %s",     nvars, deparse(xnames))
-#: R/gam.fit3.r:0
+#. R/gam.fit4.r: gettextf("Length of start should equal %d and correspond to initial coefs for %s",     nvars, deparse(xnames))
+#: R/gam.fit3.r:0 R/gam.fit4.r:0
 msgid "Length of start should equal %d and correspond to initial coefs for %s"
 msgstr "La longueur de start doit être égale à %d et correspond aux coefs initiaux pour %s"
 
@@ -753,11 +749,6 @@ msgstr "all.derivs seulement disponible dans le paramétrage de rho, theta"
 msgid "all.terms argument not supported"
 msgstr "argument all.terms non supporté"
 
-#. R/gam.fit4.r: stop("Length of start should equal ", nvars, " and correspond to initial coefs for ",     deparse(xnames))
-#: R/gam.fit4.r:0
-msgid "and correspond to initial coefs for"
-msgstr "et correspond aux coefs initiaux pour"
-
 #. R/mgcv.r: stop("anova.gam called with non gam object")
 #: R/mgcv.r:0
 msgid "anova.gam called with non gam object"
@@ -1005,9 +996,10 @@ msgstr "edge.correct doit être un booléen ou un nombre positif"
 msgid "elements of min.sp must be non negative."
 msgstr "les éléments de min.sp doivent être positifs ou nuls."
 
-#. R/gam.fit4.r: stop("emtpy models not available")
+#. R/gam.fit4.r: stop("empty models not available")
 #: R/gam.fit4.r:0
-msgid "emtpy models not available"
+#, fuzzy
+msgid "empty models not available"
 msgstr "modèles emtpy non disponibles"
 
 #. R/gamlss.r: stop("er... no discrete methods for higher derivatives")
@@ -2426,6 +2418,12 @@ msgid "there should be %d knot supplied"
 msgid_plural "there should be %d knots supplied"
 msgstr[0] "il devrait y avoir"
 msgstr[1] "il devrait y avoir"
+
+#~ msgid "Length of start should equal"
+#~ msgstr "La longueur de start doit être égale"
+
+#~ msgid "and correspond to initial coefs for"
+#~ msgstr "et correspond aux coefs initiaux pour"
 
 #~ msgid "Algorithm did not converge"
 #~ msgstr "L'algorithme n'a pas convergé"

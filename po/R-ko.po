@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.1.3\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2025-06-05 16:22\n"
+"POT-Creation-Date: 2025-06-19 14:24\n"
 "PO-Revision-Date: 2015-02-21 16:01-0600\n"
 "Last-Translator:Chel Hee Lee  <chl948@mail.usask.ca>\n"
 "Language-Team: Chel Hee Lee  <chl948@mail.usask.ca>\n"
@@ -335,13 +335,9 @@ msgstr "L이 가지고 있는 행의 개수는 적어도 열의 개수만큼 있
 msgid "Later terms sharing an `id' can not have more smoothing parameters than the first such term"
 msgstr ""
 
-#. R/gam.fit4.r: stop("Length of start should equal ", nvars, " and correspond to initial coefs for ",     deparse(xnames))
-#: R/gam.fit4.r:0
-msgid "Length of start should equal"
-msgstr "start의 길이는 "
-
 #. R/gam.fit3.r: gettextf("Length of start should equal %d and correspond to initial coefs for %s",     nvars, deparse(xnames))
-#: R/gam.fit3.r:0
+#. R/gam.fit4.r: gettextf("Length of start should equal %d and correspond to initial coefs for %s",     nvars, deparse(xnames))
+#: R/gam.fit3.r:0 R/gam.fit4.r:0
 msgid "Length of start should equal %d and correspond to initial coefs for %s"
 msgstr "start의 길이는 %d와 같아야 하며 %s에 대응하는 계수의 초기값을 가지고 있어야 합니다."
 
@@ -758,11 +754,6 @@ msgstr ""
 msgid "all.terms argument not supported"
 msgstr ""
 
-#. R/gam.fit4.r: stop("Length of start should equal ", nvars, " and correspond to initial coefs for ",     deparse(xnames))
-#: R/gam.fit4.r:0
-msgid "and correspond to initial coefs for"
-msgstr "와 같아야 하며 다음에 상응하는 계수(coef)들에 대한 초기값을 가지고 있어야 합니다."
-
 #. R/mgcv.r: stop("anova.gam called with non gam object")
 #: R/mgcv.r:0
 msgid "anova.gam called with non gam object"
@@ -1012,9 +1003,10 @@ msgstr ""
 msgid "elements of min.sp must be non negative."
 msgstr "min.sp의 구성요소는 반드시 음수이어서는 안됩니다."
 
-#. R/gam.fit4.r: stop("emtpy models not available")
+#. R/gam.fit4.r: stop("empty models not available")
 #: R/gam.fit4.r:0
-msgid "emtpy models not available"
+#, fuzzy
+msgid "empty models not available"
 msgstr "사용할 수 있는 모형이 아닙니다 (설명변수가 없습니다)."
 
 #. R/gamlss.r: stop("er... no discrete methods for higher derivatives")
@@ -2445,6 +2437,12 @@ msgstr "ziplss 모형은 문자열로 표현된 2개의 링크(link)를 필요�
 msgid "there should be %d knot supplied"
 msgid_plural "there should be %d knots supplied"
 msgstr[0] ""
+
+#~ msgid "Length of start should equal"
+#~ msgstr "start의 길이는 "
+
+#~ msgid "and correspond to initial coefs for"
+#~ msgstr "와 같아야 하며 다음에 상응하는 계수(coef)들에 대한 초기값을 가지고 있어야 합니다."
 
 #~ msgid "Algorithm did not converge"
 #~ msgstr "알고리즘이 수렴하지 않았습니다."

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.9-3\n"
-"POT-Creation-Date: 2025-06-05 16:22\n"
+"POT-Creation-Date: 2025-06-19 14:24\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -433,15 +433,10 @@ msgid "Later terms sharing an `id' can not have more smoothing parameters than t
 msgstr ""
 
 
-#: R/gam.fit4.r: 0
-#. R/gam.fit4.r: stop("Length of start should equal ", nvars, " and correspond to initial coefs for ",     deparse(xnames))
-
-msgid "Length of start should equal"
-msgstr ""
-
-
 #: R/gam.fit3.r: 0
+#: R/gam.fit4.r: 0
 #. R/gam.fit3.r: gettextf("Length of start should equal %d and correspond to initial coefs for %s",     nvars, deparse(xnames))
+#. R/gam.fit4.r: gettextf("Length of start should equal %d and correspond to initial coefs for %s",     nvars, deparse(xnames))
 
 msgid "Length of start should equal %d and correspond to initial coefs for %s"
 msgstr ""
@@ -1028,13 +1023,6 @@ msgid "all.terms argument not supported"
 msgstr ""
 
 
-#: R/gam.fit4.r: 0
-#. R/gam.fit4.r: stop("Length of start should equal ", nvars, " and correspond to initial coefs for ",     deparse(xnames))
-
-msgid "and correspond to initial coefs for"
-msgstr ""
-
-
 #: R/mgcv.r: 0
 #. R/mgcv.r: stop("anova.gam called with non gam object")
 
@@ -1381,9 +1369,9 @@ msgstr ""
 
 
 #: R/gam.fit4.r: 0
-#. R/gam.fit4.r: stop("emtpy models not available")
+#. R/gam.fit4.r: stop("empty models not available")
 
-msgid "emtpy models not available"
+msgid "empty models not available"
 msgstr ""
 
 

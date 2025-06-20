@@ -313,7 +313,7 @@ gam.fit4 <- function(x, y, sp, Eb,UrS=list(),
   ## re-parameterization complete. Initialization....
 
   nvars <- ncol(x)
-  if (nvars==0) stop("emtpy models not available")
+  if (nvars==0) stop("empty models not available")
   if (is.null(weights)) weights <- rep.int(1, nobs)
   if (is.null(offset)) offset <- rep.int(0, nobs)
 
@@ -351,9 +351,8 @@ gam.fit4 <- function(x, y, sp, Eb,UrS=list(),
 
   eta <- if (!is.null(etastart)) etastart
          else if (!is.null(start)) 
-              if (length(start) != nvars) 
-                  stop("Length of start should equal ", nvars, 
-                  " and correspond to initial coefs for ", deparse(xnames))
+              if (length(start) != nvars)
+                  stop(gettextf("Length of start should equal %d and correspond to initial coefs for %s", nvars, deparse(xnames)))
               else {
                   coefold <- start
                   etaold <- offset + as.vector(if (NCOL(x) == 1) 

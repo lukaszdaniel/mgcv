@@ -2767,7 +2767,7 @@ gam.fit <- function (G, start = NULL, etastart = NULL,
 
     else if (!is.null(start)) 
     if (length(start) != nvars) 
-    stop(gettextf("Length of start should equal %d and correspond to initial coefs.",nvars)) 
+    stop(gettextf("Length of start should equal %d and correspond to initial coefs.",nvars))
     else 
     { coefold<-start                        #1.5.0
       offset+as.vector(if (NCOL(G$X) == 1)

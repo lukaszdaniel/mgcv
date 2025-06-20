@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.7-28\n"
 "Report-Msgid-Bugs-To: bugs@r-project.org\n"
-"POT-Creation-Date: 2025-06-05 16:22\n"
+"POT-Creation-Date: 2025-06-19 14:24\n"
 "PO-Revision-Date: 2025-06-06 18:45+0200\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -316,13 +316,9 @@ msgstr "argument 'L' musi mieć co najmniej tyle wierszy co kolumn."
 msgid "Later terms sharing an `id' can not have more smoothing parameters than the first such term"
 msgstr "Dalsze człony współdzielące 'id' nie mogą mieć więcej parametrów wygładzających niż pierwszy taki człon"
 
-#. R/gam.fit4.r: stop("Length of start should equal ", nvars, " and correspond to initial coefs for ",     deparse(xnames))
-#: R/gam.fit4.r:0
-msgid "Length of start should equal"
-msgstr "Długość argumentu 'start' powinna być równa"
-
 #. R/gam.fit3.r: gettextf("Length of start should equal %d and correspond to initial coefs for %s",     nvars, deparse(xnames))
-#: R/gam.fit3.r:0
+#. R/gam.fit4.r: gettextf("Length of start should equal %d and correspond to initial coefs for %s",     nvars, deparse(xnames))
+#: R/gam.fit3.r:0 R/gam.fit4.r:0
 msgid "Length of start should equal %d and correspond to initial coefs for %s"
 msgstr "długość 'start' powinna równać się %d i odnosić się do współczynników początkowych dla %s"
 
@@ -740,11 +736,6 @@ msgstr "'all.derivs' dostępne tylko w rho, parametryzacja theta"
 msgid "all.terms argument not supported"
 msgstr "argument 'all.terms' nie jest wspierany"
 
-#. R/gam.fit4.r: stop("Length of start should equal ", nvars, " and correspond to initial coefs for ",     deparse(xnames))
-#: R/gam.fit4.r:0
-msgid "and correspond to initial coefs for"
-msgstr "oraz odpowiadać początkowym współczynnikom dla"
-
 #. R/mgcv.r: stop("anova.gam called with non gam object")
 #: R/mgcv.r:0
 msgid "anova.gam called with non gam object"
@@ -991,9 +982,9 @@ msgstr "'edge.correct' musi być wartością logiczną lub liczbą dodatnią"
 msgid "elements of min.sp must be non negative."
 msgstr "elementy 'min.sp' muszą być nieujemne."
 
-#. R/gam.fit4.r: stop("emtpy models not available")
+#. R/gam.fit4.r: stop("empty models not available")
 #: R/gam.fit4.r:0
-msgid "emtpy models not available"
+msgid "empty models not available"
 msgstr "puste modele nie są dostępne"
 
 #. R/gamlss.r: stop("er... no discrete methods for higher derivatives")
@@ -2399,6 +2390,12 @@ msgid_plural "there should be %d knots supplied"
 msgstr[0] "powinien być dostarczony %d węzeł"
 msgstr[1] "powinny być dostarczone %d węzły"
 msgstr[2] "powinno być dostarczonych %d węzłów"
+
+#~ msgid "Length of start should equal"
+#~ msgstr "Długość argumentu 'start' powinna być równa"
+
+#~ msgid "and correspond to initial coefs for"
+#~ msgstr "oraz odpowiadać początkowym współczynnikom dla"
 
 #~ msgid "Algorithm did not converge"
 #~ msgstr "algorytm nie uzbieżnił się"
