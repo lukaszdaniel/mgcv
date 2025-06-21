@@ -160,7 +160,7 @@ void kd_sanity(kdtree_type kd) {
     if (kd.box[i].p1!=kd.box[i].p0) count[kd.box[i].p1]++;
   }
   for (i=0;i<n;i++) {
-    if (count[i]!=1) { Rprintf(_("point %d in %d boxes!\n"),i,count[i]);ok=0;}
+    if (count[i]!=1) { Rprintf(n_("point %d in %d box!\n", "point %d in %d boxes!\n", count[i]) , i, count[i]); ok = 0; }
   }
   if (ok) Rprintf(_("kd tree sanity checks\n"));
   FREE(count);

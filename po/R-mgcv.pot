@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.9-3\n"
-"POT-Creation-Date: 2025-06-19 14:24\n"
+"POT-Creation-Date: 2025-06-21 12:40\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1537,16 +1537,58 @@ msgstr ""
 
 
 #: R/gam.fit3.r: 0
-#. R/gam.fit3.r: gettextf("gam.fit3 no observations informative at iteration %d",     iter)
+#. R/gam.fit3.r: gettext("gam.fit3: algorithm did not converge")
 
-msgid "gam.fit3 no observations informative at iteration %d"
+msgid "gam.fit3: algorithm did not converge"
 msgstr ""
 
 
 #: R/gam.fit3.r: 0
-#. R/gam.fit3.r: gettextf("gam.fit3 non-finite coefficients at iteration %d",     iter)
+#. R/gam.fit3.r: gettext("gam.fit3: algorithm stopped at boundary value")
 
-msgid "gam.fit3 non-finite coefficients at iteration %d"
+msgid "gam.fit3: algorithm stopped at boundary value"
+msgstr ""
+
+
+#: R/gam.fit3.r: 0
+#. R/gam.fit3.r: gettext("gam.fit3: fitted probabilities numerically 0 or 1 occurred")
+
+msgid "gam.fit3: fitted probabilities numerically 0 or 1 occurred"
+msgstr ""
+
+
+#: R/gam.fit3.r: 0
+#. R/gam.fit3.r: gettext("gam.fit3: fitted rates numerically 0 occurred")
+
+msgid "gam.fit3: fitted rates numerically 0 occurred"
+msgstr ""
+
+
+#: R/gam.fit3.r: 0
+#. R/gam.fit3.r: gettextf("gam.fit3: no observations informative at iteration %d",     iter)
+
+msgid "gam.fit3: no observations informative at iteration %d"
+msgstr ""
+
+
+#: R/gam.fit3.r: 0
+#. R/gam.fit3.r: gettextf("gam.fit3: non-finite coefficients at iteration %d",     iter)
+
+msgid "gam.fit3: non-finite coefficients at iteration %d"
+msgstr ""
+
+
+#: R/gam.fit3.r: 0
+#. R/gam.fit3.r: gettext("gam.fit3: step size truncated due to divergence")
+
+msgid "gam.fit3: step size truncated due to divergence"
+msgstr ""
+
+
+#: R/gam.fit3.r: 0
+#. R/gam.fit3.r: gettext("gam.fit3: step size truncated: out of bounds")
+
+msgid "gam.fit3: step size truncated: out of bounds"
 msgstr ""
 
 

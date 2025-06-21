@@ -309,7 +309,7 @@ gam.fit3 <- function (x, y, sp, Eb,UrS=list(),
          
             if (all(!good)) {
                 conv <- FALSE
-                warn[[length(warn)+1]] <- gettextf("gam.fit3 no observations informative at iteration %d", iter)
+                warn[[length(warn)+1]] <- gettextf("gam.fit3: no observations informative at iteration %d", iter)
                 break
             }
             mevg<-mu.eta.val[good];mug<-mu[good];yg<-y[good]
@@ -357,7 +357,7 @@ gam.fit3 <- function (x, y, sp, Eb,UrS=list(),
 
             if (any(!is.finite(start))) {
                 conv <- FALSE
-                warn[[length(warn)+1]] <-gettextf("gam.fit3 non-finite coefficients at iteration %d", 
+                warn[[length(warn)+1]] <-gettextf("gam.fit3: non-finite coefficients at iteration %d", 
                   iter)
                 break
             }        
@@ -378,7 +378,7 @@ gam.fit3 <- function (x, y, sp, Eb,UrS=list(),
                   coefold <- null.coef
                   etaold <- null.eta
                 }
-                warn[[length(warn)+1]] <- "gam.fit3 step size truncated due to divergence"
+                warn[[length(warn)+1]] <- gettext("gam.fit3: step size truncated due to divergence")
                 ii <- 1
                 while (!is.finite(dev)) {
                   if (ii > control$maxit) 
@@ -395,7 +395,7 @@ gam.fit3 <- function (x, y, sp, Eb,UrS=list(),
                   cat("Step halved: new deviance =", dev, "\n")
             }
             if (!(valideta(eta) && validmu(mu))) {
-                warn[[length(warn)+1]] <- "gam.fit3 step size truncated: out of bounds"
+                warn[[length(warn)+1]] <- gettext("gam.fit3: step size truncated: out of bounds")
                 ii <- 1
                 while (!(valideta(eta) && validmu(mu))) {
                   if (ii > control$maxit) 
@@ -792,17 +792,17 @@ gam.fit3 <- function (x, y, sp, Eb,UrS=list(),
         } ## end !REML
         # end of inserted code
         if (!conv) 
-              warn[[length(warn)+1]] <- "gam.fit3 algorithm did not converge"
+              warn[[length(warn)+1]] <- gettext("gam.fit3: algorithm did not converge")
         if (boundary) 
-              warn[[length(warn)+1]] <- "gam.fit3 algorithm stopped at boundary value"
+              warn[[length(warn)+1]] <- gettext("gam.fit3: algorithm stopped at boundary value")
         eps <- 10 * .Machine$double.eps
         if (printWarn&&family$family[1] == "binomial") {
             if (any(mu > 1 - eps) || any(mu < eps)) 
-                warn[[length(warn)+1]] <- "gam.fit3 fitted probabilities numerically 0 or 1 occurred"
+                warn[[length(warn)+1]] <- gettext("gam.fit3: fitted probabilities numerically 0 or 1 occurred")
         }
         if (printWarn&&family$family[1] == "poisson") {
             if (any(mu < eps)) 
-                warn[[length(warn)+1]] <- "gam.fit3 fitted rates numerically 0 occurred"
+                warn[[length(warn)+1]] <- gettext("gam.fit3: fitted rates numerically 0 occurred")
         }
  
         residuals <- rep.int(NA, nobs)

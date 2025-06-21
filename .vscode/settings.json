@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "libintl.h": "c",
+        "localization.h": "c"
+    }
+}

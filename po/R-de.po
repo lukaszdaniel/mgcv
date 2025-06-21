@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 4.1.0 / mgcv 1.8-35\n"
 "Report-Msgid-Bugs-To: bugs@r-project.org\n"
-"POT-Creation-Date: 2025-06-19 14:24\n"
+"POT-Creation-Date: 2025-06-21 12:40\n"
 "PO-Revision-Date: 2021-05-04 16:01+0200\n"
 "Last-Translator: Detlef Steuer <steuer@hsu-hh.de>\n"
 "Language-Team: R-Core <r-core@r-project.org>\n"
@@ -1120,17 +1120,53 @@ msgstr ""
 msgid "fx length wrong from t2 term: ignored"
 msgstr "falsche Länge für fx aus dem t2 Ausdruck: wird ignoriert"
 
-#. R/gam.fit3.r: gettextf("gam.fit3 no observations informative at iteration %d",     iter)
+#. R/gam.fit3.r: gettext("gam.fit3: algorithm did not converge")
 #: R/gam.fit3.r:0
 #, fuzzy
-msgid "gam.fit3 no observations informative at iteration %d"
+msgid "gam.fit3: algorithm did not converge"
+msgstr "Algorithmus hat nicht konvergiert"
+
+#. R/gam.fit3.r: gettext("gam.fit3: algorithm stopped at boundary value")
+#: R/gam.fit3.r:0
+#, fuzzy
+msgid "gam.fit3: algorithm stopped at boundary value"
+msgstr "Algorithmus stoppte beim Randwert"
+
+#. R/gam.fit3.r: gettext("gam.fit3: fitted probabilities numerically 0 or 1 occurred")
+#: R/gam.fit3.r:0
+#, fuzzy
+msgid "gam.fit3: fitted probabilities numerically 0 or 1 occurred"
+msgstr "Es trat der Fall auf, dass die angepassten Wahrscheinlichkeiten numerisch 0 oder 1 waren"
+
+#. R/gam.fit3.r: gettext("gam.fit3: fitted rates numerically 0 occurred")
+#: R/gam.fit3.r:0
+#, fuzzy
+msgid "gam.fit3: fitted rates numerically 0 occurred"
+msgstr "Es trat der Fall auf, dass die angepassten Quoten numerisch 0 oder 1 waren"
+
+#. R/gam.fit3.r: gettextf("gam.fit3: no observations informative at iteration %d",     iter)
+#: R/gam.fit3.r:0
+#, fuzzy
+msgid "gam.fit3: no observations informative at iteration %d"
 msgstr "Keine informativen Beobachtungen bei Iteration %d"
 
-#. R/gam.fit3.r: gettextf("gam.fit3 non-finite coefficients at iteration %d",     iter)
+#. R/gam.fit3.r: gettextf("gam.fit3: non-finite coefficients at iteration %d",     iter)
 #: R/gam.fit3.r:0
 #, fuzzy
-msgid "gam.fit3 non-finite coefficients at iteration %d"
+msgid "gam.fit3: non-finite coefficients at iteration %d"
 msgstr "nicht-endliche Koeffizienten bei Iteration %d"
+
+#. R/gam.fit3.r: gettext("gam.fit3: step size truncated due to divergence")
+#: R/gam.fit3.r:0
+#, fuzzy
+msgid "gam.fit3: step size truncated due to divergence"
+msgstr "Schrittweite wurde wegen Divergenz reduziert"
+
+#. R/gam.fit3.r: gettext("gam.fit3: step size truncated: out of bounds")
+#: R/gam.fit3.r:0
+#, fuzzy
+msgid "gam.fit3: step size truncated: out of bounds"
+msgstr "Schrittweite verkleinert: Außerhalb der Begrenzung"
 
 #. R/gam.fit4.r: gettextf("gam.fit5 iteration limit reached: max abs grad = %g",     max(abs(grad)))
 #: R/gam.fit4.r:0
@@ -2516,9 +2552,6 @@ msgstr[1] "da sollten sein"
 
 #~ msgid "Not enough informative observations."
 #~ msgstr "Nicht genug informative Beobachtungen."
-
-#~ msgid "Step size truncated: out of bounds"
-#~ msgstr "Schrittweite verkleinert: Außerhalb der Begrenzung"
 
 #~ msgid "step failed: max abs grad ="
 #~ msgstr "Schritt fehlgeschlagen: max abs grad ="

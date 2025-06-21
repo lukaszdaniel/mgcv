@@ -71,10 +71,9 @@ void mgcv_omp(int *a) {
 
 void rpmat(double *A,int n) {
 
-  int i,j;
-  for (i=0;i<n;i++) {
+  for (int i=0;i<n;i++) {
     Rprintf("\n");
-    for (j=0;j<n;j++) Rprintf("%7.2g  ",A[i + n * j]);
+    for (int j=0;j<n;j++) Rprintf("%7.2g  ",A[i + n * j]);
   }
   Rprintf("\n");
 } /* rpmat */ 
@@ -122,8 +121,7 @@ void read_mat(double *M,int *r,int*c,char *path) {
 void up2lo(double * A, int n) {
 /* copies upper triangle of n by n matrix A to lower triangle */
   double *pu,*pl,*plf;
-  int i;
-  for (i=0;i<n;i++)
+  for (int i=0;i<n;i++)
     for (plf = A + i * (ptrdiff_t) n, pu=pl=plf + i,plf=plf+n,pl++,pu+=n;pl<plf;pl++,pu+=n) *pl = *pu;
 
 } /* up2lo */  
@@ -132,10 +130,9 @@ void row_squash(double *X,int rnew,int rold,int col) {
 /* rnew<rold. Copies rold by col matrix in X to rnew by col matrix in X on output.
    Does not clear beyond new matix to zero.
 */   
-  int c;
   double *Xnew,*Xold,*X1;
   Xnew = X;
-  for (c=0;c<col;c++)
+  for (int c=0;c<col;c++)
     for (Xold = X + c * (ptrdiff_t) rold,X1=Xold+rnew;Xold<X1;Xold++,Xnew++) *Xnew = *Xold;
 } /* drop_rows */  
 
