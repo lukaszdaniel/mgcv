@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.1.3\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2025-06-21 12:40\n"
+"POT-Creation-Date: 2025-06-24 18:54\n"
 "PO-Revision-Date: 2015-02-21 16:01-0600\n"
 "Last-Translator:Chel Hee Lee  <chl948@mail.usask.ca>\n"
 "Language-Team: Chel Hee Lee  <chl948@mail.usask.ca>\n"
@@ -119,6 +119,35 @@ msgstr ""
 #: R/bam.r:0
 msgid "'family' argument seems not to be a valid family object"
 msgstr "'family' 인자는 올바른 family 객체가 아닌 것 같이 보입니다."
+
+#. R/mgcv.r: stop("'id' linked smooths must have same number of arguments")
+#: R/mgcv.r:0
+msgid "'id' linked smooths must have same number of arguments"
+msgstr ""
+
+#. R/mgcv.r: stop("'object' is not of class \"gam\"")
+#: R/mgcv.r:0
+#, fuzzy
+msgid "'object' is not of class \"gam\""
+msgstr "`object'는 클래스 \"gam\"가 아닙니다."
+
+#. R/mgcv.r: stop("'rank' has wrong length in 'paraPen'")
+#: R/mgcv.r:0
+#, fuzzy
+msgid "'rank' has wrong length in 'paraPen'"
+msgstr "`paraPen'내에 있는 `rank'의 길이가 올바르지 않습니다."
+
+#. R/mgcv.r: stop("'sp' dimension wrong in 'paraPen'")
+#: R/mgcv.r:0
+#, fuzzy
+msgid "'sp' dimension wrong in 'paraPen'"
+msgstr "`paraPen'내에 있는 `sp'의 차원(dimension)이 올바르지 않습니다."
+
+#. R/mgcv.r: stop("'sp' too short")
+#: R/mgcv.r:0
+#, fuzzy
+msgid "'sp' too short"
+msgstr "`sp'의 길이가 너무 짧습니다."
 
 #. R/gam.fit3.r: stop("'theta' must be specified")
 #: R/gam.fit3.r:0
@@ -313,9 +342,10 @@ msgstr ""
 msgid "L has inconsistent dimensions."
 msgstr ""
 
-#. R/mgcv.r: stop("L has wrong dimension in `paraPen'")
+#. R/mgcv.r: stop("L has wrong dimension in 'paraPen'")
 #: R/mgcv.r:0
-msgid "L has wrong dimension in `paraPen'"
+#, fuzzy
+msgid "L has wrong dimension in 'paraPen'"
 msgstr "`paraPen'내에 있는 L의 차원(dimension)이 올바르지 않습니다."
 
 #. R/gam.fit3.r: stop("L must be a matrix.")
@@ -330,9 +360,9 @@ msgstr "L은 반드시 행렬(matrix)이어야 합니다."
 msgid "L must have at least as many rows as columns."
 msgstr "L이 가지고 있는 행의 개수는 적어도 열의 개수만큼 있어야 합니다."
 
-#. R/mgcv.r: stop("Later terms sharing an `id' can not have more smoothing parameters than the first such term")
+#. R/mgcv.r: stop("Later terms sharing an 'id' can not have more smoothing parameters than the first such term")
 #: R/mgcv.r:0
-msgid "Later terms sharing an `id' can not have more smoothing parameters than the first such term"
+msgid "Later terms sharing an 'id' can not have more smoothing parameters than the first such term"
 msgstr ""
 
 #. R/gam.fit3.r: gettextf("Length of start should equal %d and correspond to initial coefs for %s",     nvars, deparse(xnames))
@@ -478,9 +508,9 @@ msgstr ""
 msgid "No variance estimates available"
 msgstr "사용할 수 있는 분산의 추정치를 찾을 수 없습니다."
 
-#. R/gam.fit3.r: stop("Non finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'")
+#. R/gam.fit3.r: stop("Non finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'")
 #: R/gam.fit3.r:0
-msgid "Non finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'"
+msgid "Non finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'"
 msgstr ""
 
 #. R/mgcv.r: gettextf("Non-finite coefficients at iteration")
@@ -493,9 +523,9 @@ msgstr "다음의 반복에서 얻어진 계수의 추정치가 유한(finite)�
 msgid "Non-finite coefficients at iteration %d"
 msgstr "%d번째 반복에서 얻은 계수의 추정치가 유한(finite)하지 않습니다."
 
-#. R/gam.fit3.r: stop("Non-finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'")
+#. R/gam.fit3.r: stop("Non-finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'")
 #: R/gam.fit3.r:0
-msgid "Non-finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'"
+msgid "Non-finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'"
 msgstr ""
 
 #. R/bam.r: stop("Non-finite deviance")
@@ -698,37 +728,12 @@ msgstr ""
 msgid "You've got no model...."
 msgstr ""
 
-#. R/mgcv.r: stop("`id' linked smooths must have same number of arguments")
-#: R/mgcv.r:0
-msgid "`id' linked smooths must have same number of arguments"
-msgstr ""
-
-#. R/mgcv.r: stop("`object' is not of class \"gam\"")
-#: R/mgcv.r:0
-msgid "`object' is not of class \"gam\""
-msgstr "`object'는 클래스 \"gam\"가 아닙니다."
-
-#. R/mgcv.r: stop("`rank' has wrong length in `paraPen'")
-#: R/mgcv.r:0
-msgid "`rank' has wrong length in `paraPen'"
-msgstr "`paraPen'내에 있는 `rank'의 길이가 올바르지 않습니다."
-
-#. R/mgcv.r: stop("`sp' dimension wrong in `paraPen'")
-#: R/mgcv.r:0
-msgid "`sp' dimension wrong in `paraPen'"
-msgstr "`paraPen'내에 있는 `sp'의 차원(dimension)이 올바르지 않습니다."
-
-#. R/mgcv.r: stop("`sp' too short")
-#: R/mgcv.r:0
-msgid "`sp' too short"
-msgstr "`sp'의 길이가 너무 짧습니다."
-
 #. R/misc.r: stop("a has wrong number of rows")
 #: R/misc.r:0
 msgid "a has wrong number of rows"
 msgstr "a가 가진 행의 개수가 올바르지 않습니다."
 
-#. R/mgcv.r: stop(" a parametric penalty has wrong dimension")
+#. R/mgcv.r: stop("a parametric penalty has wrong dimension")
 #: R/mgcv.r:0
 msgid "a parametric penalty has wrong dimension"
 msgstr ""
@@ -1179,9 +1184,9 @@ msgstr "최대반복(iteration limit)에 도달했습니다: max abs grad = %g"
 msgid "gamm can not fix only some margins of tensor product."
 msgstr ""
 
-#. R/gamm.r: stop("gamm can not handle linked smoothing parameters (probably from use of `id' or adaptive smooths)")
+#. R/gamm.r: stop("gamm can not handle linked smoothing parameters (probably from use of 'id' or adaptive smooths)")
 #: R/gamm.r:0
-msgid "gamm can not handle linked smoothing parameters (probably from use of `id' or adaptive smooths)"
+msgid "gamm can not handle linked smoothing parameters (probably from use of 'id' or adaptive smooths)"
 msgstr ""
 
 #. R/gamm.r: warning("gamm is not designed to use extended families")
@@ -1255,21 +1260,15 @@ msgstr "그리드 벡터(grid vectors) g1과 g2의 길이가 서로 다릅니다
 msgid "gumbls requires 2 links specified as character strings"
 msgstr "gaulss 모형은 문자열로 표현된 2개의 링크(link)를 필요로 합니다."
 
-#. R/smooth.r: warning("handling `by' variables in smooth constructors may not work with the summation convention ")
+#. R/smooth.r: warning("handling 'by' variables in smooth constructors may not work with the summation convention ")
 #: R/smooth.r:0
-msgid "handling `by' variables in smooth constructors may not work with the summation convention"
+msgid "handling 'by' variables in smooth constructors may not work with the summation convention"
 msgstr ""
 
 #. R/gfam.r: stop("if response is a matrix it must have 2 columns")
 #: R/gfam.r:0
 msgid "if response is a matrix it must have 2 columns"
 msgstr ""
-
-#. R/gam.fit3.r: stop("illegal `family' argument")
-#. R/mgcv.r: stop("illegal `family' argument")
-#: R/gam.fit3.r:0 R/mgcv.r:0
-msgid "illegal `family' argument"
-msgstr "`family' 인자의 값이 올바르지 않습니다."
 
 #. R/mgcv.r: stop("in.out incorrect: see documentation")
 #: R/mgcv.r:0
@@ -1355,6 +1354,13 @@ msgstr ""
 #: R/misc.r:0
 msgid "internal error in vcorr, please report to simon.wood@r-project.org"
 msgstr ""
+
+#. R/gam.fit3.r: stop("invalid 'family' argument")
+#. R/mgcv.r: stop("invalid 'family' argument")
+#: R/gam.fit3.r:0 R/mgcv.r:0
+#, fuzzy
+msgid "invalid 'family' argument"
+msgstr "`family' 인자의 값이 올바르지 않습니다."
 
 #. R/misc.r: stop("isa requires a dg/tCMatrix")
 #: R/misc.r:0
@@ -1776,9 +1782,10 @@ msgstr ""
 msgid "not a gam object"
 msgstr "객체의 클래스가 gam이 아닙니다."
 
-#. R/mgcv.r: warning("not all required variables have been supplied in  newdata!\n")
+#. R/mgcv.r: warning("not all required variables have been supplied in newdata!\n")
 #: R/mgcv.r:0
-msgid "not all required variables have been supplied in  newdata!"
+#, fuzzy
+msgid "not all required variables have been supplied in newdata!"
 msgstr "필요한 모든 변수들을 newdata로부터 찾을 수 없습니다!"
 
 #. R/efam.r: stop("not an extended family")
@@ -1881,24 +1888,21 @@ msgstr "2차원(2D)인 경우만을 다룰 수 있습니다."
 msgid "only first element of 'id' used"
 msgstr "`id'의 첫번째 요소만이 사용되었습니다."
 
-#. R/smooth.r: warning("only first element of `id' used")
-#: R/smooth.r:0
-msgid "only first element of `id' used"
-msgstr "`id'의 첫번째 요소만이 사용되었습니다."
-
 #. R/gamm.r: stop("only one level of smooth nesting is supported by gamm")
 #: R/gamm.r:0
 msgid "only one level of smooth nesting is supported by gamm"
 msgstr ""
 
-#. R/gam.fit3.r: stop("only scalar `p' and `phi' allowed.")
+#. R/gam.fit3.r: stop("only scalar 'p' and 'phi' allowed.")
 #: R/gam.fit3.r:0
-msgid "only scalar `p' and `phi' allowed."
+#, fuzzy
+msgid "only scalar 'p' and 'phi' allowed."
 msgstr "`p'와 `phi'는 오로지 스칼라(scalar) 값만을 가질 수 있습니다."
 
-#. R/gam.fit3.r: stop("only scalar `rho' and `theta' allowed.")
+#. R/gam.fit3.r: stop("only scalar 'rho' and 'theta' allowed.")
 #: R/gam.fit3.r:0
-msgid "only scalar `rho' and `theta' allowed."
+#, fuzzy
+msgid "only scalar 'rho' and 'theta' allowed."
 msgstr "`rho'와 `theta'는 오로지 스칼라(scalar) 값만을 가질 수 있습니다."
 
 #. R/bam.r: warning("openMP not available: single threaded computation only")
@@ -2472,6 +2476,9 @@ msgstr "ziplss 모형은 문자열로 표현된 2개의 링크(link)를 필요�
 msgid "there should be %d knot supplied"
 msgid_plural "there should be %d knots supplied"
 msgstr[0] ""
+
+#~ msgid "only first element of `id' used"
+#~ msgstr "`id'의 첫번째 요소만이 사용되었습니다."
 
 #~ msgid "Length of start should equal"
 #~ msgstr "start의 길이는 "

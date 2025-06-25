@@ -731,7 +731,7 @@ clone.smooth.spec <- function(specb,spec) {
 ## the variables relating to `spec'. Used by `gam.setup' in handling 
 ## of linked smooths.
  ## check dimensions same...
- if (specb$dim!=spec$dim) stop("`id' linked smooths must have same number of arguments") 
+ if (specb$dim!=spec$dim) stop("'id' linked smooths must have same number of arguments") 
  ## Now start cloning...
  if (inherits(specb,c("tensor.smooth.spec","t2.smooth.spec"))) { ##`te' or `t2' generated base smooth.spec
     specb$term <- spec$term
@@ -788,12 +788,12 @@ parametricPenalty <- function(pterms,assign,paraPen,sp0) {
       ## remaining terms should be penalty matrices...
       np <- length(P)
 
-      if (!is.null(ranki)&&length(ranki)!=np) stop("`rank' has wrong length in `paraPen'") 
+      if (!is.null(ranki)&&length(ranki)!=np) stop("'rank' has wrong length in 'paraPen'") 
       if (np) for (i in 1:np) { ## unpack penalty matrices, offsets and ranks
         k <- k + 1
         S[[k]] <- P[[i]]
         off[k] <- min(ind) ## index of first coef penalized by this term
-        if ( ncol(P[[i]])!=nrow(P[[i]])||nrow(P[[i]])!=length(ind)) stop(" a parametric penalty has wrong dimension")
+        if ( ncol(P[[i]])!=nrow(P[[i]])||nrow(P[[i]])!=length(ind)) stop("a parametric penalty has wrong dimension")
         if (is.null(ranki)) {
           ev <- eigen(S[[k]],symmetric=TRUE,only.values=TRUE)$values
           rank[k] <- sum(ev>max(ev)*.Machine$double.eps*10) ## estimate rank
@@ -802,7 +802,7 @@ parametricPenalty <- function(pterms,assign,paraPen,sp0) {
       ## now deal with L matrices
       if (np) { ## only do this stuff if there are any penalties!
         if (is.null(Li)) Li <- diag(np)
-        if (nrow(Li)!=np) stop("L has wrong dimension in `paraPen'")
+        if (nrow(Li)!=np) stop("L has wrong dimension in 'paraPen'")
         L <- rbind(cbind(L,matrix(0,nrow(L),ncol(Li))),
                    cbind(matrix(0,nrow(Li),ncol(L)),Li))
         ind <- (length(sp)+1):(length(sp)+ncol(Li))
@@ -810,7 +810,7 @@ parametricPenalty <- function(pterms,assign,paraPen,sp0) {
         if (is.null(spi)) {
           sp[ind] <- -1 ## auto-initialize
         } else {
-          if (length(spi)!=ncol(Li)) stop("`sp' dimension wrong in `paraPen'")
+          if (length(spi)!=ncol(Li)) stop("'sp' dimension wrong in 'paraPen'")
           sp[ind] <- spi
         }
         ## add smoothing parameter names....
@@ -824,7 +824,7 @@ parametricPenalty <- function(pterms,assign,paraPen,sp0) {
   } ## looped through all terms
   if (k==0) return(NULL)
   if (!is.null(sp0)) {
-    if (length(sp0)<length(sp)) stop("`sp' too short")
+    if (length(sp0)<length(sp)) stop("'sp' too short")
     sp0 <- sp0[1:length(sp)]
     sp[sp<0] <- sp0[sp<0]
   }
@@ -1307,7 +1307,7 @@ gam.setup <- function(formula,pterms,
     } else { ## it's a repeat id => shares existing sp's
       L0 <- matrix(0,nrow(Li),ncol(L))
       if (ncol(Li)>idx[[id]]$nc) {
-        stop("Later terms sharing an `id' can not have more smoothing parameters than the first such term")
+        stop("Later terms sharing an 'id' can not have more smoothing parameters than the first such term")
       }
       L0[,idx[[id]]$c:(idx[[id]]$c+ncol(Li)-1)] <- Li
       L <- rbind(L,L0)
@@ -2744,7 +2744,7 @@ gam.fit <- function (G, start = NULL, etastart = NULL,
     aic <- family$aic
     linkinv <- family$linkinv;linkfun <- family$linkfun;mu.eta <- family$mu.eta
     if (!is.function(variance) || !is.function(linkinv)) 
-        stop("illegal `family' argument")
+        stop("invalid 'family' argument")
     valideta <- family$valideta
     if (is.null(valideta)) 
         valideta <- function(eta) TRUE
@@ -2966,7 +2966,7 @@ gam.fit <- function (G, start = NULL, etastart = NULL,
 
 
 model.matrix.gam <- function(object,...)
-{ if (!inherits(object,"gam")) stop("`object' is not of class \"gam\"")
+{ if (!inherits(object,"gam")) stop("'object' is not of class \"gam\"")
   predict(object,type="lpmatrix",...)
 }
 
@@ -3109,7 +3109,7 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
         if (length(allNames) > 0) { 
           ff <- if (is.null(object$pred.formula)) reformulate(allNames) else  object$pred.formula
           if (sum(!(allNames%in%names(newdata)))) { 
-            warning("not all required variables have been supplied in  newdata!\n")
+            warning("not all required variables have been supplied in newdata!\n")
           }
           ## note that `xlev' argument not used here, otherwise `as.factor' in 
           ## formula can cause a problem ... levels reset later.

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 4.1.0 / mgcv 1.8-35\n"
 "Report-Msgid-Bugs-To: bugs@r-project.org\n"
-"POT-Creation-Date: 2025-06-21 12:40\n"
+"POT-Creation-Date: 2025-06-24 18:54\n"
 "PO-Revision-Date: 2021-05-04 16:01+0200\n"
 "Last-Translator: Detlef Steuer <steuer@hsu-hh.de>\n"
 "Language-Team: R-Core <r-core@r-project.org>\n"
@@ -115,6 +115,36 @@ msgstr "'by'-Variable muss die gleiche Dimension wie die Glättungsargumente hab
 #: R/bam.r:0
 msgid "'family' argument seems not to be a valid family object"
 msgstr "'family' Argument scheint kein zulässiges family Objekt zu sein"
+
+#. R/mgcv.r: stop("'id' linked smooths must have same number of arguments")
+#: R/mgcv.r:0
+#, fuzzy
+msgid "'id' linked smooths must have same number of arguments"
+msgstr "'id' gelinkte Glätter müssen die selbe Anzahl von Argumenten haben"
+
+#. R/mgcv.r: stop("'object' is not of class \"gam\"")
+#: R/mgcv.r:0
+#, fuzzy
+msgid "'object' is not of class \"gam\""
+msgstr "'object' ist nicht aus der Klasse \"gam\""
+
+#. R/mgcv.r: stop("'rank' has wrong length in 'paraPen'")
+#: R/mgcv.r:0
+#, fuzzy
+msgid "'rank' has wrong length in 'paraPen'"
+msgstr "'rank' hat die falsche Länge in 'paraPen'"
+
+#. R/mgcv.r: stop("'sp' dimension wrong in 'paraPen'")
+#: R/mgcv.r:0
+#, fuzzy
+msgid "'sp' dimension wrong in 'paraPen'"
+msgstr "'sp' Dimension in 'paraPen' falsch"
+
+#. R/mgcv.r: stop("'sp' too short")
+#: R/mgcv.r:0
+#, fuzzy
+msgid "'sp' too short"
+msgstr "'sp' zu kurz"
 
 #. R/gam.fit3.r: stop("'theta' must be specified")
 #: R/gam.fit3.r:0
@@ -309,9 +339,10 @@ msgstr "Iterationsgrenze erreicht ohne volle Konvergenz -- sorgfältig prüfen"
 msgid "L has inconsistent dimensions."
 msgstr "L hat inkonsistente Dimensionen."
 
-#. R/mgcv.r: stop("L has wrong dimension in `paraPen'")
+#. R/mgcv.r: stop("L has wrong dimension in 'paraPen'")
 #: R/mgcv.r:0
-msgid "L has wrong dimension in `paraPen'"
+#, fuzzy
+msgid "L has wrong dimension in 'paraPen'"
 msgstr "L hat falsche Dimension in 'paraPen'"
 
 #. R/gam.fit3.r: stop("L must be a matrix.")
@@ -326,9 +357,10 @@ msgstr "L muss eine Matrix sein."
 msgid "L must have at least as many rows as columns."
 msgstr "L muss mindestens so viele Zeilen wie Spalten haben."
 
-#. R/mgcv.r: stop("Later terms sharing an `id' can not have more smoothing parameters than the first such term")
+#. R/mgcv.r: stop("Later terms sharing an 'id' can not have more smoothing parameters than the first such term")
 #: R/mgcv.r:0
-msgid "Later terms sharing an `id' can not have more smoothing parameters than the first such term"
+#, fuzzy
+msgid "Later terms sharing an 'id' can not have more smoothing parameters than the first such term"
 msgstr "Später auftretende Terme, die eine 'id' teilen, können nicht mehr Glättungsparameter haben als der erste solche Term"
 
 #. R/gam.fit3.r: gettextf("Length of start should equal %d and correspond to initial coefs for %s",     nvars, deparse(xnames))
@@ -475,9 +507,10 @@ msgstr "Keine Terme zum Darstellen - nichts für plot.gam() zu tun."
 msgid "No variance estimates available"
 msgstr "Keine Varianzschätzungen verfügbar"
 
-#. R/gam.fit3.r: stop("Non finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'")
+#. R/gam.fit3.r: stop("Non finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'")
 #: R/gam.fit3.r:0
-msgid "Non finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'"
+#, fuzzy
+msgid "Non finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'"
 msgstr "Unendliche Ableitungen. Versuchen Sie die Anpassungstoleranz zu reduzieren! Siehe 'epsilon' in 'gam.control'"
 
 #. R/mgcv.r: gettextf("Non-finite coefficients at iteration")
@@ -490,9 +523,10 @@ msgstr "Nicht-endliche Koeffizienten bei der Iteration"
 msgid "Non-finite coefficients at iteration %d"
 msgstr "Nicht-endliche Koeffizienten bei Iteration %d"
 
-#. R/gam.fit3.r: stop("Non-finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'")
+#. R/gam.fit3.r: stop("Non-finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'")
 #: R/gam.fit3.r:0
-msgid "Non-finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'"
+#, fuzzy
+msgid "Non-finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'"
 msgstr "Unendliche Ableitungen. Versuchen Sie die Anpassungstoleranz zu reduzieren! Siehe 'epsilon' in 'gam.control'"
 
 #. R/bam.r: stop("Non-finite deviance")
@@ -695,37 +729,12 @@ msgstr "X verlor Dimensionen in magic!!"
 msgid "You've got no model...."
 msgstr "Sie haben kein Modell ..."
 
-#. R/mgcv.r: stop("`id' linked smooths must have same number of arguments")
-#: R/mgcv.r:0
-msgid "`id' linked smooths must have same number of arguments"
-msgstr "'id' gelinkte Glätter müssen die selbe Anzahl von Argumenten haben"
-
-#. R/mgcv.r: stop("`object' is not of class \"gam\"")
-#: R/mgcv.r:0
-msgid "`object' is not of class \"gam\""
-msgstr "'object' ist nicht aus der Klasse \"gam\""
-
-#. R/mgcv.r: stop("`rank' has wrong length in `paraPen'")
-#: R/mgcv.r:0
-msgid "`rank' has wrong length in `paraPen'"
-msgstr "'rank' hat die falsche Länge in 'paraPen'"
-
-#. R/mgcv.r: stop("`sp' dimension wrong in `paraPen'")
-#: R/mgcv.r:0
-msgid "`sp' dimension wrong in `paraPen'"
-msgstr "'sp' Dimension in 'paraPen' falsch"
-
-#. R/mgcv.r: stop("`sp' too short")
-#: R/mgcv.r:0
-msgid "`sp' too short"
-msgstr "'sp' zu kurz"
-
 #. R/misc.r: stop("a has wrong number of rows")
 #: R/misc.r:0
 msgid "a has wrong number of rows"
 msgstr "a hat die falsche Zeilenzahl"
 
-#. R/mgcv.r: stop(" a parametric penalty has wrong dimension")
+#. R/mgcv.r: stop("a parametric penalty has wrong dimension")
 #: R/mgcv.r:0
 msgid "a parametric penalty has wrong dimension"
 msgstr "ein parametrischer Strafterm hat die falsche Dimension"
@@ -1179,9 +1188,10 @@ msgstr "max Iterationszahl erreicht: max abs grad = %g"
 msgid "gamm can not fix only some margins of tensor product."
 msgstr "gamm kann nicht nur einige Ränder des Tensorproduktes reparieren."
 
-#. R/gamm.r: stop("gamm can not handle linked smoothing parameters (probably from use of `id' or adaptive smooths)")
+#. R/gamm.r: stop("gamm can not handle linked smoothing parameters (probably from use of 'id' or adaptive smooths)")
 #: R/gamm.r:0
-msgid "gamm can not handle linked smoothing parameters (probably from use of `id' or adaptive smooths)"
+#, fuzzy
+msgid "gamm can not handle linked smoothing parameters (probably from use of 'id' or adaptive smooths)"
 msgstr "gamm kann mit gelinkten Glättungsparametern nicht umgehen (vermutlich aus der Nutzung von 'id' oder adaptiven Glättern)"
 
 #. R/gamm.r: warning("gamm is not designed to use extended families")
@@ -1250,21 +1260,16 @@ msgstr "Gittervektoren haben unterschiedliche Längen"
 msgid "gumbls requires 2 links specified as character strings"
 msgstr "gumbls verlangt 2 Links, angegeben als Zeichenketten"
 
-#. R/smooth.r: warning("handling `by' variables in smooth constructors may not work with the summation convention ")
+#. R/smooth.r: warning("handling 'by' variables in smooth constructors may not work with the summation convention ")
 #: R/smooth.r:0
-msgid "handling `by' variables in smooth constructors may not work with the summation convention"
+#, fuzzy
+msgid "handling 'by' variables in smooth constructors may not work with the summation convention"
 msgstr "die Handhabung von 'by' Variablen in der Glättungskonstruktion funktioniert evtl. nicht mit der Summationskonvention"
 
 #. R/gfam.r: stop("if response is a matrix it must have 2 columns")
 #: R/gfam.r:0
 msgid "if response is a matrix it must have 2 columns"
 msgstr ""
-
-#. R/gam.fit3.r: stop("illegal `family' argument")
-#. R/mgcv.r: stop("illegal `family' argument")
-#: R/gam.fit3.r:0 R/mgcv.r:0
-msgid "illegal `family' argument"
-msgstr "unerlaubtes 'family'-Argument"
 
 #. R/mgcv.r: stop("in.out incorrect: see documentation")
 #: R/mgcv.r:0
@@ -1350,6 +1355,13 @@ msgstr "Integration für diese Familie nicht verfügbar - unzureichende Ableitun
 #: R/misc.r:0
 msgid "internal error in vcorr, please report to simon.wood@r-project.org"
 msgstr "interner Fehler in vcorr, bitte an simon.wood@r-project.org melden"
+
+#. R/gam.fit3.r: stop("invalid 'family' argument")
+#. R/mgcv.r: stop("invalid 'family' argument")
+#: R/gam.fit3.r:0 R/mgcv.r:0
+#, fuzzy
+msgid "invalid 'family' argument"
+msgstr "unerlaubtes 'family'-Argument"
 
 #. R/misc.r: stop("isa requires a dg/tCMatrix")
 #: R/misc.r:0
@@ -1769,9 +1781,10 @@ msgstr "nicht-ganzzahliger Binomialnenner: Quantile inkorrekt"
 msgid "not a gam object"
 msgstr "kein gam Objekt"
 
-#. R/mgcv.r: warning("not all required variables have been supplied in  newdata!\n")
+#. R/mgcv.r: warning("not all required variables have been supplied in newdata!\n")
 #: R/mgcv.r:0
-msgid "not all required variables have been supplied in  newdata!"
+#, fuzzy
+msgid "not all required variables have been supplied in newdata!"
 msgstr "nicht alle benötigten Variablen wurden in newdata angegeben!"
 
 #. R/efam.r: stop("not an extended family")
@@ -1871,24 +1884,21 @@ msgstr "behandelt nur den 2D Fall"
 msgid "only first element of 'id' used"
 msgstr "nur das erste Element von 'id' wird genutzt"
 
-#. R/smooth.r: warning("only first element of `id' used")
-#: R/smooth.r:0
-msgid "only first element of `id' used"
-msgstr "nur das erste Element von 'id' wird genutzt"
-
 #. R/gamm.r: stop("only one level of smooth nesting is supported by gamm")
 #: R/gamm.r:0
 msgid "only one level of smooth nesting is supported by gamm"
 msgstr "nur eine Stufe von Glättungsverschachtelung wird von gamm unterstützt"
 
-#. R/gam.fit3.r: stop("only scalar `p' and `phi' allowed.")
+#. R/gam.fit3.r: stop("only scalar 'p' and 'phi' allowed.")
 #: R/gam.fit3.r:0
-msgid "only scalar `p' and `phi' allowed."
+#, fuzzy
+msgid "only scalar 'p' and 'phi' allowed."
 msgstr "Nur skalare 'p' und 'phi' erlaubt."
 
-#. R/gam.fit3.r: stop("only scalar `rho' and `theta' allowed.")
+#. R/gam.fit3.r: stop("only scalar 'rho' and 'theta' allowed.")
 #: R/gam.fit3.r:0
-msgid "only scalar `rho' and `theta' allowed."
+#, fuzzy
+msgid "only scalar 'rho' and 'theta' allowed."
 msgstr "Nur skalare 'rho' und 'theta' erlaubt."
 
 #. R/bam.r: warning("openMP not available: single threaded computation only")
@@ -2461,6 +2471,9 @@ msgid "there should be %d knot supplied"
 msgid_plural "there should be %d knots supplied"
 msgstr[0] "da sollten sein"
 msgstr[1] "da sollten sein"
+
+#~ msgid "only first element of `id' used"
+#~ msgstr "nur das erste Element von 'id' wird genutzt"
 
 # R/mgcv.r + R/gam.fit3.r
 #~ msgid "Length of start should equal"

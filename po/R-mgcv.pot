@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.9-3\n"
-"POT-Creation-Date: 2025-06-21 12:40\n"
+"POT-Creation-Date: 2025-06-24 18:54\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -128,6 +128,41 @@ msgstr ""
 #. R/bam.r: stop("'family' argument seems not to be a valid family object")
 
 msgid "'family' argument seems not to be a valid family object"
+msgstr ""
+
+
+#: R/mgcv.r: 0
+#. R/mgcv.r: stop("'id' linked smooths must have same number of arguments")
+
+msgid "'id' linked smooths must have same number of arguments"
+msgstr ""
+
+
+#: R/mgcv.r: 0
+#. R/mgcv.r: stop("'object' is not of class \"gam\"")
+
+msgid "'object' is not of class \"gam\""
+msgstr ""
+
+
+#: R/mgcv.r: 0
+#. R/mgcv.r: stop("'rank' has wrong length in 'paraPen'")
+
+msgid "'rank' has wrong length in 'paraPen'"
+msgstr ""
+
+
+#: R/mgcv.r: 0
+#. R/mgcv.r: stop("'sp' dimension wrong in 'paraPen'")
+
+msgid "'sp' dimension wrong in 'paraPen'"
+msgstr ""
+
+
+#: R/mgcv.r: 0
+#. R/mgcv.r: stop("'sp' too short")
+
+msgid "'sp' too short"
 msgstr ""
 
 
@@ -402,9 +437,9 @@ msgstr ""
 
 
 #: R/mgcv.r: 0
-#. R/mgcv.r: stop("L has wrong dimension in `paraPen'")
+#. R/mgcv.r: stop("L has wrong dimension in 'paraPen'")
 
-msgid "L has wrong dimension in `paraPen'"
+msgid "L has wrong dimension in 'paraPen'"
 msgstr ""
 
 
@@ -427,9 +462,9 @@ msgstr ""
 
 
 #: R/mgcv.r: 0
-#. R/mgcv.r: stop("Later terms sharing an `id' can not have more smoothing parameters than the first such term")
+#. R/mgcv.r: stop("Later terms sharing an 'id' can not have more smoothing parameters than the first such term")
 
-msgid "Later terms sharing an `id' can not have more smoothing parameters than the first such term"
+msgid "Later terms sharing an 'id' can not have more smoothing parameters than the first such term"
 msgstr ""
 
 
@@ -636,9 +671,9 @@ msgstr ""
 
 
 #: R/gam.fit3.r: 0
-#. R/gam.fit3.r: stop("Non finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'")
+#. R/gam.fit3.r: stop("Non finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'")
 
-msgid "Non finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'"
+msgid "Non finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'"
 msgstr ""
 
 
@@ -657,9 +692,9 @@ msgstr ""
 
 
 #: R/gam.fit3.r: 0
-#. R/gam.fit3.r: stop("Non-finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'")
+#. R/gam.fit3.r: stop("Non-finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'")
 
-msgid "Non-finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'"
+msgid "Non-finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'"
 msgstr ""
 
 
@@ -944,41 +979,6 @@ msgid "You've got no model...."
 msgstr ""
 
 
-#: R/mgcv.r: 0
-#. R/mgcv.r: stop("`id' linked smooths must have same number of arguments")
-
-msgid "`id' linked smooths must have same number of arguments"
-msgstr ""
-
-
-#: R/mgcv.r: 0
-#. R/mgcv.r: stop("`object' is not of class \"gam\"")
-
-msgid "`object' is not of class \"gam\""
-msgstr ""
-
-
-#: R/mgcv.r: 0
-#. R/mgcv.r: stop("`rank' has wrong length in `paraPen'")
-
-msgid "`rank' has wrong length in `paraPen'"
-msgstr ""
-
-
-#: R/mgcv.r: 0
-#. R/mgcv.r: stop("`sp' dimension wrong in `paraPen'")
-
-msgid "`sp' dimension wrong in `paraPen'"
-msgstr ""
-
-
-#: R/mgcv.r: 0
-#. R/mgcv.r: stop("`sp' too short")
-
-msgid "`sp' too short"
-msgstr ""
-
-
 #: R/misc.r: 0
 #. R/misc.r: stop("a has wrong number of rows")
 
@@ -987,7 +987,7 @@ msgstr ""
 
 
 #: R/mgcv.r: 0
-#. R/mgcv.r: stop(" a parametric penalty has wrong dimension")
+#. R/mgcv.r: stop("a parametric penalty has wrong dimension")
 
 msgid "a parametric penalty has wrong dimension"
 msgstr ""
@@ -1607,9 +1607,9 @@ msgstr ""
 
 
 #: R/gamm.r: 0
-#. R/gamm.r: stop("gamm can not handle linked smoothing parameters (probably from use of `id' or adaptive smooths)")
+#. R/gamm.r: stop("gamm can not handle linked smoothing parameters (probably from use of 'id' or adaptive smooths)")
 
-msgid "gamm can not handle linked smoothing parameters (probably from use of `id' or adaptive smooths)"
+msgid "gamm can not handle linked smoothing parameters (probably from use of 'id' or adaptive smooths)"
 msgstr ""
 
 
@@ -1705,9 +1705,9 @@ msgstr ""
 
 
 #: R/smooth.r: 0
-#. R/smooth.r: warning("handling `by' variables in smooth constructors may not work with the summation convention ")
+#. R/smooth.r: warning("handling 'by' variables in smooth constructors may not work with the summation convention ")
 
-msgid "handling `by' variables in smooth constructors may not work with the summation convention"
+msgid "handling 'by' variables in smooth constructors may not work with the summation convention"
 msgstr ""
 
 
@@ -1715,15 +1715,6 @@ msgstr ""
 #. R/gfam.r: stop("if response is a matrix it must have 2 columns")
 
 msgid "if response is a matrix it must have 2 columns"
-msgstr ""
-
-
-#: R/gam.fit3.r: 0
-#: R/mgcv.r: 0
-#. R/gam.fit3.r: stop("illegal `family' argument")
-#. R/mgcv.r: stop("illegal `family' argument")
-
-msgid "illegal `family' argument"
 msgstr ""
 
 
@@ -1846,6 +1837,15 @@ msgstr ""
 #. R/misc.r: stop("internal error in vcorr, please report to simon.wood@r-project.org")
 
 msgid "internal error in vcorr, please report to simon.wood@r-project.org"
+msgstr ""
+
+
+#: R/gam.fit3.r: 0
+#: R/mgcv.r: 0
+#. R/gam.fit3.r: stop("invalid 'family' argument")
+#. R/mgcv.r: stop("invalid 'family' argument")
+
+msgid "invalid 'family' argument"
 msgstr ""
 
 
@@ -2420,9 +2420,9 @@ msgstr ""
 
 
 #: R/mgcv.r: 0
-#. R/mgcv.r: warning("not all required variables have been supplied in  newdata!\n")
+#. R/mgcv.r: warning("not all required variables have been supplied in newdata!\n")
 
-msgid "not all required variables have been supplied in  newdata!"
+msgid "not all required variables have been supplied in newdata!"
 msgstr ""
 
 
@@ -2559,13 +2559,6 @@ msgid "only first element of 'id' used"
 msgstr ""
 
 
-#: R/smooth.r: 0
-#. R/smooth.r: warning("only first element of `id' used")
-
-msgid "only first element of `id' used"
-msgstr ""
-
-
 #: R/gamm.r: 0
 #. R/gamm.r: stop("only one level of smooth nesting is supported by gamm")
 
@@ -2574,16 +2567,16 @@ msgstr ""
 
 
 #: R/gam.fit3.r: 0
-#. R/gam.fit3.r: stop("only scalar `p' and `phi' allowed.")
+#. R/gam.fit3.r: stop("only scalar 'p' and 'phi' allowed.")
 
-msgid "only scalar `p' and `phi' allowed."
+msgid "only scalar 'p' and 'phi' allowed."
 msgstr ""
 
 
 #: R/gam.fit3.r: 0
-#. R/gam.fit3.r: stop("only scalar `rho' and `theta' allowed.")
+#. R/gam.fit3.r: stop("only scalar 'rho' and 'theta' allowed.")
 
-msgid "only scalar `rho' and `theta' allowed."
+msgid "only scalar 'rho' and 'theta' allowed."
 msgstr ""
 
 

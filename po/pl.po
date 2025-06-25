@@ -20,7 +20,7 @@ msgstr "'magic' wymaga wartości startowych dla parametru wygładzającego jeśl
 
 #: magic.c:565
 msgid "magic, the gcv/ubre optimizer, failed to converge after 400 iterations."
-msgstr "'magic', omptymalizator gcv/ubre, nie zdodał uzbieżnić się po 400 iteracjach."
+msgstr "'magic', optymalizator gcv/ubre nie osiągnął zbieżności po 400 iteracjach."
 
 #: mat.c:86 mat.c:108
 msgid ""
@@ -115,7 +115,7 @@ msgid "A term has fewer unique covariate combinations than specified maximum deg
 msgstr "Człon posiada mniej unikalnych kombinacji zmiennych niezależnych niż określona maksymalna liczba stopni swobody"
 
 #~ msgid "Failed to initialize memory for matrix."
-#~ msgstr "Nie udało się zainicjalizować pamięci dla macierzy."
+#~ msgstr "Nie udało się zainicjować pamięci dla macierzy."
 
 #~ msgid "An out of bound write to matrix has occurred!"
 #~ msgstr "Nastąpił zapis poza zakresem macierzy!"

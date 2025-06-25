@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.7-28\n"
 "Report-Msgid-Bugs-To: bugs@r-project.org\n"
-"POT-Creation-Date: 2025-06-21 12:40\n"
-"PO-Revision-Date: 2025-06-21 13:20+0200\n"
+"POT-Creation-Date: 2025-06-23 16:39\n"
+"PO-Revision-Date: 2025-06-23 16:53+0200\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language: pl_PL\n"
@@ -98,6 +98,31 @@ msgstr "zmienna 'by' musi mieć ten sam wymiar co argumenty wygładzania"
 #: R/bam.r:0
 msgid "'family' argument seems not to be a valid family object"
 msgstr "argument 'family' wydaje się nie być poprawnym obiektem klasy \"family\""
+
+#. R/mgcv.r: stop("'id' linked smooths must have same number of arguments")
+#: R/mgcv.r:0
+msgid "'id' linked smooths must have same number of arguments"
+msgstr "wygładzania połączone poprzez 'id' muszą mieć tę samą liczbę argumentów"
+
+#. R/mgcv.r: stop("'object' is not of class \"gam\"")
+#: R/mgcv.r:0
+msgid "'object' is not of class \"gam\""
+msgstr "argument 'object' nie jest obiektem klasy \"gam\""
+
+#. R/mgcv.r: stop("'rank' has wrong length in 'paraPen'")
+#: R/mgcv.r:0
+msgid "'rank' has wrong length in 'paraPen'"
+msgstr "'rank' posiada niepoprawną długość w 'paraPen'"
+
+#. R/mgcv.r: stop("'sp' dimension wrong in 'paraPen'")
+#: R/mgcv.r:0
+msgid "'sp' dimension wrong in 'paraPen'"
+msgstr "wymiar 'sp' jest niepoprawny w 'paraPen'"
+
+#. R/mgcv.r: stop("'sp' too short")
+#: R/mgcv.r:0
+msgid "'sp' too short"
+msgstr "'sp' jest zbyt krótkie"
 
 #. R/gam.fit3.r: stop("'theta' must be specified")
 #: R/gam.fit3.r:0
@@ -210,22 +235,22 @@ msgstr "Nie można wyodrębnić wymiarów"
 #. R/gamm.r: stop("Cannot extract the inverse from an uninitialized object")
 #: R/gamm.r:0
 msgid "Cannot extract the inverse from an uninitialized object"
-msgstr "Nie można wyodrębnić odwrotności z niezainicjalizowanego obiektu"
+msgstr "Nie można wyodrębnić odwrotności z niezainicjowanego obiektu"
 
 #. R/gamm.r: stop("Cannot extract the matrix from an uninitialized object")
 #: R/gamm.r:0
 msgid "Cannot extract the matrix from an uninitialized object"
-msgstr "Nie można wyodrębnić macierzy z niezainicjalizowanego obiektu"
+msgstr "Nie można wyodrębnić macierzy z niezainicjowanego obiektu"
 
 #. R/gamm.r: stop("Cannot extract the matrix from an uninitialized pdMat object")
 #: R/gamm.r:0
 msgid "Cannot extract the matrix from an uninitialized pdMat object"
-msgstr "Nie można wyodrębnić macierzy z niezainicjalizowanego obiektu klasy \"pdMAt\""
+msgstr "Nie można wyodrębnić macierzy z niezainicjowanego obiektu klasy \"pdMAt\""
 
 #. R/gamm.r: stop("Cannot extract the matrix with uninitialized dimensions")
 #: R/gamm.r:0
 msgid "Cannot extract the matrix with uninitialized dimensions"
-msgstr "Nie można wyodrębnić macierzy z niezainicjalizowanymi wymiarami"
+msgstr "Nie można wyodrębnić macierzy z niezainicjowanymi wymiarami"
 
 #. R/bam.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
 #. R/gam.fit3.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
@@ -290,9 +315,9 @@ msgstr "Osiągnięto limit iteracji bez pełnej zbieżności - sprawdź dokładn
 msgid "L has inconsistent dimensions."
 msgstr "argument 'L' ma niespójne wymiary."
 
-#. R/mgcv.r: stop("L has wrong dimension in `paraPen'")
+#. R/mgcv.r: stop("L has wrong dimension in 'paraPen'")
 #: R/mgcv.r:0
-msgid "L has wrong dimension in `paraPen'"
+msgid "L has wrong dimension in 'paraPen'"
 msgstr "'L' posiada niepoprawny wymiar w 'paraPen'"
 
 #. R/gam.fit3.r: stop("L must be a matrix.")
@@ -307,9 +332,9 @@ msgstr "argument 'L' musi być macierzą."
 msgid "L must have at least as many rows as columns."
 msgstr "argument 'L' musi mieć co najmniej tyle wierszy co kolumn."
 
-#. R/mgcv.r: stop("Later terms sharing an `id' can not have more smoothing parameters than the first such term")
+#. R/mgcv.r: stop("Later terms sharing an 'id' can not have more smoothing parameters than the first such term")
 #: R/mgcv.r:0
-msgid "Later terms sharing an `id' can not have more smoothing parameters than the first such term"
+msgid "Later terms sharing an 'id' can not have more smoothing parameters than the first such term"
 msgstr "Dalsze człony współdzielące 'id' nie mogą mieć więcej parametrów wygładzających niż pierwszy taki człon"
 
 #. R/gam.fit3.r: gettextf("Length of start should equal %d and correspond to initial coefs for %s",     nvars, deparse(xnames))
@@ -438,7 +463,7 @@ msgstr "Nie dostarczono danych do funkcji 'gamm.setup()'"
 #. R/mgcv.r: gettextf("No observations informative at iteration %d", iter)
 #: R/mgcv.r:0
 msgid "No observations informative at iteration %d"
-msgstr "brak obserwacji informacyjnych w iteracji %d"
+msgstr "brak obserwacji informacyjnych w %d iteracji"
 
 #. R/smooth.r: stop("No suitable s (i.e. m[2]) try increasing m[1]")
 #: R/smooth.r:0
@@ -455,9 +480,9 @@ msgstr "Brak członów do rysowania - nic do wykonania przez 'plot.gam()'."
 msgid "No variance estimates available"
 msgstr "Brak dostępnego oszacowania wariancji"
 
-#. R/gam.fit3.r: stop("Non finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'")
+#. R/gam.fit3.r: stop("Non finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'")
 #: R/gam.fit3.r:0
-msgid "Non finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'"
+msgid "Non finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'"
 msgstr "Nieskończone pochodne. Spróbuj zmniejszyć tolerancję dopasowania! Zobacz 'epsilon' w 'gam.contol'"
 
 #. R/mgcv.r: gettextf("Non-finite coefficients at iteration")
@@ -470,9 +495,9 @@ msgstr "Nieskończone współczynniki w iteracji"
 msgid "Non-finite coefficients at iteration %d"
 msgstr "nieskończone współczynniki w %d iteracji"
 
-#. R/gam.fit3.r: stop("Non-finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'")
+#. R/gam.fit3.r: stop("Non-finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'")
 #: R/gam.fit3.r:0
-msgid "Non-finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'"
+msgid "Non-finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'"
 msgstr "Nieskończone pochodne. Spróbuj zmniejszyć tolerancję dopasowania! Zobacz 'epsilon' w 'gam.contol'"
 
 #. R/bam.r: stop("Non-finite deviance")
@@ -511,7 +536,7 @@ msgstr "Wspierane jest tylko 1<p<=2"
 #. R/plots.r: warning("Partial residuals do not have a natural x-axis location for linear functional terms")
 #: R/plots.r:0
 msgid "Partial residuals do not have a natural x-axis location for linear functional terms"
-msgstr "Częsciowe reszty nie posiadają naturalnego położenia osi 'x' dla liniowych członów funkcyjnych"
+msgstr "Częściowe reszty nie posiadają naturalnego położenia osi 'x' dla liniowych członów funkcyjnych"
 
 #. R/mgcv.r: warning("Pearson residuals not available for this family - returning deviance residuals")
 #: R/mgcv.r:0
@@ -546,7 +571,7 @@ msgstr "Powtórzone zmienne jako argumenty wygładzenia nie są dozwolone"
 #. R/inla.r: stop("Requires a gam or bam prefit object")
 #: R/inla.r:0
 msgid "Requires a gam or bam prefit object"
-msgstr "Wymaga obiektu z prefitem gam lub bam"
+msgstr "Wymaga obiektu z klasy \"gam.prefit\" lub \"bam.prefit\""
 
 #. R/efam.r: stop("Response should be integer class labels")
 #: R/efam.r:0
@@ -582,7 +607,7 @@ msgstr "Coś nie tak z konstrukcją automatycznej kary"
 #. R/plots.r: stop("Something wrong with zlim")
 #: R/plots.r:0
 msgid "Something wrong with zlim"
-msgstr "Coś nie tak z 'zlim'"
+msgstr "Coś nie tak z argumentem 'zlim'"
 
 #. R/smooth.r: stop("Sorry, tensor products of smooths with multiple penalties are not supported.")
 #: R/smooth.r:0
@@ -674,37 +699,12 @@ msgstr "'X' utraciło wymiary w 'magic()!'!"
 msgid "You've got no model...."
 msgstr "Nie posiadasz modelu..."
 
-#. R/mgcv.r: stop("`id' linked smooths must have same number of arguments")
-#: R/mgcv.r:0
-msgid "`id' linked smooths must have same number of arguments"
-msgstr "wygładzania połączone poprzez 'id' muszą mieć tę samą liczbę argumentów"
-
-#. R/mgcv.r: stop("`object' is not of class \"gam\"")
-#: R/mgcv.r:0
-msgid "`object' is not of class \"gam\""
-msgstr "argument 'object' nie jest obiektem klasy \"gam\""
-
-#. R/mgcv.r: stop("`rank' has wrong length in `paraPen'")
-#: R/mgcv.r:0
-msgid "`rank' has wrong length in `paraPen'"
-msgstr "'rank' posiada niepoprawną długość w 'paraPen'"
-
-#. R/mgcv.r: stop("`sp' dimension wrong in `paraPen'")
-#: R/mgcv.r:0
-msgid "`sp' dimension wrong in `paraPen'"
-msgstr "wymiar 'sp' jest niepoprawny w 'paraPen'"
-
-#. R/mgcv.r: stop("`sp' too short")
-#: R/mgcv.r:0
-msgid "`sp' too short"
-msgstr "'sp' jest zbyt krótkie"
-
 #. R/misc.r: stop("a has wrong number of rows")
 #: R/misc.r:0
 msgid "a has wrong number of rows"
 msgstr "argument 'a' ma niepoprawną liczbę wierszy"
 
-#. R/mgcv.r: stop(" a parametric penalty has wrong dimension")
+#. R/mgcv.r: stop("a parametric penalty has wrong dimension")
 #: R/mgcv.r:0
 msgid "a parametric penalty has wrong dimension"
 msgstr "parametryczna kara ma niepoprawny wymiar"
@@ -748,7 +748,7 @@ msgstr "argument 'k' musi być dodatni."
 #. R/smooth.r: warning("argument k of s() should be integer and has been rounded")
 #: R/smooth.r:0
 msgid "argument k of s() should be integer and has been rounded"
-msgstr "argument 'k' w funkcji 's()' powinie być liczbą calkowitą więc został zaokrąglony"
+msgstr "argument 'k' w funkcji 's()' powinien być liczbą całkowitą więc został zaokrąglony"
 
 #. R/smooth.r: warning("argument of mrf should be a factor variable")
 #: R/smooth.r:0
@@ -778,7 +778,7 @@ msgstr "próba użycia niepasującej granicznej gładkiej klasy"
 #. R/bam.r: stop("bam can not discretize with this nesting structure")
 #: R/bam.r:0
 msgid "bam can not discretize with this nesting structure"
-msgstr "bam nie może dyskretyzować się z tą strukturą zagnieżdżania"
+msgstr "bam nie może dyskretyzować z tą strukturą zagnieżdżania"
 
 #. R/inla.r: stop("bam fits only supported with discrete==TRUE")
 #: R/inla.r:0
@@ -813,7 +813,7 @@ msgstr "podstawa nie nadaje się do użytku ze zmniejszoną te"
 #. R/soap.r: stop("bnd must be a list of boundary loops")
 #: R/soap.r:0
 msgid "bnd must be a list of boundary loops"
-msgstr "'bnd' musi być listą pętel granic"
+msgstr "'bnd' musi być listą pętli granicznych"
 
 #. R/soap.r: stop("bnd must be a list.")
 #: R/soap.r:0
@@ -828,7 +828,7 @@ msgstr "'bs' posiada niepoprawną długość przez co został zignorowany."
 #. R/jagam.r: warning("burnin too large, reset")
 #: R/jagam.r:0
 msgid "burnin too large, reset"
-msgstr "burnin jest zbyt duże, resetowanie"
+msgstr "argument 'burnin' jest zbyt duży, resetowanie"
 
 #. R/jagam.r: stop("by.resids argument not supported")
 #: R/jagam.r:0
@@ -853,7 +853,7 @@ msgstr "nie można wygładzić 'soap' bez granicy"
 #. R/bam.r: stop("cannot find valid starting values: please specify some")
 #: R/bam.r:0
 msgid "cannot find valid starting values: please specify some"
-msgstr "Nie mnżna znaleźć poprawnych wartości startowych: proszę określić kilka"
+msgstr "Nie można znaleźć poprawnych wartości startowych: proszę określić kilka"
 
 #. R/bam.r: gettextf("chunk.size < number of coefficients. Reset to %d",     chunk.size)
 #: R/bam.r:0
@@ -1143,9 +1143,9 @@ msgstr "osiągnięto limit iteracji w funkcji 'gam.fit5()': maksymalna wartość
 msgid "gamm can not fix only some margins of tensor product."
 msgstr "funkcja 'gamm()' nie może ustalić tylko niektórych granic produktu tensorowego."
 
-#. R/gamm.r: stop("gamm can not handle linked smoothing parameters (probably from use of `id' or adaptive smooths)")
+#. R/gamm.r: stop("gamm can not handle linked smoothing parameters (probably from use of 'id' or adaptive smooths)")
 #: R/gamm.r:0
-msgid "gamm can not handle linked smoothing parameters (probably from use of `id' or adaptive smooths)"
+msgid "gamm can not handle linked smoothing parameters (probably from use of 'id' or adaptive smooths)"
 msgstr "funkcja 'gamm()' nie może obsłużyć dołączonych parametrów wygładzania (prawdopodobnie z użycia 'id' lub adaptacyjnych wygładzeń)"
 
 #. R/gamm.r: warning("gamm is not designed to use extended families")
@@ -1166,17 +1166,17 @@ msgstr "funkcja 'gamm()' nie uzbieżniła się, spróbuj zwiększyć parametr 'n
 #. R/gamm.r: stop("gamm() can only handle random effects defined as named lists")
 #: R/gamm.r:0
 msgid "gamm() can only handle random effects defined as named lists"
-msgstr "funkcja 'gamm()' może obsłużyć jedynie efekty losowe zdefiniowane jaki nazwane listy"
+msgstr "funkcja 'gamm()' może obsłużyć jedynie efekty losowe zdefiniowane jako nazwane listy"
 
 #. R/gamlss.r: stop("gammals requires 2 links specified as character strings")
 #: R/gamlss.r:0
 msgid "gammals requires 2 links specified as character strings"
-msgstr "gammals wymaga 2 linków określonych jako ciągi znaków"
+msgstr "gammals wymaga 2 połączeń określonych jako teksty"
 
 #. R/gamlss.r: stop("gaulss requires 2 links specified as character strings")
 #: R/gamlss.r:0
 msgid "gaulss requires 2 links specified as character strings"
-msgstr "gaulss wymaga 2 linków określonych jako ciągi znaków"
+msgstr "gaulss wymaga 2 połączeń określonych jako teksty"
 
 #. R/gfam.r: stop("general familes not implemented so far")
 #: R/gfam.r:0
@@ -1191,7 +1191,7 @@ msgstr "ogólne rodziny nie są obsługiwane przez 'bam'"
 #. R/gamlss.r: stop("gevlss requires 3 links specified as character strings")
 #: R/gamlss.r:0
 msgid "gevlss requires 3 links specified as character strings"
-msgstr "gevlss wymaga 3 linków określonych jako ciągi znaków"
+msgstr "gevlss wymaga 3 połączeń określonych jako teksty"
 
 #. R/gfam.r: stop("gfam mixed response scale prediction not possible here")
 #: R/gfam.r:0
@@ -1211,23 +1211,17 @@ msgstr "wektory siatki są różnej długości"
 #. R/gamlss.r: stop("gumbls requires 2 links specified as character strings")
 #: R/gamlss.r:0
 msgid "gumbls requires 2 links specified as character strings"
-msgstr "gumbls wymaga 2 linków określonych jako ciągi znaków"
+msgstr "gumbls wymaga 2 połączeń określonych jako teksty"
 
-#. R/smooth.r: warning("handling `by' variables in smooth constructors may not work with the summation convention ")
+#. R/smooth.r: warning("handling 'by' variables in smooth constructors may not work with the summation convention ")
 #: R/smooth.r:0
-msgid "handling `by' variables in smooth constructors may not work with the summation convention"
+msgid "handling 'by' variables in smooth constructors may not work with the summation convention"
 msgstr "obsługiwanie zmiennych 'by' w konstruktorach wygładzenia może nie działać z konwencją sumacyjną"
 
 #. R/gfam.r: stop("if response is a matrix it must have 2 columns")
 #: R/gfam.r:0
 msgid "if response is a matrix it must have 2 columns"
 msgstr "jeśli odpowiedź jest macierzą, musi mieć 2 kolumny"
-
-#. R/gam.fit3.r: stop("illegal `family' argument")
-#. R/mgcv.r: stop("illegal `family' argument")
-#: R/gam.fit3.r:0 R/mgcv.r:0
-msgid "illegal `family' argument"
-msgstr "niepoprawny argument 'family'"
 
 #. R/mgcv.r: stop("in.out incorrect: see documentation")
 #: R/mgcv.r:0
@@ -1272,12 +1266,12 @@ msgstr "początkowe parametry nie są wykonalne"
 #. R/mgcv.r: warning("initial parameters very close to inequality constraints")
 #: R/mgcv.r:0
 msgid "initial parameters very close to inequality constraints"
-msgstr "początkowe parametry bardzo blisko więzów nierowności"
+msgstr "początkowe parametry bardzo blisko więzów nierówności"
 
 #. R/mgcv.r: warning("initial point very close to some inequality constraints")
 #: R/mgcv.r:0
 msgid "initial point very close to some inequality constraints"
-msgstr "początkowy punkt jest bardzo blisko do niektórych więzów nierówności"
+msgstr "początkowy punkt jest bardzo blisko niektórych więzów nierówności"
 
 #. R/gamm.r: stop("inner groupings not nested in outer!!")
 #: R/gamm.r:0
@@ -1313,6 +1307,12 @@ msgstr "całkowanie nie jest dostępne z tą rodziną - niewystarczające pochod
 #: R/misc.r:0
 msgid "internal error in vcorr, please report to simon.wood@r-project.org"
 msgstr "błąd wewnętrzny w vcorr, prosimy o zgłoszenie do simon.wood@r-project.org"
+
+#. R/gam.fit3.r: stop("invalid 'family' argument")
+#. R/mgcv.r: stop("invalid 'family' argument")
+#: R/gam.fit3.r:0 R/mgcv.r:0
+msgid "invalid 'family' argument"
+msgstr "niepoprawny argument 'family'"
 
 #. R/misc.r: stop("isa requires a dg/tCMatrix")
 #: R/misc.r:0
@@ -1554,7 +1554,7 @@ msgstr "błąd wymiaru mvn"
 #. R/mvam.r: stop("mvn does not yet handle offsets")
 #: R/mvam.r:0
 msgid "mvn does not yet handle offsets"
-msgstr "mvn jeszze nie obsługuje przesunięć"
+msgstr "mvn jeszcze nie obsługuje przesunięć"
 
 #. R/mvam.r: stop("mvn requires 2 or more dimensional data")
 #: R/mvam.r:0
@@ -1692,7 +1692,7 @@ msgstr "nie znaleziono poprawnego zestawu współczynników: proszę dostarczyć
 #. R/gam.fit4.r: stop("non finite values in Hessian")
 #: R/gam.fit4.r:0
 msgid "non finite values in Hessian"
-msgstr "wartości nieskończone w Hessianie"
+msgstr "wartości nieskończone w hesjanie"
 
 #. R/mgcv.r: warning("non-existent exclude terms requested - ignoring")
 #: R/mgcv.r:0
@@ -1719,9 +1719,9 @@ msgstr "niecałkowity mianownik dwumianu: kwantyle niepoprawne"
 msgid "not a gam object"
 msgstr "argument nie jest obiektem klasy \"gam\""
 
-#. R/mgcv.r: warning("not all required variables have been supplied in  newdata!\n")
+#. R/mgcv.r: warning("not all required variables have been supplied in newdata!\n")
 #: R/mgcv.r:0
-msgid "not all required variables have been supplied in  newdata!"
+msgid "not all required variables have been supplied in newdata!"
 msgstr "nie wszystkie wymagane zmienne zostały dostarczone w \"newdata\"!"
 
 #. R/efam.r: stop("not an extended family")
@@ -1797,7 +1797,7 @@ msgstr "argument 'object' nie jest obiektem klasy \"glm\" lub \"gam\""
 #. R/sparse.r: stop("object not fully initialized")
 #: R/sparse.r:0
 msgid "object not fully initialized"
-msgstr "obiekt nie został w pełni zainicjalizowany"
+msgstr "obiekt nie został w pełni zainicjowany"
 
 #. R/gamlss.r: stop("offset not still available for this family")
 #: R/gamlss.r:0
@@ -1819,24 +1819,19 @@ msgstr "obsługiwanie jedynie dwuwymiarowych przypadków"
 msgid "only first element of 'id' used"
 msgstr "został użyty jedynie pierwszy element 'id'"
 
-#. R/smooth.r: warning("only first element of `id' used")
-#: R/smooth.r:0
-msgid "only first element of `id' used"
-msgstr "został użyty jedynie pierwszy element 'id'"
-
 #. R/gamm.r: stop("only one level of smooth nesting is supported by gamm")
 #: R/gamm.r:0
 msgid "only one level of smooth nesting is supported by gamm"
 msgstr "tylko jeden poziom zagnieżdżania gładkości jest wspierane przez funkcję 'gamm()'"
 
-#. R/gam.fit3.r: stop("only scalar `p' and `phi' allowed.")
+#. R/gam.fit3.r: stop("only scalar 'p' and 'phi' allowed.")
 #: R/gam.fit3.r:0
-msgid "only scalar `p' and `phi' allowed."
+msgid "only scalar 'p' and 'phi' allowed."
 msgstr "tylko skalarne 'p' oraz 'phi' są dozwolone."
 
-#. R/gam.fit3.r: stop("only scalar `rho' and `theta' allowed.")
+#. R/gam.fit3.r: stop("only scalar 'rho' and 'theta' allowed.")
 #: R/gam.fit3.r:0
-msgid "only scalar `rho' and `theta' allowed."
+msgid "only scalar 'rho' and 'theta' allowed."
 msgstr "tylko skalarne 'rho' oraz 'theta' są dozwolone."
 
 #. R/bam.r: warning("openMP not available: single threaded computation only")
@@ -2052,7 +2047,7 @@ msgstr "współdzielone przesunięcia nie są dozwolone"
 #. R/gamlss.r: stop("shash requires 4 links specified as character strings")
 #: R/gamlss.r:0
 msgid "shash requires 4 links specified as character strings"
-msgstr "shash wymaga 4 linków określonych jako ciągi znaków"
+msgstr "shash wymaga 4 połączeń określonych jako teksty"
 
 #. R/gamm.r: stop("side conditions not allowed for nested smooths")
 #: R/gamm.r:0
@@ -2127,7 +2122,7 @@ msgstr "coś nie tak z przewidywaniem warstwowym"
 #. R/jagam.r: stop("sorry link not yet handled")
 #: R/jagam.r:0
 msgid "sorry link not yet handled"
-msgstr "przepraszamy, link nie jest jeszcze obsługiwany"
+msgstr "przepraszamy, połączenie nie jest jeszcze obsługiwane"
 
 #. R/plots.r: warning("sorry no option for contouring with errors: try plot.gam")
 #: R/plots.r:0
@@ -2323,7 +2318,7 @@ msgstr "nazwy zmiennych nie zgadzają się z nazwami granic"
 #. R/gam.fit3.r: stop("variance function not recognized for quasi")
 #: R/gam.fit3.r:0
 msgid "variance function not recognized for quasi"
-msgstr "funkcja wariancji nie została rozpoznana dla kwazi"
+msgstr "funkcja wariancji nie została rozpoznana dla quasi"
 
 #. R/plots.r: gettextf("view variables must be one of %s", paste(v.names, collapse = ", "))
 #: R/plots.r:0
@@ -2388,7 +2383,7 @@ msgstr "'y' musi zawierać jedną zmienną jeśli nie zawiera dwóch"
 #. R/gamlss.r: stop("ziplss requires 2 links specified as character strings")
 #: R/gamlss.r:0
 msgid "ziplss requires 2 links specified as character strings"
-msgstr "ziplss wymaga 2 linków określonych jako ciągi znaków"
+msgstr "ziplss wymaga 2 połączeń określonych jako teksty"
 
 #. R/smooth.r: ngettext(nk, "there should be %d knot supplied", "there should be %d knots supplied")
 #. R/smooth.r: ngettext(nk + 2 * m[1] + 2, "there should be %d knot supplied",     "there should be %d knots supplied")
@@ -2428,8 +2423,8 @@ msgstr[2] "powinno być dostarczonych %d węzłów"
 #~ msgstr "nrow(M$X) != length(M$y)"
 
 #, fuzzy
-#~ msgid "\"%s\" link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\""
-#~ msgstr "połączenie niedostępne dla regresji beta; dostępne linki to \"logit\", \"probit\", \"cloglog\" oraz \"cauchit\""
+#~ msgid "\"%s\" link not available for beta regression; available links are \"logit\", \"probit\", \"cloglog\" and \"cauchit\""
+#~ msgstr "połączenie niedostępne dla regresji beta; dostępne połączenia to \"logit\", \"probit\", \"cloglog\" oraz \"cauchit\""
 
 #, fuzzy
 #~ msgid "\"%s\" link not available for negative binomial family; available links are \"identity\", \"log\" and \"sqrt\""
@@ -2440,7 +2435,7 @@ msgstr[2] "powinno być dostarczonych %d węzłów"
 #~ msgstr "połączenie nie jest dostępne dla skalowanego rozkładu t; dostępne połączenia to \"identity\", \"log\", oraz \"inverse\""
 
 #, fuzzy
-#~ msgid "\"%s\" link not available for zero inflated; available link for `lambda' is only  \"loga\""
+#~ msgid "\"%s\" link not available for zero inflated; available link for 'lambda' is only \"loga\""
 #~ msgstr "połączenie nie jest dostępne dla rozkładu z zerowym zawyżeniem; dostępne połączenia dla 'lambda' to tylko \"loga\""
 
 #~ msgid "absorb.cons must be TRUE for multi-formula models"
@@ -2521,7 +2516,7 @@ msgstr[2] "powinno być dostarczonych %d węzłów"
 #~ msgid "nlm.fd not available with negative binomial Theta estimation"
 #~ msgstr "'nlm.fd' nie jest dostępne z ujemnym oszacowaniem Theta rozkładu Pascala"
 
-#~ msgid "only outer methods `newton' & `bfgs' supports `negbin' family and theta selection: reset"
+#~ msgid "only outer methods 'newton' & 'bfgs' supports 'negbin' family and theta selection: reset"
 #~ msgstr "tylko zewnętrzne metody 'newton' oraz 'bfgs' wspierają rodzinę 'negbin' oraz wybór theta: reset"
 
 #~ msgid "x has no row attribute"

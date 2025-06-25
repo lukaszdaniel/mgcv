@@ -651,7 +651,7 @@ gamm.setup <- function(formula,pterms,
                  data=data,knots=knots,sp=NULL,
                  min.sp=NULL,H=NULL,absorb.cons=TRUE,sparse.cons=0,gamm.call=TRUE)
  
-  if (!is.null(G$L)) stop("gamm can not handle linked smoothing parameters (probably from use of `id' or adaptive smooths)")
+  if (!is.null(G$L)) stop("gamm can not handle linked smoothing parameters (probably from use of 'id' or adaptive smooths)")
   # now perform re-parameterization...
 
   first.f.para <- G$nsdf+1 

@@ -207,7 +207,7 @@ gam.fit3 <- function (x, y, sp, Eb,UrS=list(),
     linkinv <- family$linkinv
     mu.eta <- family$mu.eta
     if (!is.function(variance) || !is.function(linkinv)) 
-        stop("illegal `family' argument")
+        stop("invalid 'family' argument")
     valideta <- family$valideta
     if (is.null(valideta)) 
         valideta <- function(eta) TRUE
@@ -620,7 +620,7 @@ gam.fit3 <- function (x, y, sp, Eb,UrS=list(),
             REML1 <- oo$D1/(2*scale*gamma) + oo$trA1/2 - rp$det1/2 
             if (deriv==2) REML2 <- (matrix(oo$D2,nSp,nSp)/(scale*gamma) + matrix(oo$trA2,nSp,nSp) - rp$det2)/2
             if (sum(!is.finite(REML2))) {
-               stop("Non finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'")
+               stop("Non finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'")
             }
           }
           if (!scale.known&&deriv) { ## need derivatives wrt log scale, too 
@@ -758,7 +758,7 @@ gam.fit3 <- function (x, y, sp, Eb,UrS=list(),
           
              if (sum(!is.finite(D1))||sum(!is.finite(P1))||sum(!is.finite(trA1))) { 
                  stop(
-               "Non-finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'")
+               "Non-finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'")
              }
          
              delta.3 <- delta*delta.2
@@ -774,7 +774,7 @@ gam.fit3 <- function (x, y, sp, Eb,UrS=list(),
               
                if (sum(!is.finite(D2))||sum(!is.finite(P2))||sum(!is.finite(trA2))) { 
                  stop(
-                 "Non-finite derivatives. Try decreasing fit tolerance! See `epsilon' in `gam.contol'")
+                 "Non-finite derivatives. Try decreasing fit tolerance! See 'epsilon' in 'gam.contol'")
                }
              
                GCV2 <- outer(trA1,D1)
@@ -2708,7 +2708,7 @@ ldTweedie0 <- function(y,mu=y,p=1.5,phi=1,rho=NA,theta=NA,a=1.001,b=1.999) {
 ## Original fixed p and phi version.
 
   if (!is.na(rho)&&!is.na(theta)) { ## use rho and theta and get derivs w.r.t. these
-    if (length(rho)>1||length(theta)>1) stop("only scalar `rho' and `theta' allowed.")
+    if (length(rho)>1||length(theta)>1) stop("only scalar 'rho' and 'theta' allowed.")
     if (a>=b||a<=1||b>=2) stop("1<a<b<2 (strict) required")
     work.param <- TRUE
     th <- theta;phi <- exp(rho)
@@ -2718,7 +2718,7 @@ ldTweedie0 <- function(y,mu=y,p=1.5,phi=1,rho=NA,theta=NA,a=1.001,b=1.999) {
                    ((a-b)*exp(2*th)+(b-a)*exp(th))/(exp(th)+1)^3
   } else { ## still need working params for tweedious call...
     work.param <- FALSE 
-    if (length(p)>1||length(phi)>1) stop("only scalar `p' and `phi' allowed.")
+    if (length(p)>1||length(phi)>1) stop("only scalar 'p' and 'phi' allowed.")
     rho <- log(phi)
     if (p>1&&p<2) {
       if (p <= a) a <- (1+p)/2
@@ -2838,7 +2838,7 @@ ldTweedie <- function(y,mu=y,p=1.5,phi=1,rho=NA,theta=NA,a=1.001,b=1.999,all.der
 ## Dunn & Smyth (2005) Statistics and Computing 15:267-280.
   n <- length(y)
   if (all(!is.na(rho))&&all(!is.na(theta))) { ## use rho and theta and get derivs w.r.t. these
-    #if (length(rho)>1||length(theta)>1) stop("only scalar `rho' and `theta' allowed.")
+    #if (length(rho)>1||length(theta)>1) stop("only scalar 'rho' and 'theta' allowed.")
     if (a>=b||a<=1||b>=2) stop("1<a<b<2 (strict) required")
     work.param <- TRUE
     ## should buffered code for fixed p and phi be used?
@@ -2861,7 +2861,7 @@ ldTweedie <- function(y,mu=y,p=1.5,phi=1,rho=NA,theta=NA,a=1.001,b=1.999,all.der
   } else { ## still need working params for tweedious call...
     work.param <- FALSE
     if (all.derivs) warning("all.derivs only available in rho, theta parameterization")
-    #if (length(p)>1||length(phi)>1) stop("only scalar `p' and `phi' allowed.")
+    #if (length(p)>1||length(phi)>1) stop("only scalar 'p' and 'phi' allowed.")
     buffer <- if (length(unique(p))==1&&length(unique(phi))==1) TRUE else FALSE 
     rho <- log(phi)
     if (min(p)>=1&&max(p)<=2) {

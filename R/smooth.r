@@ -588,7 +588,7 @@ t2 <- function(..., k=NA,bs="cr",m=NA,d=NA,by=NA,xt=NULL,id=NULL,sp=NULL,full=FA
   if (!is.null(id)) { 
     if (length(id)>1) { 
       id <- id[1]
-      warning("only first element of `id' used")
+      warning("only first element of 'id' used")
     } 
     id <- as.character(id)
   }
@@ -3901,7 +3901,7 @@ smoothCon <- function(object,data,knots=NULL,absorb.cons=FALSE,scale.penalty=TRU
     matrixArg <- TRUE 
     ## now get the number of columns in the matrix argument...
     if (is.null(sm$ind)) q <- nrow(sm$X)/n else q <- length(sm$ind)/n
-    if (!is.null(sm$by.done)) warning("handling `by' variables in smooth constructors may not work with the summation convention ")
+    if (!is.null(sm$by.done)) warning("handling 'by' variables in smooth constructors may not work with the summation convention ")
   } else {
     matrixArg <- FALSE
     if (!is.null(sm$ind)) {  ## unpack model matrix + any offset

@@ -1932,7 +1932,7 @@ betar <- function (theta = NULL, link = "logit",eps=.Machine$double.eps*100) {
 #            if (!is.null(stats$name))
 #                linktemp <- stats$name
 #        }
-#        else stop(linktemp, " link not available for beta regression; available links are  \"logit\", \"probit\", \"cloglog\" and \"cauchit\"")
+#        else stop(linktemp, " link not available for beta regression; available links are \"logit\", \"probit\", \"cloglog\" and \"cauchit\"")
 #    }
    
     n.theta <- 1
