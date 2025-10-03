@@ -426,7 +426,6 @@ void QPCLS(matrix *Z,matrix *X, matrix *p, matrix *y,matrix *Ain,matrix *b,matri
 
 { matrix Q,T,Rf,PX,Py,a,P,p1,s,c,Xy,y1,u,Pd,pz,pk;
   int k,i,j,tk,*I,*ignore,*fixed,*delog,maxdel=100;
-  double x;
   I=(int *)CALLOC((size_t) p->r,sizeof(int)); /* I[i] is the row of Ain containing ith active constraint */
   fixed=(int *)CALLOC((size_t) p->r,sizeof(int)); /* fixed[i] is set to 1 when the corresponding inequality constraint is to be left in regardless of l.m. estimate */
   ignore=(int *)CALLOC((size_t) Ain->r,sizeof(int)); /* ignore[i] is 1 if ith row of Ain is in active set, 0 otherwise */
@@ -504,7 +503,7 @@ void QPCLS(matrix *Z,matrix *X, matrix *p, matrix *y,matrix *Ain,matrix *b,matri
       } else  /* routine has arrived at a minimum */
       { /* feasibility check..... */
         /*matmult(P,*Ain,*p,0,0);
-          x=0.0;for (i=0;i<P.r;i++) if (P.V[i]-b->V[i]<x) x=P.V[i]-b->V[i];
+          double x=0.0;for (i=0;i<P.r;i++) if (P.V[i]-b->V[i]<x) x=P.V[i]-b->V[i];
           printf("P\n Worst feasibility violation %g",x);*/
         /* create Z - this version is a full null space matrix, rather than sequence of rotations */
         *Z=Q; Z->c -= tk;

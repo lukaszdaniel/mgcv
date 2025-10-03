@@ -2986,7 +2986,7 @@ void ncvd(double *NCV,double *NCV1,double *NCV2,double *beta,double *db, double 
    
    On exit rsd contains first weighted cross-validated residual for each neighbourhood.  
 */
-  double *A,*A2,**A1,*Aaa,*IAaa,*Ap,*Aaap,*IA,*IAp,*ba,*bp,*rp,one=1.0,zero=0.0,*dp0,*dp1,*dp2,
+  double *A = NULL,*A2 = NULL,**A1,*Aaa,*IAaa,*Ap,*Aaap,*IA,*IAp,*ba,*bp,*rp,one=1.0,zero=0.0,*dp0,*dp1,*dp2,
     *dp3,xx,*L,**beta1,**mu1,**P,*wij,*wp,**ba1,**IAdAIA,*B,*ba1p,**L1,*IAdAIAp,***beta2,*mu2,
     *V2,*U,*ba2,*NCVth,*NCV1th,*NCV2th,*ba2p,*Arp,*Alp,*IAdAIArp,*work,***L2,***U2,*Vl,*xbdwork,*rsd1;
   int ncs=0,dum,i1,i,j,M,q,r,info=1,*k1p,*k2p,*a1p,*a2p,tid=0,maxM,maxM2,*xbiwork,
