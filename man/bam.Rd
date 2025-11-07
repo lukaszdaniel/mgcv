@@ -225,6 +225,8 @@ Li, Z & S.N. Wood (2020) Faster model matrix crossproducts for large generalized
 
 \section{WARNINGS }{
 
+For \code{method} set to \code{"fREML"}, \code{"REML"} or \code{"ML"} the returned smoothness criterion value is for the model itself, otherwise for the working model. The former is comparable to \code{gam} (but typically a little larger, since it was the working model version that was actually optimized), the latter not.   
+
 The routine may be slower than optimal if the default \code{"tp"} basis is used. 
 
 This routine is less stable than `gam' for the same dataset.

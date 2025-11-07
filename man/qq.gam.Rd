@@ -58,7 +58,6 @@ Computational Statistics & Data Analysis. 56(8), 2404-2409.
 
 M.G. Ben and V.J. Yohai (2004) JCGS 13(1), 36-47.
 
-\url{https://www.maths.ed.ac.uk/~swood34/}
 
 }
 \author{ Simon N. Wood \email{simon.wood@r-project.org}}

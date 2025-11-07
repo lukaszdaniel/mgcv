@@ -14,9 +14,12 @@ approach is sufficient for implementing a wide range of commonly used random eff
 \code{s(g,bs="re")} produces a random coefficient for each level of \code{g}, with the random coefficients all modelled as i.i.d. normal. If \code{g} is a factor and \code{x} is numeric, then \code{s(x,g,bs="re")} produces an i.i.d. normal random slope relating the response to \code{x} for each level of \code{g}. If \code{h} is another factor then \code{s(h,g,bs="re")} produces the usual i.i.d. normal \code{g} - \code{h} interaction. Note that a rather useful approximate test for zero random effect is also implemented for such terms based on Wood (2013). If the precision
 matrix is known to within a multiplicative constant, then this can be supplied via the \code{xt} argument of \code{s}. See \link{smooth.construct.re.smooth.spec} for details and example. Some models require differences between different levels of the same random effect: these can be implemented as described in \code{\link{linear.functional.terms}}.
 
+
 Alternatively, but less straightforwardly, the \code{paraPen} argument to \code{\link{gam}} can be used: 
-see \code{\link{gam.models}}. If smoothing parameter estimation is by ML or REML (e.g. \code{gam(...,method="REML")}) then this approach is 
-a completely conventional likelihood based treatment of random effects.
+see \code{\link{gam.models}}.
+
+If smoothing parameter estimation is by ML or REML (e.g. \code{gam(...,method="REML")}) then this approach is 
+a completely conventional likelihood based treatment of random effects, using a full Laplace approximation to the (restricted) marginal likelihood. However note that MAP estimates of the model coefficients are returned. For the fixed effects in non-Gaussian cases, these are only approximately the MLEs (with the random effects integrated out), and the difference can be large in some circumstances.      
 
 \code{gam} can be slow for fitting models with large numbers of random effects, because it does not exploit the sparsity that is often a feature
 of parametric random effects. It can not be used for models with more coefficients than data. However \code{gam} is often faster and more reliable 
@@ -26,6 +29,9 @@ To facilitate the use of random effects with \code{gam}, \code{\link{gam.vcomp}}
 smoothing parameters to variance components. It also provides confidence intervals, if smoothness estimation is by ML or REML. 
 
 Note that treating random effects as smooths does not remove the usual problems associated with testing variance components for equality to zero: see \code{\link{summary.gam}} and \code{\link{anova.gam}}.   
+
+Note also that 
+
 
 }
 

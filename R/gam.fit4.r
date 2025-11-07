@@ -732,7 +732,8 @@ gam.fit4 <- function(x, y, sp, Eb,UrS=list(),
      lsth2 <- if (nt>0) as.matrix(ls$lsth2)[1:nt,1:nt] else matrix(0,0,0) ## exclude any derivs w.r.t log scale here
      REML <- ((dev+oo$P)/(2*scale) - ls$ls)/gamma + (oo$ldet - rp$det)/2 - 
              as.numeric(scoreType=="REML") * Mp * (log(2*pi*scale)/2-log(gamma)/2)
-     
+     attr(REML,"ml.pen") <- oo$P/(2*scale*gamma) + (oo$ldet - rp$det)/2 - 
+                            as.numeric(scoreType=="REML") * Mp * (log(2*pi*scale)/2-log(gamma)/2)
      if (deriv) {
        det1 <- oo$ldet1
        if (nSp) {
@@ -1099,11 +1100,11 @@ gam.fit5 <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,deriv=2,family,scoreTyp
     while ((!is.finite(ll1)||ll1 <= ll0) && khalf < 25) { ## step halve until it succeeds...
       step <- step/fac;coef1 <- coef + step
       ll <- llf(y,x,coef1,weights,family,offset=offset,deriv=0)
-      ll1 <- ll$l - (t(coef1)%*%St%*%coef1)/2
+      ll1 <- ll$l - drop(t(coef1)%*%St%*%coef1)/2
       if (is.finite(ll1)&&ll1>=ll0) { ## improvement, or at least no worse.
         ll <- llf(y,x,coef1,weights,family,offset=offset,deriv=1)
       }
-      if (ll1 == ll0) no.change <- no.change + 1 
+      if (is.finite(ll1) && ll1 == ll0) no.change <- no.change + 1 
       ## abort if step has made no difference (e.g. 2 iteractions of exactly no improvement)...
       if (max(abs(coef-coef1))<max(abs(coef))*.Machine$double.eps||no.change>1) khalf <- 100
       khalf <- khalf + 1
@@ -1128,11 +1129,11 @@ gam.fit5 <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,deriv=2,family,scoreTyp
     while ((!is.finite(ll1)||(ll1 <= ll0 && !iconv)) && khalf < 25) { ## step cut until it succeeds...
       step <- step/10;coef1 <- coef + step
       ll <- llf(y,x,coef1,weights,family,offset=offset,deriv=0)
-      ll1 <- ll$l - (t(coef1)%*%St%*%coef1)/2
+      ll1 <- ll$l - drop(t(coef1)%*%St%*%coef1)/2
       if (is.finite(ll1)&&ll1>=ll0) { ## improvement, or no worse
         ll <- llf(y,x,coef1,weights,family,offset=offset,deriv=1)
       }
-      if (ll1 == ll0) no.change <- no.change + 1
+      if (is.finite(ll1) && ll1 == ll0) no.change <- no.change + 1
       ## abort if step has made no difference...
       if (max(abs(coef-coef1))<max(abs(coef))*.Machine$double.eps||no.change>1) khalf <- 100 ## step gone nowhere
       khalf <- khalf + 1
@@ -1152,7 +1153,7 @@ gam.fit5 <- function(x,y,lsp,Sl,weights=NULL,offset=NULL,deriv=2,family,scoreTyp
             coef <- coef*(1+(rep_len(c(0,1),length(coef))*.02-.01)*perturbed) + 
                     (rep_len(c(0,1),length(coef)) - 0.5 ) * mean(abs(coef))*1e-5*perturbed 
             ll <- llf(y,x,coef,weights,family,offset=offset,deriv=1) 
-            ll0 <- ll$l - (t(coef)%*%St%*%coef)/2
+            ll0 <- ll$l - drop(t(coef)%*%St%*%coef)/2
 	    grad <- ll$lb - St%*%coef
             Hp <- -ll$lbb+St
           } else {        

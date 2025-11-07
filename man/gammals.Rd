@@ -3,7 +3,7 @@
 %- Also NEED an `\alias' for EACH other topic documented here.
 \title{Gamma location-scale model family}
 \description{The \code{gammals} family implements gamma location scale additive models in which 
-the log of the mean, \eqn{\mu}{m}, and the log of the scale parameter, \eqn{\phi}{s} (see details) can depend on additive smooth predictors.The parameterization is of the usual GLM type where the variance of the response is given by \eqn{\phi\mu^2}{sm^2}. Useable only with \code{\link{gam}}, the linear predictors are specified via a list of formulae.
+the log of the mean, \eqn{\mu}{m}, and the log of the scale parameter, \eqn{\phi}{s} (see details) can depend on additive smooth predictors. The parameterization is of the usual GLM type where the variance of the response is given by \eqn{\phi\mu^2}{sm^2}. Useable only with \code{\link{gam}}, the linear predictors are specified via a list of formulae.
 }
 
 \usage{
@@ -17,7 +17,7 @@ gammals(link=list("identity","log"),b=-7)
  An object inheriting from class \code{general.family}.
 }
 
-\details{Used with \code{\link{gam}} to fit gamma location - scale models parameterized in terms of the log mean and the log scale parameter (the response variance is the squared mean multiplied by the scale parameter). Note that \code{identity} links mean that the linear predictors give the log mean and log scale directly. By default the \code{log} link for the scale parameter simply forces the log scale parameter to have a lower limit given by argument \code{b}: if \eqn{\eta}{l} is the linear predictor for the log scale parameter, \eqn{\phi}{s}, then \eqn{\log \phi = b + \log(1+e^\eta)}{log(s) = b + log(1+e^l)}. 
+\details{Used with \code{\link{gam}} to fit gamma location - scale models parameterized in terms of the log mean and the log scale parameter (the response variance is the squared mean multiplied by the scale parameter). Note that \code{identity} links mean that the linear predictors give the log mean and log scale directly. By default the \code{log} link for the scale parameter simply forces the log scale parameter to have a lower limit given by argument \code{b}: if \eqn{\eta}{l} is the linear predictor for the log scale parameter, \eqn{\phi}{s}, then \eqn{\log \phi = b + \log(1+e^{\eta-b})}{log(s) = b + log(1+e^(l-b))}. 
 
 
 \code{gam} is called with 

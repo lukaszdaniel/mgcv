@@ -37,11 +37,7 @@ notLog(x)
 
 \author{ Simon N. Wood \email{simon.wood@r-project.org}}
 
-\references{
 
-\url{https://www.maths.ed.ac.uk/~swood34/}
-
-}
 
 \seealso{ \code{\link{pdTens}}, \code{\link{pdIdnot}},  \code{\link{gamm}}}
 

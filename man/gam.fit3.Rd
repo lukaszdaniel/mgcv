@@ -129,8 +129,6 @@ models. Journal of the Royal Statistical Society (B) 73(1):3-36
 O 'Sullivan, Yandall and Raynor (1986) Automatic smoothing of regression
 functions in generalized linear models. J. Amer. Statist. Assoc. 81:96-103.
 
-\url{https://www.maths.ed.ac.uk/~swood34/}
-
 }
 \author{ Simon N. Wood \email{simon.wood@r-project.org}
 
@@ -139,7 +137,7 @@ by the R core (see \code{\link{glm.fit}} for further credits).
 }
 
 
-\seealso{\code{\link{gam.fit}},  \code{\link{gam}}, \code{\link{magic}}}
+\seealso{\code{\link{gam}}, \code{\link{magic}}}
 
 
 \keyword{models} \keyword{smooth} \keyword{regression}%-- one or more ...

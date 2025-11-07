@@ -6,7 +6,7 @@ Liable to change in future release:
   change to "REML". (1.8-24, June 2018) 
 
 Currently deprecated and liable to be removed:
-- gam.fit and full.score (1.9-0)
+- gam.fit (1.9-0, July 2023)
 
 Issues: 
 
@@ -21,7 +21,57 @@ present, and reparameterization needs checking (also for bam).
 * bam(...,discrete=TRUE) has no option to use the identical
 	discretizaton to that used in fitting when predicting
 
-* efsud Vb every time? Fix bam NCV variance comp, to be as gam.
+1.9-4
+
+*** scasm function provided for shape constrained additive smooth models, via
+ linear and quadratic programming, with smoothness by extended Fellner-Schall. 
+
+* Censored Box-Cox Gaussian, bcg, family introduced. 
+
+* plot.gam now allows plotting of derivatives of 1-D smooth terms, to give 
+  direct analogue of GLM regression coefficients, also some re-arrangement to
+	allow use of bootstrap samples for uncertainty bands.
+
+* predict.gam now allows a 'bs' field of simulated replicate parameter vectors,
+  and direct computation of CIs at different levels. 	
+
+* New scheme 2 for default 1-D plots. 
+
+* bam now returns approx REML/ML for the model itself, rather than for the 
+  working linearized model (other smoothness criteria still reported for 
+  working model only). 
+
+* Improved scale estimation initialization for extended families in bam: can
+  make a noticable difference with 'tw' family in close to Poisson situation.  
+
+* 4-D plotting code axis error fix (y axis labels were being recycled from 
+  x axis labels).
+
+* Long ignored argument 'shade' removed from 'plot.gam'.  
+
+* cnorm/clog single vector response fix. 
+
+* cnorm and cpois improved numerical stability.
+
+* Fix of one letter typo in gam.outer call to efsud that caused offsets to be 
+ignored. Thanks to Brian Montgomery for reporting the problem. 
+
+* nat.param now warns is model matrix not full rank.
+
+* sf and sw soap films given new classes to avoid clas=h with sf package 
+	- thanks Gavin Simpson.
+
+* Slight change to gammals scale link to make interpretation more
+  straightforward.	
+
+* gumbls link change and derivative correction.
+
+* Added option to inSide to allow nmes for x and y to be provided.
+
+* gam.vcomp modified to have a print method, rather than print itself - thanks
+ to Gavin Simpson. 
+
+* long deprecated function full.score removed. 
 
 1.9-3
 

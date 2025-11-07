@@ -21,9 +21,7 @@ even coverage, where even means having approximately the same number of data bet
 
 \value{ An array of knot locations.
 }
-\references{
-\url{https://www.maths.ed.ac.uk/~swood34/}
-}
+
 \author{ Simon N. Wood \email{simon.wood@r-project.org}} 
 
 \seealso{ \code{\link{smooth.construct.cc.smooth.spec}}  }

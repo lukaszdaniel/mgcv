@@ -1,4 +1,4 @@
-## (c) Simon N. Wood (2013-2022) distributed under GPL2
+## (c) Simon N. Wood (2013-2025) distributed under GPL2
 ## Code for the gamlss families.
 ## idea is that there are standard functions converting
 ## derivatives w.r.t. mu to derivatives w.r.t. eta, given 
@@ -229,7 +229,7 @@ gamlss.ncv <- function(X,y,wt,nei,beta,family,llf,H=NULL,Hi=NULL,R=NULL,offset=N
 } ## gamlss.ncv
 
 gamlss.etamu <- function(l1,l2,l3=NULL,l4=NULL,ig1,g2,g3=NULL,g4=NULL,i2,i3=NULL,i4=NULL,deriv=0) {
-## lj is the array of jth order derivatives of l
+## lj is the array of jth order derivatives of l w.r.t. patrameters
 ## gj[,k] contains the jth derivatives for the link of the kth lp
 ## ig1 is one over first deriv of link
 ## kth parameter. This routine transforms derivatives 
@@ -594,7 +594,9 @@ gamlss.gH <- function(X,jj,l1,l2,i2,l3=0,i3=0,l4=0,i4=0,d1b=0,d2b=0,deriv=0,fh=N
 ## d1b and d2b are first and second derivatives of beta w.r.t. sps.
 ## fh is a factorization of the penalized hessian, while D contains the corresponding
 ##    Diagonal pre-conditioning weights.
-## deriv: 0 - just grad and Hess
+## deriv: < -2 - bootstrap the gradients only: abs(deriv)-1 is the number of reps
+##       -2 - a single bootstrap rep of the gradient and Hessian
+##        0 - just grad and Hess
 ##        1 - tr(Hp^{-1} dH/drho_j) vector - Hp^{-1} must be supplied in fh
 ##        2 - first deriv of Hess
 ##        3 - everything.
@@ -607,56 +609,67 @@ gamlss.gH <- function(X,jj,l1,l2,i2,l3=0,i3=0,l4=0,i4=0,d1b=0,d2b=0,deriv=0,fh=N
     sparse <- discrete <- FALSE
     p <- ncol(X);n <- nrow(X)
   }  
-  trHid2H <- d1H <- d2H <- NULL ## defaults
+  lbb <- trHid2H <- d1H <- d2H <- NULL ## defaults
   ifunc <- !is.array(i2) ## are index functions provided in place of index arrays?
 
-  ## the gradient...
+  ## the gradient, or boostrap versions thereof...
   l1map <- attr(l1,"remap")
-  lb <- rep(0,p)
-  if (is.null(l1map)) { ## all cols of l1 supplied
-    for (i in 1:K) { ## first derivative loop
-      lb[jj[[i]]] <- lb[jj[[i]]] + if (discrete) XWyd(X$Xd,rep(1,n),l1[,i],X$kd,X$ks,X$ts,X$dt,X$v,X$qc,X$drop,lt=X$lpid[[i]]) else
-                     colSums(l1[,i]*X[,jj[[i]],drop=FALSE]) ## !
+  lb <- rep(0,p); nobs <- nrow(X) 
+  nbs <- if (deriv<0) abs(deriv)-1 else 0 ## number of bootstrap reps
+  if (nbs) lbs <- matrix(0,p,nbs) ## storage for BS reps
+  for (r in 1:max(1,nbs)) {
+    #wbs <- if (nbs)  tabulate(sample(nobs,replace=TRUE),nobs) else rep(1,nobs) ## bootstrap weights
+    wbs <- if (nbs)  sample(c(-1,1),nobs,replace=TRUE) else rep(1,nobs) ## bootstrap weights EXPERIMENTAL
+    if (is.null(l1map)) { ## all cols of l1 supplied
+      for (i in 1:K) { ## first derivative loop
+        lb[jj[[i]]] <- lb[jj[[i]]] + if (discrete) XWyd(X$Xd,rep(1,n),wbs*l1[,i],X$kd,X$ks,X$ts,X$dt,X$v,X$qc,X$drop,lt=X$lpid[[i]]) else
+                       colSums((wbs*l1[,i])*X[,jj[[i]],drop=FALSE]) ## !
+      }
+    } else { ## only non-zero cols of l1 supplied (only supplied for completeness - unclear any sensible model could ever want this)
+      for (i in 1:K) if (l1map[i]>0) { ## first derivative loop
+        lb[jj[[i]]] <- lb[jj[[i]]] + if (discrete) XWyd(X$Xd,rep(1,n),wbs*l1[,l1map[i]],X$kd,X$ks,X$ts,X$dt,X$v,X$qc,X$drop,lt=X$lpid[[i]]) else
+                       colSums((wbs*l1[,l1map[i]])*X[,jj[[i]],drop=FALSE]) ## !
+      }
     }
-  } else { ## only non-zero cols of l1 supplied (only supplied for completeness - unclear any sensible model could ever want this)
-    for (i in 1:K) if (l1map[i]>0) { ## first derivative loop
-      lb[jj[[i]]] <- lb[jj[[i]]] + if (discrete) XWyd(X$Xd,rep(1,n),l1[,l1map[i]],X$kd,X$ks,X$ts,X$dt,X$v,X$qc,X$drop,lt=X$lpid[[i]]) else
-                     colSums(l1[,l1map[i]]*X[,jj[[i]],drop=FALSE]) ## !
+    if (nbs) {
+      lbs[,r] <- lb; lb[] <- 0
     }
-  }
+  } ## r loop
+  if (nbs) lb <- drop(lbs) ## BS reps returned in lb
   
   ## the Hessian...
-  lbb <- if (sparse) Matrix(0,p,p) else matrix(0,p,p)
-  if (sandwich) { ## reset l2 so that Hessian becomes 'filling' for sandwich estimate
-    if (deriv>0) warning("sandwich requested with higher derivatives")
-    if (!is.null(l1map)) stop("sandwich requested with structurally zero first derivatives - can't be sensible")
-    k <- 0;
-    for (i in 1:K) for (j in i:K) { k <- k + 1;l2[,k] <- l1[,i]*l1[,j] }
-    attr(l2,"remap") <- NULL ## l2 has to be full now.
-  }
-
-  l2map <- attr(l2,"remap")
-  if (is.null(l2map)) { ## l2 supplied with all columns
-    for (i in 1:K) for (j in i:K) {
-      ## A <- t(X[,jj[[i]],drop=FALSE])%*%(l2[,i2[i,j]]*X[,jj[[j]],drop=FALSE])
-      mi2 <- if (ifunc) i2(i,j) else i2[i,j] 
-      A <- if (discrete) XWXd(X$Xd,w=l2[,mi2],k=X$kd,ks=X$ks,ts=X$ts,dt=X$dt,v=X$v,qc=X$qc,nthreads=1,drop=X$drop,lt=X$lpid[[i]],rt=X$lpid[[j]]) else
-             crossprod(X[,jj[[i]],drop=FALSE],l2[,mi2]*X[,jj[[j]],drop=FALSE])
-      lbb[jj[[i]],jj[[j]]] <- lbb[jj[[i]],jj[[j]]] + A 
-      if (j>i) lbb[jj[[j]],jj[[i]]] <- lbb[jj[[j]],jj[[i]]] + t(A) 
-    } 
-  } else { ## l2 supplied with zero columns dropped
-     for (i in 1:K) for (j in i:K) {
-      mi2 <- if (ifunc) i2(i,j) else i2[i,j]
-      if (l2map[mi2]>0) {
-        A <- if (discrete) XWXd(X$Xd,w=l2[,l2map[mi2]],k=X$kd,ks=X$ks,ts=X$ts,dt=X$dt,v=X$v,qc=X$qc,nthreads=1,drop=X$drop,lt=X$lpid[[i]],rt=X$lpid[[j]]) else
-             crossprod(X[,jj[[i]],drop=FALSE],l2[,l2map[mi2]]*X[,jj[[j]],drop=FALSE])
-        lbb[jj[[i]],jj[[j]]] <- lbb[jj[[i]],jj[[j]]] + A 
-        if (j>i) lbb[jj[[j]],jj[[i]]] <- lbb[jj[[j]],jj[[i]]] + t(A)
-      }	
+  if (deriv >= -2) {
+    lbb <- if (sparse) Matrix(0,p,p) else matrix(0,p,p)
+    if (sandwich) { ## reset l2 so that Hessian becomes 'filling' for sandwich estimate
+      if (deriv>0) warning("sandwich requested with higher derivatives")
+      if (!is.null(l1map)) stop("sandwich requested with structurally zero first derivatives - can't be sensible")
+      k <- 0;
+      for (i in 1:K) for (j in i:K) { k <- k + 1;l2[,k] <- l1[,i]*l1[,j] }
+      attr(l2,"remap") <- NULL ## l2 has to be full now.
     }
-  }
 
+    l2map <- attr(l2,"remap")
+    if (is.null(l2map)) { ## l2 supplied with all columns
+      for (i in 1:K) for (j in i:K) {
+        ## A <- t(X[,jj[[i]],drop=FALSE])%*%(l2[,i2[i,j]]*X[,jj[[j]],drop=FALSE])
+        mi2 <- if (ifunc) i2(i,j) else i2[i,j] 
+        A <- if (discrete) XWXd(X$Xd,w=wbs*l2[,mi2],k=X$kd,ks=X$ks,ts=X$ts,dt=X$dt,v=X$v,qc=X$qc,nthreads=1,drop=X$drop,lt=X$lpid[[i]],rt=X$lpid[[j]]) else
+               crossprod(X[,jj[[i]],drop=FALSE],(wbs*l2[,mi2])*X[,jj[[j]],drop=FALSE])
+        lbb[jj[[i]],jj[[j]]] <- lbb[jj[[i]],jj[[j]]] + A 
+        if (j>i) lbb[jj[[j]],jj[[i]]] <- lbb[jj[[j]],jj[[i]]] + t(A) 
+      } 
+    } else { ## l2 supplied with zero columns dropped
+       for (i in 1:K) for (j in i:K) {
+         mi2 <- if (ifunc) i2(i,j) else i2[i,j]
+         if (l2map[mi2]>0) {
+           A <- if (discrete) XWXd(X$Xd,w=wbs*l2[,l2map[mi2]],k=X$kd,ks=X$ks,ts=X$ts,dt=X$dt,v=X$v,qc=X$qc,nthreads=1,drop=X$drop,
+	        lt=X$lpid[[i]],rt=X$lpid[[j]]) else crossprod(X[,jj[[i]],drop=FALSE],(wbs*l2[,l2map[mi2]])*X[,jj[[j]],drop=FALSE])
+           lbb[jj[[i]],jj[[j]]] <- lbb[jj[[i]],jj[[j]]] + A 
+           if (j>i) lbb[jj[[j]],jj[[i]]] <- lbb[jj[[j]],jj[[i]]] + t(A)
+         }	
+      }
+    }
+  } ## if deriv >= 0
 
   if (deriv>0) {
     ## the first derivative of the Hessian, using d1b
@@ -939,7 +952,7 @@ gaulss <- function(link=list("identity","logb"),b=0.01) {
     l0 <- -.5 * ymu2 * tau2 - .5 * log(2*pi) + log(tau)
     l <- sum(l0)
 
-    if (deriv>0) {
+    if (deriv) {
 
       l1[,1] <- tau2*ymu
       l1[,2] <- 1/tau - tau*ymu2  
@@ -1256,7 +1269,7 @@ multinom <- function(K=1) {
 
     l1 <- matrix(0,n,K) ## first deriv matrix
  
-    if (deriv>0) {
+    if (deriv) {
       for (i in 1:K) l1[,i] <- ee[,i]/beta ## alpha1
     
       ## the second derivatives...
@@ -1271,7 +1284,7 @@ multinom <- function(K=1) {
       ## finish first derivatives...
       for (i in 1:K) l1[,i] <- as.numeric(y==i) - l1[,i] 
 
-    } ## if (deriv>0)
+    } ## if (deriv)
  
     l3 <- l4 <- 0 ## defaults
     tri <- family$tri ## indices to facilitate access to earlier results
@@ -1590,7 +1603,7 @@ zipll <- function(y,g,eta,deriv=0) {
    l[!zind] <- l1ee(eta[!zind]) + yp*g[!zind] - lee1(g[!zind]) - lgamma(yp+1)
    p <- 1-exp(-et) ## probablity of non-zero
 
-   if (deriv>0) { ## get first and second derivs...
+   if (deriv) { ## get first and second derivs...
      n <- length(y)
      l1 <- matrix(0,n,2)
      le <- lde(eta,deriv) ## derivs of ll wrt eta     
@@ -1824,7 +1837,7 @@ ziplss <-  function(link=list("identity","identity")) {
     ## l1 <- matrix(0,n,2)
     zl <- zipll(y,lambda,p,deriv)
 
-    if (deriv>0) {
+    if (deriv) {
       ## need some link derivatives for derivative transform
       ig1 <- cbind(family$linfo[[1]]$mu.eta(eta),family$linfo[[2]]$mu.eta(eta1))
       g2 <- cbind(family$linfo[[1]]$d2link(lambda),family$linfo[[2]]$d2link(p))
@@ -2061,7 +2074,7 @@ gevlss <- function(link=list("identity","identity","logit")) {
     l0  <- (-aa2*(1+xi)*log.aa1)-1/aa1^aa2-rho;
     l <- sum(l0)
 
-    if (deriv>0) {
+    if (deriv) {
       ## first derivatives m, r, x...
       bb1 <- 1/exp1^rho;
       bb2 <- bb1*xi*ymu+1;
@@ -2647,18 +2660,6 @@ twlss <- function(link=list("log","identity","identity"),a=1.01,b=1.99) {
 } ## end twlss
 
 
-lb.linkfun <- function(mu,b=-7) {
-## lower bound link function - see gammals for related routines. 
-  eta <- mub <- mu-b
-  ii <- mub < .Machine$double.eps
-  if (any(ii)) eta[ii] <- log(.Machine$double.eps)
-  jj <- mub > -log(.Machine$double.eps)
-  if (any(jj)) eta[jj] <- mub[jj]
-  jj <- !jj & !ii
-  if (any(jj)) eta[jj] <- log(exp(mub[jj])-1)
-  eta
-} ## lb.linkfun
-
 
 gammals <- function(link=list("identity","log"),b=-7) {
 ## General family for gamma location scale model...
@@ -2685,45 +2686,36 @@ gammals <- function(link=list("identity","log"),b=-7) {
     stats[[i]]$d3link <- fam$d3link
     stats[[i]]$d4link <- fam$d4link
   }
-  if (link[[2]]=="log") { ## g^{-1}(eta) = b + log(1+exp(eta)) link
+  if (link[[2]]=="log") { ## g^{-1}(eta) = b + log(1+exp(eta-b)) link
     stats[[2]]$valideta <- function(eta) TRUE
+
     stats[[2]]$linkfun <- eval(parse(text=paste("function(mu,b=",b,") {\n eta <- mub <- mu-b;\n",
-      "ii <- mub < .Machine$double.eps;\n if (any(ii)) eta[ii] <- log(.Machine$double.eps);\n",
-      "jj <- mub > -log(.Machine$double.eps);if (any(jj)) eta[jj] <- mub[jj];\n",
-      "jj <- !jj & !ii;if (any(jj)) eta[jj] <- log(exp(mub[jj])-1);eta }")))
+      "ii <- mub < .Machine$double.eps;\n if (any(ii)) eta[ii] <- log(.Machine$double.eps)+b;\n",
+      "jj <- mub > -log(.Machine$double.eps);if (any(jj)) eta[jj] <- mub[jj]+b;\n",
+      "jj <- !jj & !ii;if (any(jj)) eta[jj] <- log(exp(mub[jj])-1)+b;eta }")))
 
     stats[[2]]$mu.eta <- eval(parse(text=paste("function(eta,b=",b,") {\n",
-      "ii <- eta < 0;eta <- exp(-eta*sign(eta))\n",
+      "eta <- eta - b; ii <- eta < 0;eta <- exp(-eta*sign(eta))\n",
       "if (any(ii)) { ei <- eta[ii];eta[ii] <- ei/(1+ei)}\n",
       "ii <- !ii;if (any(ii)) eta[ii] <- 1/(1+eta[ii])\n",
       "eta }\n")))
 
     stats[[2]]$linkinv <- eval(parse(text=paste("function(eta,b=",b,") {\n",
-      "mu <- eta;ii <- eta > -log(.Machine$double.eps)\n",
-      "if (any(ii)) mu[ii] <- b + eta[ii]\n",
-      "ii <- !ii;if (any(ii)) mu[ii] <- b + log(1 + exp(eta[ii]))\n",
+      "mu <- eta;ii <- eta-b < -log(.Machine$double.eps)\n",
+      "if (any(ii)) mu[ii] <- b + log1p(exp(eta[ii]-b))\n",
       "mu }\n")))
 
     stats[[2]]$d2link <- eval(parse(text=paste("function(mu,b=",b,") {\n",
-      "eta <- lb.linkfun(mu,b=b); ii <- eta > 0\n",
-      "eta <- exp(-eta*sign(eta))\n",
-      "if (any(ii)) { ei <- eta[ii];eta[ii] <- -(ei^2 + ei) }\n",
-      "ii <- !ii;if (any(ii)) { ei <- eta[ii];eta[ii] <- -(1+ei)/ei^2 }\n",
-      "eta }\n")))
+      "mub <- mu - b; mub <-  exp(-mub*sign(mub))\n",
+      "-mub/(mub-1)^2 }\n")))
 
     stats[[2]]$d3link <- eval(parse(text=paste("function(mu,b=",b,") {\n",
-      "eta <- lb.linkfun(mu,b=b);ii <- eta > 0\n",
-      "eta <- exp(-eta*sign(eta))\n",
-      "if (any(ii)) { ei <- eta[ii]; eta[ii] <- (2*ei^2+ei)*(ei+1) }\n",
-      "ii <- !ii;if (any(ii)) { ei <- eta[ii]; eta[ii] <- (2+ei)*(1+ei)/ei^3 }\n",
-      "eta }\n")))
+      "mub <- mu - b; sm <- -sign(mub);mub <- exp(mub*sm) \n",
+      "sm*(mub+mub^2)/(mub-1)^3 }\n")))
     
     stats[[2]]$d4link <- eval(parse(text=paste("function(mu,b=",b,") {\n",
-      "eta <- lb.linkfun(mu,b=b);ii <- eta > 0\n",
-      "eta <- exp(-eta*sign(eta))\n",
-      "if (any(ii)) { ei <- eta[ii];eta[ii] <- -(6*ei^3+6*ei^2+ei)*(ei+1) }\n",
-      "ii <- !ii;if (any(ii)) { ei <- eta[ii]; eta[ii] <- -(6+6*ei+ei^2)*(1+ei)/ei^4 }\n",
-      "eta }\n")))
+      "mub <- mu - b; sm <- -sign(mub);mub <- exp(mub*sm)\n",
+      "sm*(mub+4*mub^2+mub^3)/(mub-1)^4 }\n")))
   }
 
   residuals <- function(object,type=c("deviance","pearson","response")) {
@@ -2787,8 +2779,9 @@ gammals <- function(link=list("identity","log"),b=-7) {
 
     l0  <-  etlymt-logy-ethmuy-lgamma(eth) ## l
     l <- sum(l0)
+    if (!is.finite(l)) return(list(l=l,l0=l0))
 
-    if (deriv>0) {
+    if (deriv) {
       l1 <- matrix(0,n,2)
      
       l1[,1]  <- ethmuy-eth ## lm
@@ -3014,46 +3007,38 @@ gumbls <- function(link=list("identity","log"),b=-7) {
     stats[[i]]$d3link <- fam$d3link
     stats[[i]]$d4link <- fam$d4link
   }
-  if (link[[2]]=="log") { ## g^{-1}(eta) = b + log(1+exp(eta)) link
+  if (link[[2]]=="log") { ## g^{-1}(eta) = b + log(1+exp(eta-b)) link
     stats[[2]]$valideta <- function(eta) TRUE
+
     stats[[2]]$linkfun <- eval(parse(text=paste("function(mu,b=",b,") {\n eta <- mub <- mu-b;\n",
-      "ii <- mub < .Machine$double.eps;\n if (any(ii)) eta[ii] <- log(.Machine$double.eps);\n",
-      "jj <- mub > -log(.Machine$double.eps);if (any(jj)) eta[jj] <- mub[jj];\n",
-      "jj <- !jj & !ii;if (any(jj)) eta[jj] <- log(exp(mub[jj])-1);eta }")))
+      "ii <- mub < .Machine$double.eps;\n if (any(ii)) eta[ii] <- log(.Machine$double.eps)+b;\n",
+      "jj <- mub > -log(.Machine$double.eps);if (any(jj)) eta[jj] <- mub[jj]+b;\n",
+      "jj <- !jj & !ii;if (any(jj)) eta[jj] <- log(exp(mub[jj])-1)+b;eta }")))
 
     stats[[2]]$mu.eta <- eval(parse(text=paste("function(eta,b=",b,") {\n",
-      "ii <- eta < 0;eta <- exp(-eta*sign(eta))\n",
+      "eta <- eta - b; ii <- eta < 0;eta <- exp(-eta*sign(eta))\n",
       "if (any(ii)) { ei <- eta[ii];eta[ii] <- ei/(1+ei)}\n",
       "ii <- !ii;if (any(ii)) eta[ii] <- 1/(1+eta[ii])\n",
       "eta }\n")))
 
     stats[[2]]$linkinv <- eval(parse(text=paste("function(eta,b=",b,") {\n",
-      "mu <- eta;ii <- eta > -log(.Machine$double.eps)\n",
-      "if (any(ii)) mu[ii] <- b + eta[ii]\n",
-      "ii <- !ii;if (any(ii)) mu[ii] <- b + log(1 + exp(eta[ii]))\n",
+      "mu <- eta;ii <- eta-b < -log(.Machine$double.eps)\n",
+      "if (any(ii)) mu[ii] <- b + log1p(exp(eta[ii]-b))\n",
       "mu }\n")))
 
     stats[[2]]$d2link <- eval(parse(text=paste("function(mu,b=",b,") {\n",
-      "eta <- lb.linkfun(mu,b=b); ii <- eta > 0\n",
-      "eta <- exp(-eta*sign(eta))\n",
-      "if (any(ii)) { ei <- eta[ii];eta[ii] <- -(ei^2 + ei) }\n",
-      "ii <- !ii;if (any(ii)) { ei <- eta[ii];eta[ii] <- -(1+ei)/ei^2 }\n",
-      "eta }\n")))
+      "mub <- mu - b; mub <-  exp(-mub*sign(mub))\n",
+      "-mub/(mub-1)^2 }\n")))
 
     stats[[2]]$d3link <- eval(parse(text=paste("function(mu,b=",b,") {\n",
-      "eta <- lb.linkfun(mu,b=b);ii <- eta > 0\n",
-      "eta <- exp(-eta*sign(eta))\n",
-      "if (any(ii)) { ei <- eta[ii]; eta[ii] <- (2*ei^2+ei)*(ei+1) }\n",
-      "ii <- !ii;if (any(ii)) { ei <- eta[ii]; eta[ii] <- (2+ei)*(1+ei)/ei^3 }\n",
-      "eta }\n")))
+      "mub <- mu - b; sm <- -sign(mub);mub <- exp(mub*sm) \n",
+      "sm*(mub+mub^2)/(mub-1)^3 }\n")))
     
     stats[[2]]$d4link <- eval(parse(text=paste("function(mu,b=",b,") {\n",
-      "eta <- lb.linkfun(mu,b=b);ii <- eta > 0\n",
-      "eta <- exp(-eta*sign(eta))\n",
-      "if (any(ii)) { ei <- eta[ii];eta[ii] <- -(6*ei^3+6*ei^2+ei)*(ei+1) }\n",
-      "ii <- !ii;if (any(ii)) { ei <- eta[ii]; eta[ii] <- -(6+6*ei+ei^2)*(1+ei)/ei^4 }\n",
-      "eta }\n")))
+      "mub <- mu - b; sm <- -sign(mub);mub <- exp(mub*sm)\n",
+      "sm*(mub+4*mub^2+mub^3)/(mub-1)^4 }\n")))
   }
+
 
   residuals <- function(object,type=c("deviance","pearson","response")) {
       mean <- object$fitted.values[,1]
@@ -3127,7 +3112,7 @@ gumbls <- function(link=list("identity","log"),b=-7) {
     
     n <- length(y)
      
-    if (deriv>0) {
+    if (deriv) {
       lz <- ez - 1 ## e^{-z} - 1
       zm <- -eb   ## -e^{-b}
       zb <- -z
@@ -3516,7 +3501,7 @@ shash <- function(link = list("identity", "logeb", "identity", "identity"), b = 
     l0 <-  - tau - 0.5*log(2*pi) + log(CC) - 0.5*.log1pexp(2*log(abs(z))) - 0.5*SS^2 - phiPen*phi^2 
     l <- sum(l0)
     
-    if (deriv>0) {
+    if (deriv) {
       
       zsd <- z*sig*del
       sSp1 <- .sqrtX2pm(z, 1) # sqrt(z^2+1)

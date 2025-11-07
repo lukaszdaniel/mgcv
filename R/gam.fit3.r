@@ -6,7 +6,7 @@
 ## derivatives via the implicit function theorem used. 
 
 
-gam.reparam <- function(rS,lsp,deriv) 
+gam.reparam <- function(rS,lsp,deriv) {
 ## Finds an orthogonal reparameterization which avoids `dominant machine zero leakage' between 
 ## components of the square root penalty.
 ## rS is the list of the square root penalties: last entry is root of fixed. 
@@ -24,7 +24,7 @@ gam.reparam <- function(rS,lsp,deriv)
 ## det -- log |S|
 ## det1 -- dlog|S|/dlog(sp) if deriv >0
 ## det2 -- hessian of log|S| wrt log(sp) if deriv>1  
-{ q <- nrow(rS[[1]])
+  q <- nrow(rS[[1]])
   rSncol <- unlist(lapply(rS,ncol))
   M <- length(lsp) 
   if (length(rS)>M) fixed.penalty <- TRUE else fixed.penalty <- FALSE
@@ -616,6 +616,8 @@ gam.fit3 <- function (x, y, sp, Eb,UrS=list(),
           REML <- (Dp/(2*scale) - ls[1])/gamma + oo$rank.tol/2 - rp$det/2 -
 	          remlInd*(Mp/2*(log(2*pi*scale)-log(gamma)))
           attr(REML,"Dp") <- Dp/(2*scale)
+	  attr(REML,"ml.pen") <- oo$conv.tol/(2*scale*gamma) + oo$rank.tol/2 - rp$det/2 -
+	                         remlInd*(Mp/2*(log(2*pi*scale)-log(gamma)))
           if (deriv) {
             REML1 <- oo$D1/(2*scale*gamma) + oo$trA1/2 - rp$det1/2 
             if (deriv==2) REML2 <- (matrix(oo$D2,nSp,nSp)/(scale*gamma) + matrix(oo$trA2,nSp,nSp) - rp$det2)/2

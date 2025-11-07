@@ -1,5 +1,6 @@
 \name{gam.vcomp}
 \alias{gam.vcomp}
+\alias{print.gam.vcomp}
 %- Also NEED an `\alias' for EACH other topic documented here.
 \title{Report gam smoothness estimates as variance components}
 \description{GAMs can be viewed as mixed models, where the smoothing parameters are related to variance 
@@ -7,10 +8,12 @@ components. This routine extracts the estimated variance components associated w
 }
 \usage{
 gam.vcomp(x,rescale=TRUE,conf.lev=.95)
+
+\method{print}{gam.vcomp}(x,...)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{ 
-\item{x}{ a fitted model object of class \code{gam} as produced by \code{gam()}.}
+\item{x}{ a fitted model object of class \code{gam} as produced by \code{gam()}, or an onject of class \code{gam.vcomp} for the print method.}
 
 \item{rescale}{ the penalty matrices for smooths are rescaled before fitting, for numerical 
 stability reasons, if \code{TRUE} this rescaling is reversed, so that the variance components
@@ -19,6 +22,8 @@ are on the original scale.}
 \item{conf.lev}{ when the smoothing parameters are estimated by REML or ML, then confidence intervals 
 for the variance components can be obtained from large sample likelihood results. This gives the 
 confidence level to work at.}
+
+\item{...}{ other arguments.}
 }
 \details{The (pseudo) inverse of the penalty matrix penalizing a term is proportional to the 
 covariance matrix of the term's coefficients, when these are viewed as random. For single penalty smooths, 
@@ -33,16 +38,33 @@ The routine is particularly useful for model fitted by \code{\link{gam}} in whic
 been incorporated.
 }
 
-\value{ Either a vector of variance components for each smooth term (as standard deviations), or a matrix. The first column of the 
-matrix gives standard deviations for each term, while the subsequent columns give lower and upper confidence bounds, on the same scale.
+\value{
+  Either a vector of variance components for each smooth term (as standard
+  deviations), or a list. A list will be returned if the smoothness selection
+  method used was REML or ML, or where a model has more smoothing parameters
+  than actually estimated.
+  
+  If a list, it will contain some or all of the elements described depending on
+  the method of smoothness selection used, and whether some smoothing parameters
+  were not estimated.
+  
+  Depending on the smoothness selection method, element \code{vc} may contain a
+  matrix or a vector. If REML or ML smoothness selection was used,
+  \code{vc} will be a matrix whose first column gives standard deviations for
+  each term, while the subsequent columns give lower and upper confidence
+  bounds, on the same scale. For models fitted with other smoothness selection
+  methods, component \code{vc} will be a vector of standard deviations.
 
-For models in which there are more smoothing parameters than actually estimated (e.g. if some were fixed, or smoothing parameters are linked) then a list is returned. The \code{vc} element is as above, the \code{all} element is a vector of variance components for all the smoothing parameters (estimated + fixed or replicated).
+  The \code{all} element is a vector of variance components for
+  all the smoothing parameters (estimated + fixed or replicated).
 
-The routine prints a table of estimated standard deviations and confidence limits, if these can be 
-computed, and reports the numerical rank of the covariance matrix.
+  Additionally, for REML or ML smoothness selection, the numerical rank of the
+  covariance matrix and the Hessian matrix are returns as elements \code{rank}
+  and \code{rank.hess} respectively.
+
 }
 
-\author{Simon N. Wood \email{simon.wood@r-project.org}
+\author{Simon N. Wood \email{simon.wood@r-project.org} modified by Gavin Simpson
 }
 
 \references{

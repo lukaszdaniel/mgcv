@@ -388,7 +388,7 @@ plot.jam <- function(x,rug=TRUE,se=TRUE,pages=0,select=NULL,scale=-1,
   plot.gam(x,residuals=FALSE,rug=rug,se=se,pages=pages,select=select,scale=scale,
               n=n,n2=n2,theta=theta,phi=phi,jit=jit,xlab=xlab,
               ylab=ylab,main=main,ylim=ylim,xlim=xlim,too.far=too.far,
-              all.terms=FALSE,shade=shade,shade.col=shade.col,
+              all.terms=FALSE,shade.col=shade.col,
               shift=shift,trans=trans,seWithMean=seWithMean,
               unconditional=FALSE,by.resids=FALSE,
               scheme=scheme,...)

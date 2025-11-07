@@ -80,6 +80,9 @@ Journal of the American Statistical Association 111, 1548-1575
 
 }
 
+\section{WARNINGS }{
+As \code{p} and the scale parameter tend to 1 the Tweedie distribution tends towards a Poisson, however it remains continuously supported, meaning that the corresponding log likelihood does not converge on the Poisson log likelihood. For example, AIC can be radically different for Poisson and Tweedie models for which the fit is almost identical.     
+}
 \seealso{\code{\link{ldTweedie}}, \code{\link{rTweedie}}}
 
 \examples{

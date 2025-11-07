@@ -12,7 +12,6 @@ The following families (class \code{family}) are in the exponential family given
 \item \code{\link{Tweedie}} An exponential family distribution for which the variance of the response is given by the mean response to the power \code{p}. 
 \code{p} is in (1,2) and must be supplied. Alternatively, see \code{\link{tw}} to estimate \code{p} (\code{gam/bam} only).
 \item \code{\link{negbin}} The negative binomial. Alternatively see \code{\link{nb}} to estimate the \code{theta} parameter of the negative binomial (\code{gam/bam} only). 
-
 }
 
 
@@ -21,6 +20,7 @@ which is a sum of independent terms, each corresponding to a single response obs
 \itemize{
 \item \code{\link{betar}} for proportions data on (0,1) when the binomial is not appropriate.
 \item \code{\link{cnorm}} censored normal distribution, for log normal accelerated failure time models, Tobit regression and rounded data, for example.
+\item \code{\link{bcg}} Box-Cox transformed censored Gaussian.
 \item \code{\link{clog}} censored logistic distribution, for accelerated failure time models.
 \item \code{\link{cpois}} censored Poisson distribution. 
 \item \code{\link{nb}} for negative binomial data when the \code{theta} parameter is to be estimated.

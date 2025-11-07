@@ -58,8 +58,6 @@ Pinheiro J.C. and Bates, D.M. (2000) Mixed effects Models in S and S-PLUS. Sprin
 
 The \code{nlme} source code.
 
-\url{https://www.maths.ed.ac.uk/~swood34/}
-
 }
 
 \seealso{ \code{\link{te}}, \code{\link{pdTens}}, \code{\link{notLog2}}, \code{\link{gamm}}}

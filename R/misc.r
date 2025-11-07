@@ -18,7 +18,29 @@ mchol <- function(A) {
   R ## R'R = H[pivot,pivot]
 } ## mchol
 
-dpnorm <- function(x0,x1) {
+logexm1 <- function(x) {
+## compute log(e^x-1), avoiding over or underflow errors
+  xt <- log(1/.Machine$double.eps)+1
+  ii <- x < xt 
+  x[ii] <- log(expm1(x[ii]))
+  x
+} ## logexm1
+
+dpnorm <- function(x0,x1,log.p=FALSE) {
+  ## Cancellation avoiding evaluation of
+  ## exp(a1)*pnorm(x1)-exp(a0)*pnorm(x0) or its log
+  if (any(x0>=x1)) warning("some x0>=x1")
+  ## first avoid 1-1 problems by exchanging and changing sign of double +ve
+  ii <- x1>0&x0>0
+  d <- x0[ii];x0[ii] <- -x1[ii];x1[ii] <- -d
+  p0 <- pnorm(x0,log.p=TRUE); p1 <- pnorm(x1,log.p=TRUE)
+  dp <- p0 + logexm1(p1-p0)
+  if (log.p==FALSE) dp <- exp(dp) 
+  dp
+} ## dpnorm
+
+
+dpnorm0 <- function(x0,x1) { ## old unused
   ## Cancellation avoiding evaluation of pnorm(x1)-pnorm(x0) 
   ## first avoid 1-1 problems by exchanging and changing sign of double +ve
   ii <- x1>0&x0>0
@@ -30,7 +52,7 @@ dpnorm <- function(x0,x1) {
   p[ii] <- dnorm(m)*d
   p[!ii] <- pnorm(x1[!ii]) - pnorm(x0[!ii])
   p
-} ## dpnorm
+} ## dpnorm0
 
 
 "%.%" <- function(a,b) {
@@ -76,7 +98,7 @@ rmvn <- function(n,mu,V) {
     z <- matrix(rnorm(p*n),n,p)%*%t(R) + mu
   } else { 
     if (length(mu)!=p) stop("mu dimensions wrong")
-    z <- t(R%*% matrix(rnorm(p*n),p,n) + mu)
+    z <- t(R%*% matrix(rnorm(p*n),p,n) + as.numeric(mu))
     if (n==1) z <- as.numeric(z)
   }
   z

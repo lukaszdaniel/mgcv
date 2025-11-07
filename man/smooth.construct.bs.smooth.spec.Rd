@@ -1,5 +1,6 @@
 \name{smooth.construct.bs.smooth.spec}
 \alias{smooth.construct.bs.smooth.spec}
+\alias{smooth.construct.sc.smooth.spec}
 \alias{Predict.matrix.Bspline.smooth}
 \alias{b.spline}
 \alias{d.spline}
@@ -9,10 +10,13 @@
 \description{\code{\link{gam}} can use smoothing splines based on univariate B-spline bases
 with derivative based penalties, specified via terms like \code{s(x,bs="bs",m=c(3,2))}. \code{m[1]} controls the spline order, with \code{m[1]=3} being a cubic spline, \code{m[1]=2} being quadratic, and so on. The integrated square of the \code{m[2]}th derivative is used as the penalty. So \code{m=c(3,2)} is a conventional cubic spline. Any further elements of \code{m}, after the first 2, define the order of derivative in further penalties. If \code{m} is supplied as a single number, then it is taken to be \code{m[1]} and \code{m[2]=m[1]-1}, which is only a conventional smoothing spline in the \code{m=3}, cubic spline case. Notice that the definition of the spline order in terms of \code{m[1]} is intuitive, but differs to that used with the \code{\link{tprs}} and \code{\link{p.spline}} bases. See details for options for controlling the interval over which the penalty is evaluated (which can matter if it is necessary to extrapolate).
 
+Shape constrained \code{"sc"} versions are available for use with \code{\link{scasm}}.
+
 }
 
 \usage{
 \method{smooth.construct}{bs.smooth.spec}(object, data, knots)
+\method{smooth.construct}{sc.smooth.spec}(object, data, knots)
 \method{Predict.matrix}{Bspline.smooth}(object, data)
 }
 
@@ -42,7 +46,10 @@ Linear extrapolation is used for prediction that requires extrapolation
 (i.e. prediction outside the range of the interior \code{k-m[1]+1} knots --- the interval over which the penalty is evaluated). Such extrapolation is not
 allowed in basis construction, but is when predicting.
 
-It is possible to set a \code{deriv} flag in a smooth specification or smooth object, so that a model or prediction matrix produces the requested derivative of the spline, rather than evaluating it. 
+It is possible to set a \code{deriv} flag in a smooth specification or smooth object, so that a model or prediction matrix produces the requested derivative of the spline, rather than evaluating it.
+
+Shape constrained versions for use with \code{\link{scasm}} are specified by model terms like \code{s(x,bs="sc",xt="m+")} for a monotonic increasing function, or  \code{s(x,bs="sc",xt=c("m+","c-"))} for increasing and concave (negative second derivative). The vector supplied for \code{xt} can contain any meaningful combination of \code{"+"} (positive), \code{"m+"} (increasing), \code{"m-"} (decreasing), \code{"c+"} (convex) and \code{"c-"} (concave). The constraints will only be processed when used with \code{\link{scasm}}. Constraints can be used in tensor product terms.
+
 }
 
 \section{WARNING}{\code{m[1]} directly controls the spline order here, which is intuitively sensible, but different to other bases.}

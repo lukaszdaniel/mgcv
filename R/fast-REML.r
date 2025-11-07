@@ -1713,6 +1713,8 @@ Sl.fit <- function(Sl,X,y,rho,fixed,log.phi=0,phi.fixed=TRUE,rss.extra=0,nobs=NU
   ## its derivatives....
   reml <- (rss.bSb/(phi*gamma) + (nobs/gamma-Mp)*log(2*pi*phi) + Mp*log(gamma) +
            ldetXXS - ldS$ldetS)/2
+  reml.pen <- (dift$bSb/(phi*gamma) - Mp*log(2*pi*phi) + Mp*log(gamma) +
+              ldetXXS - ldS$ldetS)/2 ## subtract from log lik to get REML 	   
   reml1 <-  (dXXS$d1[!fixed] - ldS$ldet1 + # dift$bSb1[!fixed]/phi)/2 
             (dift$rss1[!fixed] + dift$bSb1[!fixed])/(phi*gamma))/2
 
@@ -1732,7 +1734,7 @@ Sl.fit <- function(Sl,X,y,rho,fixed,log.phi=0,phi.fixed=TRUE,rss.extra=0,nobs=NU
   #list(reml=dift$rss,reml1=dift$rss1,reml2=dift$rss2)
   #list(reml=dift$bSb,reml1=dift$bSb1,reml2=dift$bSb2) 
   list(reml=as.numeric(reml),reml1=reml1,reml2=reml2,beta=beta[rp],PP=PP,
-       rp=ldS$rp,rss=dift$rss+rss.extra,nobs=nobs,d1b=dift$d1b)
+       rp=ldS$rp,rss=dift$rss+rss.extra,nobs=nobs,d1b=dift$d1b,reml.pen=as.numeric(reml.pen))
 } ## Sl.fit
 
 fast.REML.fit <- function(Sl,X,y,rho,L=NULL,rho.0=NULL,log.phi=0,phi.fixed=TRUE,

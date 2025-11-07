@@ -442,7 +442,7 @@ bgam.fitd <- function (G, mf, gp ,scale , coef=NULL, etastart = NULL,
   y <- G$y
   weights <- G$w 
   conv <- FALSE
-  nobs <- nrow(mf)
+  n <- nobs <- nrow(mf)
   offset <- G$offset 
 
   if (method=="NCV") {
@@ -470,8 +470,9 @@ bgam.fitd <- function (G, mf, gp ,scale , coef=NULL, etastart = NULL,
     if (!is.null(pini$Theta)) G$family$putTheta(pini$Theta)
     if (!is.null(pini$y)) y <- pini$y
     if (is.null(G$family$scale)) scale <- 1 else scale <- if (G$family$scale<0) scale else G$family$scale
-    scale1 <- scale
-    if (scale < 0) scale <- var(y) *.1 ## initial guess
+    #scale1 <- scale
+    #if (scale < 0) scale <- var(y) *.1 ## initial guess
+    if (scale < 0) log.phi <- log(var(y) *.1) ## initial guess
   } else efam <- FALSE
 
   if (rho!=0) { ## AR1 error model
@@ -612,9 +613,17 @@ bgam.fitd <- function (G, mf, gp ,scale , coef=NULL, etastart = NULL,
 	
       if (efam) { ## extended family
 	if (iter>1) { ## estimate theta
-          if (family$n.theta>0||scale1<0) theta <- estimate.theta(theta,family,y,mu,scale=scale1,wt=G$w,tol=1e-7)
-          if (!is.null(family$scale) && scale1<0) {
-	    scale <- exp(theta[family$n.theta+1])
+          #if (family$n.theta>0||scale1<0) theta <- estimate.theta(theta,family,y,mu,scale=scale1,wt=G$w,tol=1e-7)
+	  if (family$n.theta>0||(scale<0&&iter<5&&method!="NCV")) {
+	    ## optimize log lik wrt scale here early on, but then switch to avoid possibility of cycles...
+	    scale1 <- if (scale<0&&iter<5&&method!="NCV") scale else exp(log.phi) 
+	    theta <- estimate.theta(theta,family,y,mu,scale=scale1,wt=G$w,tol=1e-7)
+          }
+          #if (!is.null(family$scale) && scale1<0) {
+	  if (!is.null(family$scale) && scale<0 && iter<5&&method!="NCV") {
+	    #scale <- exp(theta[family$n.theta+1])
+	    lsp0[n.sp+1] <- log.phi <- theta[family$n.theta+1] ## overwrite current scale estimate with better at iter=2
+	    Nstep[n.sp+1] <- 0 ## and don't use Newton step this time!
 	    theta <- theta[1:family$n.theta]
 	  }  
           family$putTheta(theta)
@@ -641,7 +650,6 @@ bgam.fitd <- function (G, mf, gp ,scale , coef=NULL, etastart = NULL,
         w <- (G$w * mu.eta.val^2)/variance(mu)
       }
       
-  
       qrx$y.norm2 <- if (rho==0) sum(w*z^2) else   ## AR mod needed
           sum(rwMatrix(ar.stop,ar.row,ar.weight,sqrt(w)*z,trans=FALSE)^2) 
        
@@ -774,11 +782,16 @@ bgam.fitd <- function (G, mf, gp ,scale , coef=NULL, etastart = NULL,
   object <- list(mgcv.conv=conv,rank=prop$r,
                  scale.estimated = scale<=0,
 		 outer.info=NULL, optimizer=c("perf","chol")) 
-  Mp <- G$nsdf
+  #Mp <- G$nsdf
   if (length(G$smooth)>1) for (i in 1:length(G$smooth)) Mp <- Mp + G$smooth[[i]]$null.space.dim
   scale <- exp(log.phi)
-  crit <- if (method=="NCV") prop$NCV else (dev/(scale*gamma) - prop$ldetS + prop$ldetXXS +
-                                     (length(y)/gamma-Mp)*log(2*pi*scale)+Mp*log(gamma))/2
+
+  lsat <- if (inherits(family,"extended.family")) family$ls(y,weights,family$getTheta(),scale)$ls else
+                                                  family$ls(y,weights,n,scale)[1]
+
+  crit <- if (method=="NCV") prop$NCV else ((dev-2*lsat*scale)/(scale*gamma) - prop$ldetS + prop$ldetXXS)/2 
+                                      ## +Mp*log(gamma))/2  + (length(y)/gamma-Mp)*log(2*pi*scale)
+                                     (length(y)/gamma-Mp)*log(2*pi*scale)
   if (rho!=0) { ## correct REML score for AR1 transform
     df <- if (is.null(mf$"(AR.start)")) 1 else sum(mf$"(AR.start)")
     crit <- crit - (nobs/gamma-df)*log(ld)
@@ -910,8 +923,9 @@ bgam.fit <- function (G, mf, chunk.size, gp ,scale ,gamma,method, coef=NULL,etas
       if (!is.null(pini$Theta)) G$family$putTheta(pini$Theta)
       if (!is.null(pini$y)) y <- pini$y
       if (is.null(G$family$scale)) scale <- 1 else scale <- if (G$family$scale<0) scale else G$family$scale
-      scale1 <-scale
-      if (scale < 0) scale <- var(y) *.1 ## initial guess
+      #scale1 <-scale
+      #if (scale < 0) scale <- var(y) *.1 ## initial guess
+      if (scale < 0) log.phi <- log(var(y) *.1) ## initial guess
     } else efam <- FALSE
 
  
@@ -1188,9 +1202,15 @@ bgam.fit <- function (G, mf, chunk.size, gp ,scale ,gamma,method, coef=NULL,etas
       }
 
       if (efam && iter>1) { ## estimate theta
-        if (family$n.theta>0||scale1<0) theta <- estimate.theta(theta,family,G$y,linkinv(eta),scale=scale1,wt=G$w,tol=1e-7)
-        if (!is.null(family$scale) && scale1<0) {
-	   scale <- exp(theta[family$n.theta+1])
+        #if (family$n.theta>0||scale1<0) theta <- estimate.theta(theta,family,G$y,linkinv(eta),scale=scale1,wt=G$w,tol=1e-7)
+	if (family$n.theta>0||(scale<0&&iter<5)) {
+	  ## optimize log lik wrt scale here early on, but then switch to avoid possibility of cycles...
+	  scale1 <- if (scale<0&&iter<5) scale else object$scale 
+	  theta <- estimate.theta(theta,family,G$y,linkinv(eta),scale=scale1,wt=G$w,tol=1e-7)
+        }
+        #if (!is.null(family$scale) && scale1<0) {
+	if (!is.null(family$scale) && scale<0 && iter<5) {
+	   object$scale <- exp(theta[family$n.theta+1]) ## overwrite current scale estimate with better at iter=2
 	   theta <- theta[1:family$n.theta]
 	}  
         family$putTheta(theta)
@@ -1221,6 +1241,7 @@ bgam.fit <- function (G, mf, chunk.size, gp ,scale ,gamma,method, coef=NULL,etas
                              log.phi=log.phi,phi.fixed=scale>0,rss.extra=rss.extra,
                              nobs =nobs+nobs.extra,Mp=um$Mp,nt=npt,gamma=gamma)
         res <- Sl.postproc(Sl,fit,um$undrop,qrx$R,cov=FALSE,L=G$L,nt=npt)
+	attr(fit$reml,"ml.pen") <- fit$reml.pen  
         object <- list(coefficients=res$beta,db.drho=fit$d1b,
                        gcv.ubre=fit$reml,mgcv.conv=list(iter=fit$iter,
                        message=fit$conv),rank=ncol(um$X),
@@ -1639,7 +1660,7 @@ bam.fit <- function(G,mf,chunk.size,gp,scale,gamma,method,rho=0,
        }
        yX.last <- c(G$y[n],G$X[n,])  ## store final row, in case of update
        X <- rwMatrix(stop,row,weight,sqrt(G$w)*G$X)
-       y <- rwMatrix(stop,row,weight,sqrt(G$w)*G$y)
+       y <- rwMatrix(stop,row,weight,sqrt(G$w)*(G$y-G$offset))
        qrx <- qr_update(X,y,use.chol=use.chol,nt=npt)
    
        rm(X); if (gc.level>1) gc() ## X can be large: remove and reclaim
@@ -2180,7 +2201,7 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
             family <- family()
     if (is.null(family$family))
             stop("family not recognized")
-    family <- fix.family(family) ## apply any general family patches (e.g. gaussian log link initialization)  
+    family <- fix.family(fix.family.ls(family)) ## apply any general family patches (e.g. gaussian log link initialization)  
     if (family$family=="gaussian"&&family$link=="identity") am <- TRUE else am <- FALSE
     if (scale==0) { if (family$family %in% c("poisson","binomial")) scale <- 1 else scale <- -1} 
     if (!method%in%c("fREML","GACV.Cp","GCV.Cp","REML",
@@ -2758,9 +2779,13 @@ bam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
   if (rho!=0&&family$family=="gaussian") dev <- sum(object$std.rsd^2)
   object$aic <- if (efam) family$aic(object$y,object$fitted.values,family$getTheta(),object$prior.weights,dev) else
                 family$aic(object$y,1,object$fitted.values,object$prior.weights,dev)
-  object$aic <- object$aic -
-                2 * (length(object$y) - sum(sum(object$model[["(AR.start)"]])))*log(1/sqrt(1-rho^2)) + ## correction for AR
-                2*sum(object$edf)
+  if (rho!=0) object$aic <- object$aic -
+              2 * (length(object$y) - sum(sum(object$model[["(AR.start)"]])))*log(1/sqrt(1-rho^2))  ## correction for AR
+  ml.pen <- attr(object$gcv.ubre,"ml.pen")
+  if (!is.null(ml.pen)) { ## correct RE/ML by replacing working log-lik by actual  
+    object$gcv.ubre <- object$aic/(2*gamma) + ml.pen
+  }
+  object$aic <- object$aic + 2*sum(object$edf)
   if (!is.null(object$edf2)&&sum(object$edf2)>sum(object$edf1)) object$edf2 <- object$edf1
   if (is.null(object$null.deviance)) object$null.deviance <- sum(family$dev.resids(object$y,weighted.mean(object$y,object$prior.weights),object$prior.weights))
   if (!is.null(object$full.sp)) {

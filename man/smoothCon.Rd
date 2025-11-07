@@ -100,10 +100,6 @@ The parameterization used by \code{\link{gam}} can be controlled via
 }
 
 
-\references{ 
-
-\url{https://www.maths.ed.ac.uk/~swood34/}
-}
 
 \author{Simon N. Wood \email{simon.wood@r-project.org}}
 

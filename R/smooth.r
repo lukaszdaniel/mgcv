@@ -13,7 +13,7 @@
 ##############################
 
 nat.param <- function(X,S,rank=NULL,type=0,tol=.Machine$double.eps^.8,unit.fnorm=TRUE) {
-## X is an n by p model matrix. 
+## X is a full rank n by p model matrix. 
 ## S is a p by p +ve semi definite penalty matrix, with the 
 ## given rank. 
 ## * type 0 reparameterization leaves
@@ -85,6 +85,7 @@ nat.param <- function(X,S,rank=NULL,type=0,tol=.Machine$double.eps^.8,unit.fnorm
 
   qrx <- qr(X,tol=.Machine$double.eps^.8)
   R <- qr.R(qrx)
+  if (Rrank(R)<ncol(R)) warning("smooth model matrix not full rank")
   RSR <- forwardsolve(t(R),t(forwardsolve(t(R),t(S))))
   er <- eigen(RSR,symmetric=TRUE)
   if (is.null(rank)||rank<1||rank>ncol(S)) { 
@@ -3636,7 +3637,7 @@ smooth.construct3 <- function(object,data,knots) {
 ## the evaluated `object$term's and the `by' variable... it
 ## obtains such a data object from `data' and also deals with
 ## multiple evaluations at the same covariate points efficiently
-## In contrast to smooth.constuct2 it returns an object in which
+## In contrast to smooth.construct2 it returns an object in which
 ## `X' contains the rows required to make the full model matrix,
 ## and ind[i] tells you which row of `X' is the ith row of the
 ## full model matrix. If `ind' is NULL then `X' is the full model matrix.
@@ -4211,7 +4212,7 @@ smoothCon <- function(object,data,knots=NULL,absorb.cons=FALSE,scale.penalty=TRU
     ## that does not depend on the model matrix (e.g. type=2)
     S11 <- sml[[1]]$S[[1]][1,1];rank <- sml[[1]]$rank;
     p <- ncol(sml[[1]]$X)
-    if (is.null(rank) || max(abs(sml[[1]]$S[[1]] - diag(c(rep(S11,rank),rep(0,p-rank))))) > 
+    if (is.null(rank) || max(abs(sml[[1]]$S[[1]] - diag(c(rep(S11,rank),rep(0,p-rank)),nrow=p))) > 
         abs(S11)*.Machine$double.eps^.8 ) {
       np <- nat.param(sml[[1]]$X,sml[[1]]$S[[1]],rank=sml[[1]]$rank,type=2,unit.fnorm=FALSE) 
       sml[[1]]$X <- np$X;sml[[1]]$S[[1]] <- diag(p)
@@ -4235,7 +4236,7 @@ smoothCon <- function(object,data,knots=NULL,absorb.cons=FALSE,scale.penalty=TRU
       S11 <- sml[[1]]$S[[1]][1,1]
       rank <- sml[[1]]$rank;
       p <- ncol(sml[[1]]$X)
-      if (is.null(rank) || max(abs(sml[[1]]$S[[1]] - diag(c(rep(S11,rank),rep(0,p-rank))))) > 
+      if (is.null(rank) || max(abs(sml[[1]]$S[[1]] - diag(c(rep(S11,rank),rep(0,p-rank)),nrow=p))) > 
         abs(S11)*.Machine$double.eps^.8 ) need.full <- TRUE else {
         need.full <- FALSE ## matrix is already a suitable diagonal
         if (p>rank) for (i in 1:length(sml)) {

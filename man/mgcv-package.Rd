@@ -7,7 +7,7 @@
 }
 \description{
 \code{mgcv} provides functions for generalized additive modelling (\code{\link{gam}} and \code{\link{bam}})  and
-generalized additive mixed modelling (\code{\link{gamm}}, and \code{\link{random.effects}}), including location scale and shape extensions. The term GAM is taken to include 
+generalized additive mixed modelling (\code{\link{gamm}}, and \code{\link{random.effects}}), including location scale and shape extensions. Shape constrained models can be estimated using \code{\link{scasm}}.  The term GAM is taken to include 
 any model dependent on unknown smooth functions of predictors and estimated by quadratically penalized (possibly quasi-) likelihood maximization. Available distributions are covered in \code{\link{family.mgcv}} and available smooths in \code{\link{smooth.terms}}.
 
 Particular features of the package are facilities for automatic smoothness selection (Wood, 2004, 2011), 
@@ -61,7 +61,9 @@ The package also provides a generalized additive mixed modelling function,
 \code{lme} from the \code{nlme} library (for an \code{lme4} based version, see package \code{gamm4}). 
 \code{gamm} is particularly useful
 for modelling correlated data (i.e. where a simple independence model for the
-residual variation is inappropriate). In addition, low level routine \code{\link{magic}}
+residual variation is inappropriate). See \code{\link{random.effects}} for including random effects in models estimated by \code{gam}, \code{bam} or \code{scasm}.
+
+In addition, low level routine \code{\link{magic}}
 can fit models to data with a known correlation structure.
 
 
@@ -88,8 +90,15 @@ Maintainer: Simon Wood <simon.wood@r-project.org>
 Part funded by EPSRC: EP/K005251/1
 }
 \references{
+
+\url{https://webhomes.maths.ed.ac.uk/~swood34/}
+
 These provide details for the underlying mgcv methods, and fuller 
 references to the large literature on which the methods are based.
+
+Wood, S.N. (2025) Generalized Additive Models. Annual Review of
+Statistics and Its Applications 12:497-526
+\doi{10.1146/annurev-statistics-112723-034249}
 
 Wood, S. N. (2020) Inference and computation with generalized
 additive models and their extensions. Test 29(2): 307-339.

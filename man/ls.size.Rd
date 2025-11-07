@@ -20,11 +20,7 @@ ls.size(x)
 same names as the elements of the list. If \code{x} is not a list then its size in bytes is returned, un-named.
 }
 
-\references{
 
-
-\url{https://www.maths.ed.ac.uk/~swood34/}
-}
 \author{ Simon N. Wood \email{simon.wood@r-project.org}
 
 

@@ -404,7 +404,7 @@ gfam <- function(fl) {
 	  y[ii] <- pri$y
         }
         if (is.null(pri$Theta)) {
-          theta[ith] <- fl[[i]]$getTheta()
+          Theta[ith] <- fl[[i]]$getTheta()
         } else {
           theta.mod <- TRUE
 	  Theta[ith] <- pri$Theta

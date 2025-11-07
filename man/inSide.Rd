@@ -7,7 +7,7 @@ Assesses whether points are inside a boundary. The boundary must enclose the
 domain, but may include islands. 
 }
 \usage{
-inSide(bnd,x,y)
+inSide(bnd,x,y,xname=NULL,yname=NULL)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
@@ -18,6 +18,8 @@ inSide(bnd,x,y)
   See below for details.}
   \item{x}{x co-ordinates of points to be tested.}
   \item{y}{y co-ordinates of points to be tested.}
+  \item{xname}{name of variable in \code{bnd} that \code{x} relates to. Defaults to name of variable supplied as \code{x}.}
+  \item{yname}{name of variable in \code{bnd} that \code{y} relates to. Defaults to name of variable supplied as \code{y}.}
 }
 
 \details{
@@ -46,18 +48,15 @@ inside the boundary.
 
 }
    
-\references{
 
-\url{https://www.maths.ed.ac.uk/~swood34/}
-}
 \author{ Simon N. Wood \email{simon.wood@r-project.org}} 
 
 
 \examples{
 require(mgcv)
 m <- 300;n <- 150
-xm <- seq(-1,4,length=m);yn<-seq(-1,1,length=n)
-x <- rep(xm,n);y<-rep(yn,rep(m,n))
+xm <- seq(-1,4,length=m);yn <- seq(-1,1,length=n)
+x <- rep(xm,n);y <- rep(yn,rep(m,n))
 er <- matrix(fs.test(x,y),m,n)
 bnd <- fs.boundary()
 in.bnd <- inSide(bnd,x,y)
@@ -68,6 +67,11 @@ points(x,y,col=as.numeric(in.bnd)+1,pch=".")
 plot(x,y,col=as.numeric(in.bnd)+1,pch=".",ylim=c(-1,0),xlim=c(3,3.5))
 lines(bnd$x,bnd$y,col=3)
 points(x,y,col=as.numeric(in.bnd)+1,pch=".")
+
+## alternatively, give the names of x and y
+d <- data.frame(x, y); rm(x, y)
+in.bnd2 <- inSide(bnd, d$x, d$y, xname="x", yname="y")
+all.equal(in.bnd, in.bnd2)
 
 }
 \keyword{models} \keyword{smooth} \keyword{regression}%-- one or more ..

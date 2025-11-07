@@ -26,7 +26,7 @@ pcls(M)
 	    initialize this to a zero by zero matrix. Note that there is no need 
             to supply the vector \eqn{ \bf c}{c}, it is defined implicitly by the 
             initial parameter estimates \eqn{ \bf p}{p}.}
- \item{S}{ A list of penalty matrices. \code{S[[i]]} is the smallest contiguous matrix including 
+ \item{S}{A list of penalty matrices. \code{S[[i]]} is the smallest contiguous matrix including 
           all the non-zero elements of the ith penalty matrix. The first parameter it
           penalizes is given by \code{off[i]+1} (starting counting at 1). }
  \item{off}{ Offset values locating the elements of \code{M$S} in
@@ -35,10 +35,13 @@ pcls(M)
 \item{sp}{ An array of  smoothing parameter estimates.}
 \item{p}{An array of feasible initial parameter estimates - these must
 satisfy the constraints, but should avoid satisfying the inequality
-constraints as equality constraints.}
+constraints as equality constraints (unless these are constraints in \code{active}).}
 \item{Ain}{Matrix for the inequality constraints \eqn{ {\bf A}_{in}
     {\bf p} > {\bf b}_{in}}{A_in p > b}. }
 \item{bin}{vector in the inequality constraints. }
+\item{active}{if present this indexes any inequality constraints currently active. Typically only
+used in applications calling \code{pcls} sequentially. Must never exceed dimension of \code{p} minus
+the number of fixed constraints.}
 } % end describe
 } % end M
 }
@@ -47,10 +50,9 @@ constraints as equality constraints.}
   This solves the problem:
  
 \deqn{ minimise~ \| { \bf W}^{1/2} ({ \bf Xp - y} ) \|^2  +  \sum_{i=1}^m
-\lambda_i {\bf p^\prime S}_i{\bf p} }{ min || W^0.5 (Xp-y) ||^2 + 
-lambda_1 p'S_1 p + lambda_1 p'S_2 p + . . .}
-subject to constraints \eqn{ {\bf Cp}={\bf c}}{Cp=c} and \eqn{ {\bf
-    A}_{in}{\bf p}>{\bf b}_{in}}{A_in p > b_in}, w.r.t. \eqn{\bf p}{p} given the
+\lambda_i {\bf p^\prime S}_i{\bf p} }{ min || W^0.5 (Xp-y) ||^2 + lambda_1 p'S_1 p + lambda_1 p'S_2 p + . . .}
+subject to constraints \eqn{ {\bf Cp}={\bf c}}{Cp=c} and
+\eqn{ {\bf A}_{in}{\bf p}>{\bf b}_{in}}{A_in p > b_in}, w.r.t. \eqn{\bf p}{p} given the
 smoothing parameters \eqn{\lambda_i}{lambda_i}.
 \eqn{ {\bf X}}{X} is a design matrix, \eqn{\bf p}{p} a parameter vector, 
 \eqn{\bf y}{y} a data vector, \eqn{\bf W}{W} a diagonal weight matrix,
@@ -80,7 +82,6 @@ Press, London.
 Wood, S.N. (1994) Monotonic smoothing splines fitted by cross validation SIAM
 Journal on Scientific Computing 15(5):1126-1133
 
-\url{https://www.maths.ed.ac.uk/~swood34/}
 }
 \author{ Simon N. Wood \email{simon.wood@r-project.org}} 
 

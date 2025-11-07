@@ -1,7 +1,7 @@
 \name{Predict.matrix.soap.film}
 \alias{Predict.matrix.soap.film}
-\alias{Predict.matrix.sw}
-\alias{Predict.matrix.sf}
+\alias{Predict.matrix.sf.wiggly}
+\alias{Predict.matrix.sf.film}
 
 %- Also NEED an `\alias' for EACH other topic documented here.
 \title{Prediction matrix for soap film smooth}
@@ -11,13 +11,13 @@ the smooth.  This is the \code{\link{Predict.matrix}} method function required b
 }
 \usage{
 \method{Predict.matrix}{soap.film}(object,data)
-\method{Predict.matrix}{sw}(object,data)
-\method{Predict.matrix}{sf}(object,data)
+\method{Predict.matrix}{sf.wiggly}(object,data)
+\method{Predict.matrix}{sf.film}(object,data)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
 
-\item{object}{A class \code{"soap.film"}, \code{"sf"} or \code{"sw"} object.}
+\item{object}{A class \code{"soap.film"}, \code{"sf.wiggly"} or \code{"sf.film"} object.}
 
 \item{data}{A list list or data frame containing the arguments of the smooth
 at which predictions are required.}
@@ -35,11 +35,6 @@ The smooth object will be largely what is returned from
 the contribution from any known boundary conditions on the smooth.
 
 }
-\references{
-
-\url{https://www.maths.ed.ac.uk/~swood34/}
-}
-\author{ Simon N. Wood \email{s.wood@bath.ac.uk}} 
 
 \seealso{\code{\link{smooth.construct.so.smooth.spec}}}
 

@@ -4,15 +4,15 @@
 \title{Default GAM plotting}
 \description{ Takes a fitted \code{gam} object produced by \code{gam()} and plots the 
    component smooth functions that make it up, on the scale of the linear
-   predictor. Optionally produces term plots for parametric model components
-   as well.}
+   predictor. Optionally derivatives of 1-D plots may be plotted. Optionally produces term plots
+   for parametric model components as well.}
 \usage{
 \method{plot}{gam}(x,residuals=FALSE,rug=NULL,se=TRUE,pages=0,select=NULL,scale=-1,
          n=100,n2=40,n3=3,theta=30,phi=30,jit=FALSE,xlab=NULL,
          ylab=NULL,main=NULL,ylim=NULL,xlim=NULL,too.far=0.1,
-         all.terms=FALSE,shade=FALSE,shade.col="gray80",shift=0,
+         all.terms=FALSE,shade.col="gray80",shift=0,
          trans=I,seWithMean=FALSE,unconditional=FALSE,by.resids=FALSE,
-         scheme=0,...)
+         scheme=0,deriv=FALSE,...)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{ 
@@ -34,13 +34,13 @@ estimates fixed (i.e. the estimates for the term plus the residuals).}
  is <= 10000 and \code{FALSE} otherwise.} 
   
 \item{se}{ when TRUE (default) upper and lower lines are added to the
-  1-d plots at 2 standard errors
-        above and below the estimate of the smooth being plotted while for
-	2-d plots, surfaces at +1 and -1 standard errors are contoured
-	and overlayed on the contour plot for the estimate. If a
-	positive number is supplied then this number is multiplied by
-	the standard errors when calculating standard error curves or
-  surfaces. See also \code{shade}, below. }
+        1-d plots corresponding to 95\% confidence limits.
+        For 2-d plots, surfaces corresponding to lower and upper
+	limits of 68\% confidence intervals are contoured
+	and overlayed on the contour plot for the estimate. If one or more
+        numbers (between 0 and 1) are supplied then these are the confidence
+	level used whatever the dimension. Currently scheme 2 uses 2 levels.
+	Any value 1 or above resets to \code{TRUE}, failing which any value 0 or below rests to \code{FALSE}.  }
 
 \item{pages}{ (default 0) the number of pages over which to spread the output. For example, 
 if \code{pages=1} then all terms will be plotted on one page with the layout performed automatically. 
@@ -84,10 +84,7 @@ interpretation of plots.}
 model components are also plotted, via a call to \code{\link{termplot}}. Only
 terms of order 1 can be plotted in this way. Also see warnings.}
 
-\item{shade}{Set to \code{TRUE} to produce shaded regions as confidence bands
-for smooths (not avaliable for parametric terms, which are plotted using \code{termplot}).}
-
-\item{shade.col}{define the color used for shading confidence bands.}
+\item{shade.col}{define the color used for shading confidence bands, for schemes that use this. For schemes using 2 colours this should be a 2 element vector of colours to over-ride defaults (\code{\link{rgb}} can be useful).}
 
 \item{shift}{constant to add to each smooth (on the scale of the linear
 predictor) before plotting. Can be useful for some diagnostics, or with \code{trans}.}
@@ -114,12 +111,16 @@ Usually the answer is no, they would be meaningless.}
 
 \item{scheme}{Integer or integer vector selecting a plotting scheme for each plot. See details.}
 
+\item{deriv}{set to \code{TRUE} to plot derivative of smooth w.r.t covariate for 1-D terms supporting this.}
+
 \item{...}{ other graphics parameters to pass on to plotting commands. See details for smooth plot specific options.}
 
 }
 \details{ Produces default plot showing the smooth components of a
   fitted GAM, and optionally parametric terms as well, when these can be
   handled by \code{\link{termplot}}.
+
+For 1-D smooths with supporting plot methods \code{deriv=TRUE} specifies plotting of derivative of the smooth w.r.t. the covariate and its confidence band. Such derivatives are the direct analogues of the coefficients in a linear regression, giving the rate of change of the linear predictor w.r.t. the covariate. The plot label is modified to indicate that the derivative is being plotted.  
 
 For smooth  terms \code{plot.gam} actually calls plot method functions depending on the 
 class of the smooth. Currently \code{\link{random.effects}}, Markov random fields (\code{\link{mrf}}), 
@@ -131,16 +132,15 @@ with the covariate name, while the y axis is labelled \code{s(cov,edf) } where \
 is the covariate name, and \code{edf} the estimated (or user defined for regression splines) 
 degrees of freedom of the smooth. \code{scheme == 0} produces a smooth curve with dashed curves 
 indicating 2 standard error bounds. \code{scheme == 1} illustrates the error bounds using a shaded
-region.
+region. \code{scheme == 2} shows 68\% and 95\% confidence regions (levels can be reset by \code{se}). 
 
 For \code{scheme==0}, contour plots are produced for 2-d smooths with the x-axes labelled with the first covariate
 name and the y axis with the second covariate name. The main title of
 the plot is something like \code{s(var1,var2,edf)}, indicating the
 variables of which the term is a function, and the estimated degrees of
 freedom for the term. When \code{se=TRUE}, estimator variability is shown by overlaying
-contour plots at plus and minus 1 s.e. relative to the main
-estimate. If \code{se} is a positive number then contour plots are at plus or minus \code{se} multiplied
-by the s.e. Contour levels are chosen to try and ensure reasonable
+contour plots for 68\% confidence limits. If \code{se} is a positive number in (0,1) then contour plots
+are at the estimate and confidence limits at the giuven level. Contour levels are chosen to try and ensure reasonable
 separation of the contours of the different plots, but this is not
 always easy to achieve. Note that these plots can not be modified to the same extent as the other plot. 
    
@@ -234,6 +234,7 @@ x0 <- factor(x0)
 b<-gam(y~x0+s(x1)+s(x2)+s(x3))
 plot(b,pages=1,residuals=TRUE,all.terms=TRUE,shade=TRUE,shade.col=2)
 plot(b,pages=1,seWithMean=TRUE) ## better coverage intervals
+plot(b,pages=1,scale=0,scheme=2,deriv=TRUE) ## plot derivs of smooths
 
 ## just parametric term alone...
 termplot(b,terms="x0",se=TRUE)

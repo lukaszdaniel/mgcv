@@ -95,14 +95,14 @@ bnd2C <- function(bnd) {
   bnd
 } ## end bnd2C
 
-inSide <- function(bnd,x,y)
+inSide <- function(bnd,x,y,xname=NULL,yname=NULL) {
 ## tests whether each point x[i],y[i] is inside the boundary defined
 ## by bnd$x, bnd$y, or by multiple boundary loops in bnd[[1]]$x,
 ## bnd[[1]]$y, bnd[[2]]$x, ... etc. 
 ## names in bnd must match those of x and y, but do not need to be "x" and "y"
-{ ## match the names up first...
-  xname <- deparse(substitute(x))
-  yname <- deparse(substitute(y))
+  ## match the names up first...
+  if (is.null(xname)) xname <- deparse(substitute(x))
+  if (is.null(yname)) yname <- deparse(substitute(y))
   bnd.name <- names(bnd)
   if (is.null(bnd.name)) for (i in 1:length(bnd)) { 
     bnd.name <- names(bnd[[i]])
@@ -524,7 +524,7 @@ smooth.construct.so.smooth.spec<-function(object,data,knots)
 
 
 
-smooth.construct.sf.smooth.spec<-function(object,data,knots)
+smooth.construct.sf.smooth.spec <- function(object,data,knots)
 ## a soap film smooth boundary interpolating film only constructor 
 ## method function for integration with mgcv::gam
 { if (is.null(knots)) stop("knots must be specified for soap")
@@ -624,7 +624,7 @@ smooth.construct.sf.smooth.spec<-function(object,data,knots)
   
   object$sd <- sd
 
-  class(object)<-c("sf","soap.film")  # Give object a class
+  class(object)<-c("sf.film","soap.film")  # Give object a class
   object
 } ## end of boundary film component soap constructor
 
@@ -714,7 +714,7 @@ smooth.construct.sw.smooth.spec<-function(object,data,knots)
   object$sd <- sd
   object$C <- matrix(0,0,ncol(object$X)) ## this is tied to zero
 
-  class(object)<-c("sw","soap.film")  # Give object a class
+  class(object)<-c("sf.wiggly","soap.film")  # Give object a class
   object
 } ## end of wiggly component of soap constructor
 
@@ -730,8 +730,8 @@ Predict.matrix.soap.film<-function(object,data)
   X
 }
 
-Predict.matrix.sf <- function(object,data)
-# prediction method function for the sf smooth class --- the boundary interpolating film
+Predict.matrix.sf.film <- function(object,data)
+# prediction method function for the sf.film smooth class --- the boundary interpolating film
 # component of a soap film smooth 
 { x <- get.var(object$term[1],data)
   y <- get.var(object$term[2],data)
@@ -741,8 +741,8 @@ Predict.matrix.sf <- function(object,data)
   X
 }
 
-Predict.matrix.sw <- function(object,data)
-# prediction method function for the sw smooth class --- the wiggly
+Predict.matrix.sf.wiggly <- function(object,data)
+# prediction method function for the sf.wiggly smooth class --- the wiggly
 # component of a soap film smooth 
 { x <- get.var(object$term[1],data)
   y <- get.var(object$term[2],data)
@@ -751,10 +751,10 @@ Predict.matrix.sw <- function(object,data)
   X
 }
 
-plot.soap.film <- function(x,P=NULL,data=NULL,label="",se1.mult=1,se2.mult=2,
+plot.soap.film <- function(x,P=NULL,data=NULL,label="",
                      partial.resids=FALSE,rug=TRUE,se=TRUE,scale=-1,n=100,n2=40,n3=3,
 		     theta=30,phi=30,jit=FALSE,xlab=NULL,ylab=NULL,main=NULL,
-                     ylim=NULL,xlim=NULL,too.far=0.1,shade=FALSE,shade.col="gray80",
+                     ylim=NULL,xlim=NULL,too.far=0.1,shade.col="gray80",
                      shift=0,trans=I,by.resids=FALSE,scheme=0,hcolors=heat.colors(100),
                      contour.col=1,...) {
 ## plot method function for soap.smooth terms
@@ -763,10 +763,10 @@ plot.soap.film <- function(x,P=NULL,data=NULL,label="",se1.mult=1,se2.mult=2,
             if (is.null(xlim)) xlim <- c(x$sd$x0,x$sd$x0+ncol(x$sd$G)*x$sd$dx)
             if (is.null(ylim)) ylim <- c(x$sd$y0,x$sd$y0+nrow(x$sd$G)*x$sd$dy)
        
-            P0 <- plot.mgcv.smooth(x=x,P=P,data=data,label=label,se1.mult=se1.mult,se2.mult=se2.mult,
+            P0 <- plot.mgcv.smooth(x=x,P=P,data=data,label=label,
                      partial.resids=partial.resids,rug=rug,se=se,scale=scale,n=n,n2=n2,
                      theta=theta,phi=phi,jit=jit,xlab=xlab,ylab=ylab,main=main,
-                     ylim=ylim,xlim=xlim,too.far=too.far,shade=shade,shade.col=shade.col,
+                     ylim=ylim,xlim=xlim,too.far=too.far,shade.col=shade.col,
                      shift=shift,trans=trans,by.resids=by.resids,hcolors=hcolors, ## don't pass scheme!!
                      contour.col=contour.col,...)
             if (outline) { if (is.null(names(P$bnd))) {
@@ -781,7 +781,7 @@ plot.soap.film <- function(x,P=NULL,data=NULL,label="",se1.mult=1,se2.mult=2,
     beta <- unconstrain(x,attr(x,"coefficients"))*x$irng ## coefs
     raw <- data[x$term]
     film <- wiggly <- TRUE
-    if (inherits(x,"sw")) film <- FALSE else if (inherits(x,"sf")) wiggly <- FALSE
+    if (inherits(x,"sf.wiggly")) film <- FALSE else if (inherits(x,"sf.film")) wiggly <- FALSE
     soap.basis(x$sd,film=film,wiggly=wiggly,plot=TRUE,beta=beta) -> G
     if (is.null(xlab)) xlabel<- x$term[1] else xlabel <- xlab
     if (is.null(ylab)) ylabel <- x$term[2] else ylabel <- ylab

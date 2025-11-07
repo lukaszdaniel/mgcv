@@ -21,9 +21,7 @@ function returns \code{NULL}.}
 
 \value{The evaluated variable or \code{NULL}. May be coerced to a numeric vector if it's a matrix.}
 
-\references{
-\url{https://www.maths.ed.ac.uk/~swood34/}
-}
+
 \author{ Simon N. Wood \email{simon.wood@r-project.org} } 
 
 \seealso{  \code{\link{gam} } }

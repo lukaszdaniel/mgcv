@@ -43,7 +43,6 @@ null.space.dimension(d,m)
 \references{
 Wood, S.N. (2003) Thin plate regression splines. J.R.Statist.Soc.B 65(1):95-114
 
-\url{https://www.maths.ed.ac.uk/~swood34/}
 }
 
 

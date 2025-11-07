@@ -62,8 +62,6 @@ Wood S.N. (2017) Generalized Additive Models: An Introduction with R (2nd editio
 and Hall/CRC Press.
 
 
-\url{https://www.maths.ed.ac.uk/~swood34/}
-
 }
 \author{ Simon N. Wood \email{simon.wood@r-project.org}}
 

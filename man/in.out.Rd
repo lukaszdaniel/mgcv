@@ -27,11 +27,7 @@ the boundary and \code{FALSE} otherwise.
 \details{ The algorithm works by counting boundary crossings (using compiled C code).
 }
 
-\references{
 
-
-\url{https://www.maths.ed.ac.uk/~swood34/}
-}
 \author{ Simon N. Wood \email{simon.wood@r-project.org}
 
 

@@ -34,10 +34,7 @@ the options do not depend on variables which might not be available later.}
 \item{response}{Name of the response variable.}
 }
 
-\references{
 
-\url{https://www.maths.ed.ac.uk/~swood34/}
-}
 \author{ Simon N. Wood \email{simon.wood@r-project.org}}
 
 

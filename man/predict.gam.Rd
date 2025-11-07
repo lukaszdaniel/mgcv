@@ -46,7 +46,7 @@ the model: for example integrated quantities, or derivatives of smooths. A
 linear predictor matrix can also be used to implement approximate prediction
 outside \code{R} (see example code, below). }
 
-\item{se.fit}{ when this is TRUE (not default) standard error estimates are returned for each prediction.}
+\item{se.fit}{ when this is TRUE (not default) standard error estimates are returned for each prediction. If set to a number between 0 and 1 then this is taken as the confidence level for intervals that are returned instead.}
 
 \item{terms}{if \code{type=="terms"} or \code{type="iterms"} then only results for the terms (smooth or parametric) named in this array
 will be returned. Otherwise any terms not named in this array will be set to zero. If \code{NULL} then all terms are included.}
@@ -93,7 +93,7 @@ array of predictions is returned. The dimensions of the returned arrays depends 
 \code{type} is \code{"terms"} or not: if it is then the array is 2 dimensional with each 
 term in the linear predictor separate, otherwise the array is 1 dimensional and contains the 
 linear predictor/predicted values (or corresponding s.e.s). The linear predictor returned termwise will 
-not include the offset or the intercept.
+not include the offset or the intercept. If \code{se.fit} is a number between 0 and 1 then in place of \code{se.fit} two arrays are returned \code{ll} and \code{ul} giving the confidence interval limits.   
 
 \code{newdata} can be a data frame, list or model.frame: if it's a model frame
 then all variables must be supplied.

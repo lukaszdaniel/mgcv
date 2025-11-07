@@ -1,5 +1,6 @@
 \name{smooth.construct.ad.smooth.spec}
 \alias{smooth.construct.ad.smooth.spec}
+\alias{smooth.construct.scad.smooth.spec}
 \alias{adaptive.smooth}
 %- Also NEED an `\alias' for EACH other topic documented here.
 \title{Adaptive smooths in GAMs}
@@ -31,12 +32,14 @@ The problem is particularly serious for smooths of 2 variables, where the number
 get reasonable flexibility in the penalty can grow rather fast, but it often requires a very large smoothing basis 
 dimension to make good use of this flexibility. In short, adaptive smooths should be used sparingly and with care. 
 
-In practice it is often as effective to simply transform the smoothing covariate as it is to use an adaptive smooth.
+Shape constrained versions are available for use with \code{\link{scasm}}, with constraints speficied as in \code{\link{smooth.construct.sc.smooth.spec}}. 
 
+In practice it is often as effective to simply transform the smoothing covariate as it is to use an adaptive smooth.
 }
 
 \usage{
 \method{smooth.construct}{ad.smooth.spec}(object, data, knots)
+\method{smooth.construct}{scad.smooth.spec}(object, data, knots)
 }
 
 \arguments{ 

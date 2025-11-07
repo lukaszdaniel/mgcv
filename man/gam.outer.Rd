@@ -31,8 +31,7 @@ gam.outer(lsp,fscale,family,control,method,optimizer,
 
 \item{family}{the model family.}
 
-\item{control}{control argument to pass to \code{\link{gam.fit}} if pure
-finite differencing is being used.}
+\item{control}{control argument to pass to \code{\link{gam.fit3}} etc.}
 
 \item{method}{method argument to \code{\link{gam}} defining the smoothness criterion to use (but depending on whether or not scale known).}
 
@@ -59,8 +58,6 @@ See Wood (2008) for full details on `outer iteration'.
 Wood, S.N. (2011) Fast stable restricted maximum likelihood 
 and marginal likelihood estimation of semiparametric generalized linear 
 models. Journal of the Royal Statistical Society (B) 73(1):3-36
-
-\url{https://www.maths.ed.ac.uk/~swood34/}
 
 }
 \author{ Simon N. Wood \email{simon.wood@r-project.org}}

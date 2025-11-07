@@ -251,10 +251,11 @@ pcls <- function(M)
     active[1] <- length(M$active);active[1:length(M$active)+1] <- M$active
     if (active[1]>=length(M$p)) stop("too many active constraints!")
   }  
-  o<-.C(C_RPCLS,as.double(M$X),as.double(M$p),as.double(M$y),as.double(M$w),as.double(M$Ain),as.double(M$bin)
+  o<-.C(C_RPCLS,X=as.double(M$X),p=as.double(M$p),as.double(M$y),as.double(M$w),as.double(M$Ain),as.double(M$bin)
         ,as.double(M$C),as.double(Sa),as.integer(M$off),as.integer(df),as.double(M$sp),
         as.integer(length(M$off)),as.integer(nar),active=active)
-  p <- array(o[[2]],length(M$p))
+  #p <- array(o[[2]],length(M$p))
+  p <- o$p
   if (qra.exist) p <- qr.qy(qra,c(rep(0,j),p))
   attr(p,"active") <- if (o$active[1]>0) o$active[1:o$active[1]+1]+1 else integer(0) ## the active set
   p
@@ -1404,6 +1405,7 @@ gam.setup <- function(formula,pterms,
       warning("NA's in supplied smoothing parameter vector - ignoring.")
       ok <- FALSE
     }
+    if (length(sp)==0) ok <- FALSE
   } else ok <- FALSE
   G$sp <- if (ok) sp[1:ncol(L)] else rep(-1,ncol(L))
   
@@ -1656,7 +1658,7 @@ gam.outer <- function(lsp,fscale,family,control,method,optimizer,criterion,scale
   if (optimizer[1]=="efs"&& optimizer[2] != "no.sps" ) { ## experimental extended efs
     ##warning("efs is still experimental!")
     if (inherits(family,"general.family")) {
-      object <- efsud(x=G$X,y=G$y,lsp=lsp,Sl=G$Sl,weights=G$w,offset=G$offxset,family=family,
+      object <- efsud(x=G$X,y=G$y,lsp=lsp,Sl=G$Sl,weights=G$w,offset=G$offset,family=family,
                      control=control,Mp=G$Mp,start=start)
     } else {
       family <- fix.family.ls(family)
@@ -1847,7 +1849,7 @@ gam.outer <- function(lsp,fscale,family,control,method,optimizer,criterion,scale
   object$sig2 <- object$scale
   
   object
-} ## gam.outer
+} ## gam.outer control
 
 get.null.coef <- function(G,start=NULL,etastart=NULL,mustart=NULL,...) {
 ## Get an estimate of the coefs corresponding to maximum reasonable deviance...
@@ -2396,7 +2398,7 @@ gam <- function(formula,family=gaussian(),data=list(),weights=NULL,subset=NULL,n
   if (!is.null(G$L)) { 
     object$full.sp <- as.numeric(exp(G$L%*%log(object$sp)+G$lsp0))
     names(object$full.sp) <- names(G$lsp0)
-  }
+  } else object$full.sp <- as.numeric(exp(log(object$sp)+G$lsp0))
   names(object$sp) <- names(G$sp)
   object$paraPen <- G$pP
   object$formula <- G$formula
@@ -2575,31 +2577,6 @@ mgcv.find.theta<-function(Theta,T.max,T.min,weights,good,mu,mu.eta.val,G,tol)
 }
 
 
-full.score <- function(sp,G,family,control,gamma,...)
-# function suitable for calling from nlm in order to polish gam fit
-# so that actual minimum of score is found in generalized cases
-{ .Deprecated(msg="Internal mgcv function full.score is no longer used and will be removed soon.")
-  if (is.null(G$L)) {
-    G$sp<-exp(sp);
-  } else {
-    G$sp <- as.numeric(exp(G$L%*%sp + G$lsp0))
-  }
-  # set up single fixed penalty....
-  q<-NCOL(G$X)
-  if (is.null(G$H)) G$H<-matrix(0,q,q)
-  for (i in 1:length(G$S))
-  { j<-ncol(G$S[[i]])
-    off1<-G$off[i];off2<-off1+j-1
-    G$H[off1:off2,off1:off2]<-G$H[off1:off2,off1:off2]+G$sp[i]*G$S[[i]]
-  }
-  G$S<-list() # have to reset since length of this is used as number of penalties
-  G$L <- NULL
-  xx<-gam.fit(G,family=family,control=control,gamma=gamma,...)
-  res <- xx$gcv.ubre.dev
-  attr(res,"full.gam.object")<-xx
-  res
-} ## full.score
-
 am.fit <- function (G, #start = NULL, etastart = NULL, 
     #mustart = NULL,# family = gaussian(), 
     control = gam.control(),gamma=1,...) {
@@ -2688,281 +2665,6 @@ am.fit <- function (G, #start = NULL, etastart = NULL,
 } ## am.fit
 
 
-gam.fit <- function (G, start = NULL, etastart = NULL, 
-    mustart = NULL, family = gaussian(), 
-    control = gam.control(),gamma=1,
-    fixedSteps=(control$maxit+1),...) 
-# fitting function for a gam, modified from glm.fit.
-# note that smoothing parameter estimates from one irls iterate are carried over to the next irls iterate
-# unless the range of s.p.s is large enough that numerical problems might be encountered (want to avoid 
-# completely flat parts of gcv/ubre score). In the latter case autoinitialization is requested.
-# fixedSteps < its default causes at most fixedSteps iterations to be taken,
-# without warning if convergence has not been achieved. This is useful for
-# obtaining starting values for outer iteration.
-{   .Deprecated(msg="Internal mgcv function gam.fit is no longer used - see gam.fit3.")
-    intercept<-G$intercept
-    conv <- FALSE
-    n <- nobs <- NROW(G$y) ## n just there to keep codetools happy
-    nvars <- NCOL(G$X) # check this needed
-    y<-G$y # original data
-    X<-G$X # original design matrix
-    if (nvars == 0) stop("Model seems to contain no terms")
-    olm <- G$am   # only need 1 iteration as it's a pure additive model.
-    if (!olm)  .Deprecated(msg="performance iteration with gam is deprecated, use bam instead")
-    find.theta<-FALSE # any supplied -ve binomial theta treated as known, G$sig2 is scale parameter
-    if (substr(family$family[1],1,17)=="Negative Binomial")
-    { Theta <- family$getTheta()
-      if (length(Theta)==1) { ## Theta fixed
-        find.theta <- FALSE
-        G$sig2 <- 1
-      } else {
-        if (length(Theta)>2)
-        warning("Discrete Theta search not available with performance iteration")
-        Theta <- range(Theta)
-        T.max <- Theta[2]          ## upper search limit
-        T.min <- Theta[1]          ## lower search limit
-        Theta <- sqrt(T.max*T.min) ## initial value
-        find.theta <- TRUE
-      }
-      nb.link<-family$link # negative.binomial family, there's a choise of links
-    }
-
-    
-    # obtain average element sizes for the penalties
-    n.S<-length(G$S)
-    if (n.S>0)
-    { S.size<-0
-      for (i in 1:n.S) S.size[i]<-mean(abs(G$S[[i]])) 
-    }
-    weights<-G$w # original weights
-
-    n.score <- sum(weights!=0) ## n to use in GCV score (i.e. don't count points with no influence)   
-
-    offset<-G$offset 
-
-    variance <- family$variance;dev.resids <- family$dev.resids
-    aic <- family$aic
-    linkinv <- family$linkinv;linkfun <- family$linkfun;mu.eta <- family$mu.eta
-    if (!is.function(variance) || !is.function(linkinv)) 
-        stop("invalid 'family' argument")
-    valideta <- family$valideta
-    if (is.null(valideta)) 
-        valideta <- function(eta) TRUE
-    validmu <- family$validmu
-    if (is.null(validmu)) 
-        validmu <- function(mu) TRUE
-    if (is.null(mustart))   # new from version 1.5.0 
-    { eval(family$initialize)}
-    else 
-    { mukeep <- mustart
-      eval(family$initialize)
-      mustart <- mukeep
-    }
-    if (NCOL(y) > 1) 
-        stop("y must be univariate unless binomial")
-    
-    coefold <- NULL                 # 1.5.0
-    eta <- if (!is.null(etastart))  # 1.5.0
-        etastart
-
-    else if (!is.null(start)) 
-    if (length(start) != nvars) 
-    stop(gettextf("Length of start should equal %d and correspond to initial coefs.",nvars))
-    else 
-    { coefold<-start                        #1.5.0
-      offset+as.vector(if (NCOL(G$X) == 1)
-       G$X * start
-       else G$X %*% start)
-    }
-    else family$linkfun(mustart)
-    mu <- linkinv(eta)
-    if (!(validmu(mu) && valideta(eta))) 
-        stop("Can't find valid starting values: please specify some")
-    devold <- sum(dev.resids(y, mu, weights))
-   
-    boundary <- FALSE
-    scale <- G$sig2
-
-    msp <- G$sp
-    magic.control<-list(tol=G$conv.tol,step.half=G$max.half,#maxit=control$maxit+control$globit,
-                          rank.tol=control$rank.tol)
-
-    for (iter in 1:(control$maxit)) 
-    {
-        good <- weights > 0
-        varmu <- variance(mu)[good]
-        if (any(is.na(varmu))) 
-            stop("NAs in V(mu)")
-        if (any(varmu == 0)) 
-            stop("0s in V(mu)")
-        mu.eta.val <- mu.eta(eta)
-        if (any(is.na(mu.eta.val[good]))) 
-            stop("NAs in d(mu)/d(eta)")
-        good <- (weights > 0) & (mu.eta.val != 0) # note good modified here => must re-calc each iter
-        if (all(!good)) {
-            conv <- FALSE
-            warning(gettextf("No observations informative at iteration %d", 
-                iter))
-            break
-        }
-   
-        mevg <- mu.eta.val[good];mug <- mu[good];yg <- y[good]
-        weg <- weights[good];##etag <- eta[good]
-        var.mug<-variance(mug)
-
-        G$y <- z <- (eta - offset)[good] + (yg - mug)/mevg
-        w <- sqrt((weg * mevg^2)/var.mug)
-        
-        G$w<-w
-        G$X<-X[good,,drop=FALSE]  # truncated design matrix       
-     
-        # must set G$sig2 to scale parameter or -1 here....
-        G$sig2 <- scale
-
-
-        if (sum(!is.finite(G$y))+sum(!is.finite(G$w))>0) 
-        stop("iterative weights or data non-finite in gam.fit - regularization may help. See ?gam.control.")
-
-        ## solve the working weighted penalized LS problem ...
-
-        mr <- magic(G$y,G$X,msp,G$S,G$off,L=G$L,lsp0=G$lsp0,G$rank,G$H,matrix(0,0,ncol(G$X)),  #G$C,
-                    G$w,gamma=gamma,G$sig2,G$sig2<0,
-                    ridge.parameter=control$irls.reg,control=magic.control,n.score=n.score,nthreads=control$nthreads)
-        G$p<-mr$b;msp<-mr$sp;G$sig2<-mr$scale;G$gcv.ubre<-mr$score;
-
-        if (find.theta) {# then family is negative binomial with unknown theta - estimate it here from G$sig2
-            ##  need to get edf array
-          mv <- magic.post.proc(G$X,mr,w=G$w^2)
-          G$edf <- mv$edf
-
-          Theta<-mgcv.find.theta(Theta,T.max,T.min,weights,good,mu,mu.eta.val,G,.Machine$double.eps^0.5)
-          family<-do.call("negbin",list(theta=Theta,link=nb.link))
-          variance <- family$variance;dev.resids <- family$dev.resids
-          aic <- family$aic
-          family$Theta <- Theta ## save Theta estimate in family
-        }
-
-        if (any(!is.finite(G$p))) {
-            conv <- FALSE   
-            warning(gettextf("Non-finite coefficients at iteration %d",iter))
-            break
-        }
-
-		
-        start <- G$p
-        eta <- drop(X %*% start) # 1.5.0
-        mu <- linkinv(eta <- eta + offset)
-        eta <- linkfun(mu) # force eta/mu consistency even if linkinv truncates
-        dev <- sum(dev.resids(y, mu, weights))
-        if (control$trace) 
-            message(gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv"))
-        boundary <- FALSE
-        if (!is.finite(dev)) {
-            if (is.null(coefold))
-            stop("no valid set of coefficients has been found:please supply starting values",
-            call. = FALSE)
-            warning("Step size truncated due to divergence",call.=FALSE)
-            ii <- 1
-            while (!is.finite(dev)) {
-                if (ii > control$maxit) 
-                  stop("inner loop 1; can't correct step size")
-                ii <- ii + 1
-                start <- (start + coefold)/2
-                eta<-drop(X %*% start)
-                mu <- linkinv(eta <- eta + offset)
-                eta <- linkfun(mu) 
-                dev <- sum(dev.resids(y, mu, weights))
-            }
-            boundary <- TRUE
-            if (control$trace) 
-                cat("Step halved: new deviance =", dev, "\n")
-        }
-        if (!(valideta(eta) && validmu(mu))) {
-            warning("Step size truncated: out of bounds.",call.=FALSE)
-            ii <- 1
-            while (!(valideta(eta) && validmu(mu))) {
-                if (ii > control$maxit) 
-                  stop("inner loop 2; can't correct step size")
-                ii <- ii + 1
-                start <- (start + coefold)/2
-                eta<-drop(X %*% start)
-                mu <- linkinv(eta <- eta + offset)
-                eta<-linkfun(mu)
-            }
-            boundary <- TRUE
-            dev <- sum(dev.resids(y, mu, weights))
-            if (control$trace) 
-                cat("Step halved: new deviance =", dev, "\n")
-        }
-
-        ## Test for convergence here ...
-
-        if (abs(dev - devold)/(0.1 + abs(dev)) < control$epsilon || olm ||
-            iter >= fixedSteps) {
-            conv <- TRUE
-            coef <- start #1.5.0
-            break
-        }
-        else {
-            devold <- dev
-            coefold <- coef<-start
-        }
-    }
-    if (!conv) 
-    { warning("algorithm did not converge") 
-    }
-    if (boundary) 
-        warning("Algorithm stopped at boundary value")
-    eps <- 10 * .Machine$double.eps
-    if (family$family[1] == "binomial") {
-        if (any(mu > 1 - eps) || any(mu < eps)) 
-            warning("fitted probabilities numerically 0 or 1 occurred")
-    }
-    if (family$family[1] == "poisson") {
-        if (any(mu < eps)) 
-            warning("fitted rates numerically 0 occurred")
-    }
-    
-    residuals <- rep(NA, nobs)
-    residuals[good] <- z - (eta - offset)[good]
-    
-    wt <- rep(0, nobs)
-    wt[good] <- w^2
-   
-    wtdmu <- if (intercept) sum(weights * y)/sum(weights) else linkinv(offset)
-    nulldev <- sum(dev.resids(y, wtdmu, weights))
-    n.ok <- nobs - sum(weights == 0)
-    nulldf <- n.ok - as.integer(intercept)
-    
-    ## Extract a little more information from the fit....
-
-    mv <- magic.post.proc(G$X,mr,w=G$w^2)
-    G$Vp<-mv$Vb;G$hat<-mv$hat;
-    G$Ve <- mv$Ve # frequentist cov. matrix
-    G$edf<-mv$edf
-    G$conv<-mr$gcv.info
-    G$sp<-msp
-    rank<-G$conv$rank
-
-    ## use MLE of scale in Gaussian case - best estimate otherwise. 
-    dev1 <- if (scale>0) scale*sum(weights) else if (family$family=="gaussian") dev else G$sig2*sum(weights)  
-
-    aic.model <- aic(y, n, mu, weights, dev1) + 2 * sum(G$edf)
-    if (scale < 0) { ## deviance based GCV
-      gcv.ubre.dev <- n.score*dev/(n.score-gamma*sum(G$edf))^2
-    } else { # deviance based UBRE, which is just AIC
-      gcv.ubre.dev <- dev/n.score + 2 * gamma * sum(G$edf)/n.score - G$sig2
-    }
-  
-	list(coefficients = as.vector(coef), residuals = residuals, fitted.values = mu, 
-        family = family,linear.predictors = eta, deviance = dev,
-        null.deviance = nulldev, iter = iter, weights = wt, prior.weights = weights,  
-        df.null = nulldf, y = y, converged = conv,sig2=G$sig2,edf=G$edf,edf1=mv$edf1,hat=G$hat,
-        ##F=mv$F,
-        R=mr$R,
-        boundary = boundary,sp = G$sp,nsdf=G$nsdf,Ve=G$Ve,Vp=G$Vp,rV=mr$rV,mgcv.conv=G$conv,
-        gcv.ubre=G$gcv.ubre,aic=aic.model,rank=rank,gcv.ubre.dev=gcv.ubre.dev,scale.estimated = (scale < 0))
-} ## gam.fit
 
 
 model.matrix.gam <- function(object,...)
@@ -3046,9 +2748,6 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
     if (is.null(na.action)) na.act <- NULL 
     else {
       na.txt <- if (is.character(na.action)||is.function(na.action)) get.na.action(na.action) else "na.pass"
-      #if (is.character(na.action))
-      #na.txt <- na.action else ## substitute(na.action) else
-      #if (is.function(na.action)) na.txt <- deparse(substitute(na.action))
       if (na.txt=="na.pass") na.act <- "na.exclude" else
       if (na.txt=="na.exclude") na.act <- "na.omit" else
       na.act <- na.action
@@ -3082,8 +2781,7 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
         # yname <- all.vars(object$terms)[attr(object$terms,"response")] ## redundant
         resp <- get.var(yname,newdata,FALSE)
         naresp <- FALSE
-        #if (!is.null(object$family$predict)&&!is.null(newdata[[yname]])) {
-	if (!is.null(object$family$predict)&&!is.null(resp)) {
+   	if (!is.null(object$family$predict)&&!is.null(resp)) {
           ## response provided, and potentially needed for prediction (e.g. Cox PH family)
           if (!is.null(object$pred.formula)) object$pred.formula <- attr(object$pred.formula,"full")
           response <- TRUE
@@ -3198,6 +2896,16 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
   lpi <- if (is.list(object$formula)) attr(object$formula,"lpi") else NULL
   nlp <- if (is.null(lpi)) 1 else length(lpi)  ## number of linear predictors
   n.smooth<-length(object$smooth)
+  if (is.numeric(se.fit)) {
+    if (se.fit>=1) se.fit <- TRUE
+    if (se.fit<=0) se.fit <- FALSE
+    if (is.numeric(se.fit)) {
+      alpha <- (1-se.fit)/2
+      z.alpha <- -qnorm(alpha)
+      get.ci <- TRUE;se.fit <- FALSE
+    } else get.ci <- FALSE
+  } else get.ci <- FALSE
+  
   if (type=="lpmatrix") {
     H <- matrix(0,np,nb)
   } else if (type=="terms"||type=="iterms") { 
@@ -3207,15 +2915,11 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
     n.pterms <- length(term.labels)
     fit <- array(0,c(np,n.pterms+as.numeric(para.only==0)*n.smooth))
     if (se.fit) se <- fit
+    if (get.ci) ll <- ul <- fit
     ColNames <- term.labels
   } else { ## "response" or "link"
-    ## get number of linear predictors, in case it's more than 1...
-    #if (is.list(object$formula)) {
-    #  nlp <- length(lpi) ## number of linear predictors
-    #} else nlp <- 1 
-   
     fit <- if (nlp>1) matrix(0,np,nlp) else array(0,np)
-    if (se.fit) se <- fit
+    if (se.fit) se <- fit; if (get.ci) ll <- ul <- fit
     fit1 <- NULL ## "response" returned by fam$fv can be non-vector 
   }
   stop <- 0
@@ -3239,12 +2943,6 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
   }
 
   ## check if extended family required intercept to be dropped...
-  #drop.intercept <- FALSE 
-  #if (!is.null(object$family$drop.intercept)&&object$family$drop.intercept) {
-  #  drop.intercept <- TRUE;
-  #  ## make sure intercept explicitly included, so it can be cleanly dropped...
-  #  for (i in 1:length(Terms)) attr(Terms[[i]],"intercept") <- 1 
-  #} 
   drop.intercept <- object$family$drop.intercept
   if (is.null(drop.intercept)) {
     drop.intercept <- rep(FALSE, length(Terms))
@@ -3315,7 +3013,6 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
       }
       if (object$nsdf[i]>0) X[,pstart[i]-1 + 1:object$nsdf[i]] <- Xp
     } ## end of parametric loop
- ##   if (length(offs)==1) offs <- offs[[1]] ## messes up later handling
      
     if (!is.null(drop.ind)) X <- X[,-drop.ind]
 
@@ -3351,16 +3048,29 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
           k <- k + 1 ## counts total number of parametric terms
           ii <- ind[lass[[j]]==i] + pstart[j] - 1 
           fit[start:stop,k] <- X[,ii,drop=FALSE]%*%object$coefficients[ii]
-          if (se.fit) se[start:stop,k] <-
-          sqrt(pmax(0,rowSums((X[,ii,drop=FALSE]%*%object$Vp[ii,ii])*X[,ii,drop=FALSE])))
+          se0 <- sqrt(pmax(0,rowSums((X[,ii,drop=FALSE]%*%object$Vp[ii,ii,drop=FALSE])*X[,ii,drop=FALSE])))
+	  if (se.fit) se[start:stop,k] <- se0
+	  if (get.ci) {
+	    if (!is.null(object$bs)) {
+              ff <- X[,ii,drop=FALSE]%*%object$bs[ii,] ## BS rep functions
+	      delta <- if (is.null(attr(object$bs,"svar.only"))||is.null(object$Ve)) 0 else mean(  ## bias correction
+              se0 - sqrt(pmax(0,rowSums((X[,ii,drop=FALSE]%*%object$Ve[ii,ii,drop=FALSE])*X[,ii,drop=FALSE]))))
+              ll[start:stop,k] <- apply(ff,1,quantile,probs=alpha) - delta*z.alpha ## lower sampling + bias limit
+	      ul[start:stop,k] <- apply(ff,1,quantile,probs=1-alpha) + delta*z.alpha ## upper samploing + bias limit
+            } else {
+              ll[start:stop,k] <- fit[start:stop,k] - z.alpha*se0
+	      ul[start:stop,k] <- fit[start:stop,k] + z.alpha*se0
+	    }  
+          }
         }
       } ## assign list done
       if (n.smooth&&!para.only) {
-        for (k in 1:n.smooth) # work through the smooth terms 
-        { first <- object$smooth[[k]]$first.para; last <- object$smooth[[k]]$last.para
+        for (k in 1:n.smooth) { # work through the smooth terms 
+          first <- object$smooth[[k]]$first.para; last <- object$smooth[[k]]$last.para
           fit[start:stop,n.pterms+k] <- X[,first:last,drop=FALSE] %*% object$coefficients[first:last] + Xoff[,k]
-          if (se.fit) { # diag(Z%*%V%*%t(Z))^0.5; Z=X[,first:last]; V is sub-matrix of Vp
-            if (type=="iterms"&& attr(object$smooth[[k]],"nCons")>0) { ## termwise se to "carry the intercept
+          if (se.fit||get.ci) { # diag(Z%*%V%*%t(Z))^0.5; Z=X[,first:last]; V is sub-matrix of Vp
+            if (type=="iterms"&& !is.null(attr(object$smooth[[k]],"nCons")) && attr(object$smooth[[k]],"nCons")>0) {
+	      ## termwise se to "carry the intercept"
               ## some general families, add parameters after cmX created, which are irrelevant to cmX... 
               if (length(object$cmX) < ncol(X)) object$cmX <- c(object$cmX,rep(0,ncol(X)-length(object$cmX)))
               if (!is.null(iterms.type)&&iterms.type==2) object$cmX[-(1:object$nsdf)] <- 0 ## variability of fixed effects mean only
@@ -3368,14 +3078,29 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
               meanL1 <- object$smooth[[k]]$meanL1
               if (!is.null(meanL1)) X1 <- X1 / meanL1              
               X1[,first:last] <- X[,first:last]
-              se[start:stop,n.pterms+k] <- sqrt(pmax(0,rowSums((X1%*%object$Vp)*X1)))
-            } else se[start:stop,n.pterms+k] <- ## terms strictly centred
-            sqrt(pmax(0,rowSums((X[,first:last,drop=FALSE]%*%
+	      se0 <- sqrt(pmax(0,rowSums((X1%*%object$Vp)*X1)))
+            } else se0 <- sqrt(pmax(0,rowSums((X[,first:last,drop=FALSE]%*% ## terms strictly centred
                           object$Vp[first:last,first:last,drop=FALSE])*X[,first:last,drop=FALSE])))
-          } ## end if (se.fit)
-        } 
+	  
+	    if (se.fit) se[start:stop,n.pterms+k] <- se0
+	    if (get.ci) {
+	      if (!is.null(object$bs)) {
+	        ii <- first:last
+                ff <- X[,ii,drop=FALSE]%*%object$bs[ii,] ## BS rep functions
+	        delta <- if (is.null(attr(object$bs,"svar.only"))||is.null(object$Ve)) 0 else mean(  ## bias correction
+                se0 - sqrt(pmax(0,rowSums((X[,ii,drop=FALSE]%*%object$Ve[ii,ii,drop=FALSE])*X[,ii,drop=FALSE]))))
+                ll[start:stop,n.pterms+k] <- apply(ff,1,quantile,probs=alpha) - delta*z.alpha ## lower sampling + bias limit
+	        ul[start:stop,n.pterms+k] <- apply(ff,1,quantile,probs=1-alpha) + delta*z.alpha ## upper samploing + bias limit
+              } else {
+                ll[start:stop,n.pterms+k] <- fit[start:stop,n.pterms+k] - z.alpha*se0
+	        ul[start:stop,n.pterms+k] <- fit[start:stop,n.pterms+k] + z.alpha*se0
+	      }	
+            }
+          } ## end if (se.fit||get.ci)
+        } ## smooth term loop
         colnames(fit) <- ColNames
         if (se.fit) colnames(se) <- ColNames
+	if (get.ci) colnames(ll) <- colnames(ul) <- ColNames
       } else {
         if (para.only&&is.list(object$pterms)) { 
           ## have to use term labels that match original data, or termplot fails 
@@ -3385,6 +3110,7 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
         }
         colnames(fit) <- term.labels
         if (se.fit) colnames(se) <- term.labels
+	if (get.ci) colnames(ll) <- colnames(ul) <- ColNames
         if (para.only) { 
           # retain only terms of order 1 - this is to make termplot work
           order <- if (is.list(object$pterms)) unlist(lapply(object$pterms,attr,"order")) else attr(object$pterms,"order")
@@ -3396,6 +3122,10 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
             se <- se[,order==1,drop=FALSE]
             colnames(se) <- term.labels 
           }
+	  if (get.ci) {
+            ll <- ll[,order==1,drop=FALSE]; ul <- ul[,order==1,drop=FALSE]
+            colnames(ll) <- colnames(ul) <- term.labels 
+          }
         } 
       } 
     } else { ## "link" or "response" case
@@ -3404,7 +3134,7 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
       k <- attr(attr(object$model,"terms"),"offset")
       if (nlp>1) { ## multiple linear predictor case
         if (is.null(fam$predict)||type=="link") {
-          ##pstart <- c(pstart,ncol(X)+1)
+      
           ## get index of smooths with an offset...
           off.ind <- (1:n.smooth)[as.logical(colSums(abs(Xoff)))]
           for (j in 1:nlp) { ## looping over the model formulae
@@ -3413,59 +3143,107 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
             if (length(off.ind)) for (i in off.ind) { ## add any term specific offsets
               if (object$smooth[[i]]$first.para%in%ind)  fit[start:stop,j] <- fit[start:stop,j] + Xoff[,i]
             }
-            if (se.fit) se[start:stop,j] <- 
+            if (se.fit||get.ci) se0 <- 
             sqrt(pmax(0,rowSums((X[,ind,drop=FALSE]%*%object$Vp[ind,ind,drop=FALSE])*X[,ind,drop=FALSE])))
-            ## model offset only handled for first predictor... fixed
-            ##if (j==1&&!is.null(k))  fit[start:stop,j] <- fit[start:stop,j] + model.offset(mf)
+            if (se.fit) se[start:stop,j] <- se0
+	    if (get.ci) {
+              if (!is.null(object$bs)) {
+                ff <- X[,ind,drop=FALSE]%*%object$bs[ind,] ## BS rep functions
+	        delta <- if (is.null(attr(object$bs,"svar.only"))||is.null(object$Ve)) 0 else mean(  ## bias correction
+                se0 - sqrt(pmax(0,rowSums((X[,ind,drop=FALSE]%*%object$Ve[ind,ind,drop=FALSE])*X[,ind,drop=FALSE]))))
+                ll[start:stop,j] <- apply(ff,1,quantile,probs=alpha) - delta*z.alpha ## lower sampling + bias limit
+	        ul[start:stop,j] <- apply(ff,1,quantile,probs=1-alpha) + delta*z.alpha ## upper samploing + bias limit
+              } else {
+                ll[start:stop,j] <- fit[start:stop,j] - z.alpha*se0
+	        ul[start:stop,j] <- fit[start:stop,j] + z.alpha*se0
+	      }	
+            }
             if (type=="response") { ## need to transform lp to response scale
               linfo <- object$family$linfo[[j]] ## link information
               if (se.fit) se[start:stop,j] <- se[start:stop,j]*abs(linfo$mu.eta(fit[start:stop,j]))
+	      if (get.ci) {
+                ll[start:stop,j] <- linfo$linkinv(ll[start:stop,j])
+		ul[start:stop,j] <- linfo$linkinv(ul[start:stop,j])
+              } 
               fit[start:stop,j] <- linfo$linkinv(fit[start:stop,j])
             }
           } ## end of lp loop
         } else { ## response case with own predict code
-          #lpi <- list();pst <- c(pstart,ncol(X)+1)
-          #for (i in 1:(length(pst)-1)) lpi[[i]] <- pst[i]:(pst[i+1]-1)
+	  if (!is.null(object$bs)&&get.ci) message("note: bs not used for confidence limits")
           attr(X,"lpi") <- lpi  
-          ffv <- fam$predict(fam,se.fit,y= if (is.matrix(response)) response[start:stop,] else response[start:stop],
+          ffv <- fam$predict(fam,se.fit||get.ci,y= if (is.matrix(response)) response[start:stop,] else response[start:stop],
                              X=X,beta=object$coefficients,off=offs,Vb=object$Vp)
           if (is.matrix(fit)&&!is.matrix(ffv[[1]])) {
             fit <- fit[,1]; if (se.fit) se <- se[,1]
+	    if (get.ci) { ll <- ll[,1];ul <- ul[,1] }
           }
           if (is.matrix(ffv[[1]])&&(!is.matrix(fit)||ncol(ffv[[1]])!=ncol(fit))) {
-            fit <- matrix(0,np,ncol(ffv[[1]])); if (se.fit) se <- fit
+            fit <- matrix(0,np,ncol(ffv[[1]])); if (se.fit) se <- fit; if (get.ci) ul <- ll <- fit
           }
           if (is.matrix(fit)) {
             fit[start:stop,] <- ffv[[1]]
             if (se.fit) se[start:stop,] <- ffv[[2]]
+	    if (get.ci) {
+              ll[start:stop,] <- fit[start:stop,] - z.alpha*ffv[[2]]
+	      ul[start:stop,] <- fit[start:stop,] + z.alpha*ffv[[2]]
+            }
           } else {
             fit[start:stop] <- ffv[[1]]
             if (se.fit) se[start:stop] <- ffv[[2]]
+	     if (get.ci) {
+              ll[start:stop] <- fit[start:stop] - z.alpha*ffv[[2]]
+	      ul[start:stop] <- fit[start:stop] + z.alpha*ffv[[2]]
+            }
           }
         } ## end of own response prediction code
       } else { ## single linear predictor
         offs <- if (is.null(k)) rowSums(Xoff) else rowSums(Xoff) + model.offset(mf)
         fit[start:stop] <- X%*%object$coefficients + offs
-        if (se.fit) se[start:stop] <- sqrt(pmax(0,rowSums((X%*%object$Vp)*X)))
+	if (se.fit||get.ci) se0 <- sqrt(pmax(0,rowSums((X%*%object$Vp)*X)))
+        if (se.fit) se[start:stop] <- se0
+	if (get.ci) {
+	  if (!is.null(object$bs)) {
+             ff <- X%*%object$bs + offs ## BS rep functions
+	     delta <- if (is.null(attr(object$bs,"svar.only"))||is.null(object$Ve)) 0 else mean(  ## bias correction
+                se0 - sqrt(pmax(0,rowSums((X%*%object$Ve)*X))))
+             ll[start:stop] <- apply(ff,1,quantile,probs=alpha) - delta*z.alpha ## lower sampling + bias limit
+	     ul[start:stop] <- apply(ff,1,quantile,probs=1-alpha) + delta*z.alpha ## upper samploing + bias limit
+          } else {
+	    ll[start:stop] <- fit[start:stop] - z.alpha * se0; ul[start:stop] <- fit[start:stop] + z.alpha * se0
+          }
+        }  
         if (type=="response") { # transform    
           linkinv <- fam$linkinv
           if (is.null(fam$predict)) {
             dmu.deta <- fam$mu.eta  
-            if (se.fit) se[start:stop]<-se[start:stop]*abs(dmu.deta(fit[start:stop])) 
+            if (se.fit) se[start:stop]<-se[start:stop]*abs(dmu.deta(fit[start:stop]))
+	    if (get.ci) {
+              ll[start:stop] <- linkinv(ll[start:stop]); ul[start:stop] <- linkinv(ul[start:stop])
+            }
             fit[start:stop] <- linkinv(fit[start:stop])
           } else { ## family has its own prediction code for response case
-            ffv <- fam$predict(fam,se.fit,y= if (is.matrix(response)) response[start:stop,] else response[start:stop],
+	    if (!is.null(object$bs)&&get.ci) message("note: bs not used for confidence limits")
+            ffv <- fam$predict(fam,se.fit||get.ci,y= if (is.matrix(response)) response[start:stop,] else response[start:stop],
                                X=X,beta=object$coefficients,off=offs,Vb=object$Vp)
             if (is.null(fit1)&&is.matrix(ffv[[1]])) {
               fit1 <- matrix(0,np,ncol(ffv[[1]]))
               if (se.fit) se1 <- fit1
+	      if (get.ci) ul1 <- ll1 <- fit1
             }
             if (is.null(fit1)) {
               fit[start:stop] <- ffv[[1]]
               if (se.fit) se[start:stop] <- ffv[[2]]
+	      if (get.ci) {
+                ll[start:stop] <- fit[start:stop] - z.alpha*ffv[[2]]
+		ul[start:stop] <- fit[start:stop] + z.alpha*ffv[[2]]
+              }
             } else {
               fit1[start:stop,] <- ffv[[1]]
               if (se.fit) se1[start:stop,] <- ffv[[2]]
+	      if (get.ci) {
+                ll1[start:stop] <- fit1[start:stop] - z.alpha*ffv[[2]]
+		ul1[start:stop] <- fit1[start:stop] + z.alpha*ffv[[2]]
+              }
             }
           }
         }
@@ -3483,8 +3261,10 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
         warning("non-existent terms requested - ignoring")
       else { 
         fit <- fit[,terms,drop=FALSE]
-        if (se.fit) {
-           se <- se[,terms,drop=FALSE]
+        if (se.fit) se <- se[,terms,drop=FALSE]
+	if (get.ci) {
+           ll <- ll[,terms,drop=FALSE]
+	   ul <- ul[,terms,drop=FALSE]
         }
       }
     }
@@ -3494,8 +3274,10 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
       else { 
         exclude <- which(cnames%in%exclude) ## convert to numeric column index
         fit <- fit[,-exclude,drop=FALSE]
-        if (se.fit) {
-          se <- se[,-exclude,drop=FALSE]
+        if (se.fit) se <- se[,-exclude,drop=FALSE]
+	if (get.ci) {
+           ll <- ll[,-exclude,drop=FALSE]
+	   ul <- ul[,-exclude,drop=FALSE]
         }
       }
     }
@@ -3513,9 +3295,6 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
       s.offset <- napredict(na.act,s.offset)
       attr(H,"offset") <- s.offset ## term specific offsets...
     }
-    #if (!is.null(attr(attr(object$model,"terms"),"offset"))) {
-    #  attr(H,"model.offset") <- napredict(na.act,model.offset(mf)) 
-    #}
     if (!is.null(offs)) {
       offs <- offs[1:nlp]
       for (i in 1:nlp) offs[[i]] <- napredict(na.act,offs[[i]])
@@ -3523,25 +3302,29 @@ predict.gam <- function(object,newdata,type="link",se.fit=FALSE,terms=NULL,exclu
     }
     H <- napredict(na.act,H)
     if (length(object$nsdf)>1) { ## add "lpi" attribute if more than one l.p.
-      #lpi <- list();pst <- c(pstart,ncol(H)+1)
-      #for (i in 1:(length(pst)-1)) lpi[[i]] <- pst[i]:(pst[i+1]-1)  
       attr(H,"lpi") <- lpi
     }
   } else { 
-    if (se.fit) { 
+    if (se.fit||get.ci) { 
       if (is.null(nrow(fit))) {
-        names(fit) <- rn
-        names(se) <- rn
-        fit <- napredict(na.act,fit)
-        se <- napredict(na.act,se) 
+        names(fit) <- rn; fit <- napredict(na.act,fit)
+        if (se.fit) { names(se) <- rn; se <- napredict(na.act,se)}
+	if (get.ci) {
+          names(ll) <- rn; ll <- napredict(na.act,ll)
+	  names(ul) <- rn; ul <- napredict(na.act,ul)
+        }
       } else { 
-        rownames(fit)<-rn
-        rownames(se)<-rn
-        fit <- napredict(na.act,fit)
-        se <- napredict(na.act,se)
+        rownames(fit) <- rn; fit <- napredict(na.act,fit)
+        if (se.fit) { rownames(se) <- rn; se <- napredict(na.act,se)}
+	if (get.ci) {
+          rownames(ll) <- rn; ll <- napredict(na.act,ll)
+	  rownames(ul) <- rn; ul <- napredict(na.act,ul)
+        }
       }
-      H<-list(fit=fit,se.fit=se) 
-    } else { 
+      H <- list(fit=fit)
+      if (se.fit) H$se.fit <- se
+      if (get.ci) { H$ll <- ll; H$ul <- ul }
+    } else { ## no se
       H <- fit
       if (is.null(nrow(H))) names(H) <- rn else
       rownames(H)<-rn
@@ -4447,7 +4230,8 @@ sp.vcov <- function(x,edge.correct=TRUE,reg=1e-3) {
       return(V)
     } else return(solve(hess+reg))
   } else return(NULL)
-}
+} ## sp.vcov
+
 
 gam.vcomp <- function(x,rescale=TRUE,conf.lev=.95) {
 ## Routine to convert smoothing parameters to variance components
@@ -4547,20 +4331,44 @@ gam.vcomp <- function(x,rescale=TRUE,conf.lev=.95) {
     res <- cbind(exp(lsd),exp(ll),exp(ul))
     rownames(res) <- names(vc)
     colnames(res) <- c("std.dev","lower","upper")
-    cat("\n")
-    cat(paste("Standard deviations and",conf.lev,"confidence intervals:\n\n"))
-    print(res)
-    cat("\nRank: ");cat(rank);cat("/");cat(ncol(H));cat("\n")
+    res <- list(all = NULL, vc = res, rank = rank, rank.hess = ncol(H), conf.lev = conf.lev)
     if (!is.null(vc.full)) { 
-      cat("\nAll smooth components:\n")
-      print(sqrt(vc.full))
-      res <- list(all=sqrt(vc.full),vc=res)
+      res$all <- sqrt(vc.full)
     }
-    invisible(res)
+  } else res <- if (is.null(vc.full)) sqrt(vc) else list(vc=sqrt(vc),all=sqrt(vc.full))
+  
+  # return
+  class(res) <- c("gam.vcomp", class(res))
+  res
+} ## gam.vcomp
+
+print.gam.vcomp <- function(x, ...) {
+  cat("\n")
+  # print variance components, check if we have an array (i.e. CIs)
+  x.list <- is.list(x)
+  if (x.list && is.array(x$vc)) {
+    cat(paste("Standard deviations and", x$conf.lev,"confidence intervals:\n\n"))
+    print(x$vc, ...)
+    cat("\nRank: ");cat(x$rank);cat("/");cat(x$rank.hess);cat("\n")
   } else {
-    if (is.null(vc.full)) return(sqrt(vc)) else return(list(vc=sqrt(vc),all=sqrt(vc.full)))
-  } 
-} ## end of gam.vcomp
+    # don't have array so print just the standard deviations
+    cat(paste("Standard deviations:\n\n"))
+    if (x.list) {
+      print(x$vc)
+    } else {
+      # if x isn't a list, i.e. now if no rescaling, we need to peel off the added class...
+      cls <- class(x); i <- which(cls == "gam.vcomp")
+      class(x) <- class(x)[-i]
+      # ...and then print
+      print(x, ...)
+    }
+  }
+  # if x has components for all smooths, print them
+  if (x.list && !is.null(x$all)) {
+    cat("\nAll smooth components:\n")
+    print(x$all, ...)
+  }
+}  ## print.gam.vcomp
 
 
 gam.sandwich <- function(b,freq=FALSE) {
@@ -5015,7 +4823,7 @@ print.mgcv.version <- function()
   version <- version[pmatch("Version",version)]
   um <- strsplit(version," ")[[1]]
   version <- um[nchar(um)>0][2]
-  hello <- paste("This is mgcv ",version,". For overview type 'help(\"mgcv-package\")'.",sep="")
+  hello <- paste("This is mgcv ",version,". For overview type '?mgcv'.",sep="")
   packageStartupMessage(hello)
 }
 

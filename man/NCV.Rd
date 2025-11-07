@@ -59,7 +59,7 @@ Arlot, S. and A. Celisse (2010). A survey of cross-validation procedures for mod
 Roberts et al. (2017) Cross-validation strategies for data with temporal,
 spatial, hierarchical, or phylogenetic structure. Ecography 40(8), 913-929.
 
-Wood S.N. (2023) On Neighbourhood Cross Validation. \url{https://arxiv.org/abs/2404.16490}
+Wood S.N. (2026) On Neighbourhood Cross Validation. Statistical Science (in press). \url{https://arxiv.org/abs/2404.16490}
 }
 
 \author{ Simon N. Wood \email{simon.wood@r-project.org}}

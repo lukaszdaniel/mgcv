@@ -93,7 +93,8 @@ will have no identifiability constraints. Only use this if you really understand
 }
 \item{pc}{If not \code{NULL}, signals a point constraint: the smooth should pass through zero at the
 point given here (as a vector or list with names corresponding to the smooth names). Never ignored
-if supplied. See \code{\link{identifiability}}. }
+if supplied as a number. See \code{\link{identifiability}}. Can also be supplied as a list of lists to
+specify general linear constraints as described in \code{\link{scasm}} - ignored by other modelling routines.  }
   
 }
 
@@ -176,8 +177,6 @@ generalized additive mixed models. Biometrics 62(4):1025-1036 \doi{10.1111/j.154
 
 Wood S.N. (2017) Generalized Additive Models: An Introduction with R (2nd edition). Chapman
 and Hall/CRC Press. \doi{10.1201/9781315370279}
-
-\url{https://www.maths.ed.ac.uk/~swood34/}
 
 }
 

@@ -347,10 +347,10 @@ gam.check <- function(b, old.style=FALSE,
 ## Start of plot method functions for smooths
 #############################################
 
-plot.random.effect <- function(x,P=NULL,data=NULL,label="",se1.mult=1,se2.mult=2,
+plot.random.effect <- function(x,P=NULL,data=NULL,label="",
                      partial.resids=FALSE,rug=TRUE,se=TRUE,scale=-1,n=100,n2=40,n3=3,
                      theta=30,phi=30,jit=FALSE,xlab=NULL,ylab=NULL,main=NULL,
-                     ylim=NULL,xlim=NULL,too.far=0.1,shade=FALSE,shade.col="gray80",
+                     ylim=NULL,xlim=NULL,too.far=0.1,shade.col="gray80",
                      shift=0,trans=I,by.resids=FALSE,scheme=0,...) {
 ## plot method for a "random.effect" smooth class
  
@@ -448,17 +448,17 @@ lolaxy <- function(lo,la,theta,phi) {
   list(x=x[ind],y=y[ind])
 } ## end of lolaxy
 
-plot.sos.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
+plot.sos.smooth <- function(x,P=NULL,data=NULL,label="",
                      partial.resids=FALSE,rug=TRUE,se=TRUE,scale=-1,n=100,n2=40,n3=3,
                      theta=30,phi=30,jit=FALSE,xlab=NULL,ylab=NULL,main=NULL,
-                     ylim=NULL,xlim=NULL,too.far=0.1,shade=FALSE,shade.col="gray80",
+                     ylim=NULL,xlim=NULL,too.far=0.1,shade.col="gray80",
                      shift=0,trans=I,by.resids=FALSE,scheme=0,hcolors=heat.colors(100),
                      contour.col=4,...) {
 ## plot method function for sos.smooth terms
-  if (scheme>1) return(plot.mgcv.smooth(x,P=P,data=data,label=label,se1.mult=se1.mult,se2.mult=se2.mult,
+  if (scheme>1) return(plot.mgcv.smooth(x,P=P,data=data,label=label,
                      partial.resids=partial.resids,rug=rug,se=se,scale=scale,n=n,n2=n2,
                      theta=theta,phi=phi,jit=jit,xlab=xlab,ylab=ylab,main=main,
-                     ylim=ylim,xlim=xlim,too.far=too.far,shade=shade,shade.col=shade.col,
+                     ylim=ylim,xlim=xlim,too.far=too.far,shade.col=shade.col,
                      shift=shift,trans=trans,by.resids=by.resids,scheme=scheme-2,
                      hcolors=hcolors,contour.col=contour.col,...))
   ## convert location of pole in plotting grid to radians
@@ -651,10 +651,10 @@ polys.plot <- function(pc,z=NULL,scheme="heat",lab="",...) {
   par(oldpar)
 } ## polys.plot
 
-plot.mrf.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
+plot.mrf.smooth <- function(x,P=NULL,data=NULL,label="",
                      partial.resids=FALSE,rug=TRUE,se=TRUE,scale=-1,n=100,n2=40,n3=3,
                      theta=30,phi=30,jit=FALSE,xlab=NULL,ylab=NULL,main=NULL,
-                     ylim=NULL,xlim=NULL,too.far=0.1,shade=FALSE,shade.col="gray80",
+                     ylim=NULL,xlim=NULL,too.far=0.1,shade.col="gray80",
                      shift=0,trans=I,by.resids=FALSE,scheme=0,...) {
 ## plot method function for mrf.smooth terms, depends heavily on polys.plot, above
   if (is.null(P)) { ## get plotting information...
@@ -677,10 +677,10 @@ plot.mrf.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
 } ## end plot.mrf.smooth
 
 
-plot.sz.interaction <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
+plot.sz.interaction <- function(x,P=NULL,data=NULL,label="",
                      partial.resids=FALSE,rug=TRUE,se=TRUE,scale=-1,n=100,n2=40,n3=3,
                      theta=30,phi=30,jit=FALSE,xlab=NULL,ylab=NULL,main=NULL,
-                     ylim=NULL,xlim=NULL,too.far=0.1,shade=FALSE,shade.col="gray80",
+                     ylim=NULL,xlim=NULL,too.far=0.1,shade.col="gray80",
                      shift=0,trans=I,by.resids=FALSE,scheme=0,...) {
 ## plot method for factor smooth interactions designed for models such as s(x) + s(fac,x) where
 ## the factor level dependent smooths are strictly deviations from the main effect smooth.
@@ -715,7 +715,8 @@ plot.sz.interaction <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=
     X <- PredictMat(x,dat)
     if (is.null(xlab)) xlabel <- x$base$term else xlabel <- xlab
     if (is.null(ylab)) ylabel <- label else ylabel <- ylab
-    return(list(X=X,scale=TRUE,se=TRUE,se.mult=se1.mult,raw=raw,xlab=xlabel,ylab=ylabel,
+    clev <- if (is.numeric(se)) se else .95
+    return(list(X=X,scale=TRUE,se=TRUE,clev=clev,raw=raw,xlab=xlabel,ylab=ylabel,
              main="",x=xx,n=n,nf=nf))
   } else { ## produce the plot
     nft <- prod(P$nf) ## total number of curves
@@ -728,7 +729,7 @@ plot.sz.interaction <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=
     xt <- xlim[1] + (1:nft-.5)*dx/nft ## text locations
     ind <- 1:P$n; mind <- P$n:1
     
-    if(is.null(ylim)) ylim <- trans(range(c(P$fit+P$se,P$fit-P$se))+shift)
+    if(is.null(ylim)) ylim <- trans(range(c(P$ll[,1],P$ul[,1]))+shift)
 
     plot(P$x[ind],trans(P$fit[ind]+shift),ylim=ylim,xlab=P$xlab,ylab=P$ylab,type="n",...)
 
@@ -736,8 +737,8 @@ plot.sz.interaction <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=
     kk <- rep(0,nfac) ## factor level index vector
     if (scheme==1) {
       for (i in 1:nft) {
-        ul <- trans(P$fit[ind] + P$se[ind]+shift)
-        ll <- trans(P$fit[ind] - P$se[ind]+shift)
+        ul <- trans(P$ul[ind,1]+shift)
+        ll <- trans(P$ll[ind,1] +shift)
 	lines(P$x,ul,col="grey",lty=i);lines(P$x,ll,col="grey",lty=i)
         ii <- P$x < xt[i] - dx/30
 	yt <- approx(P$x,P$fit[ind],xt[i])$y
@@ -749,8 +750,8 @@ plot.sz.interaction <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=
       }	
     } else {
       for (i in 1:nft) {
-        ul <- trans(P$fit[ind] + P$se[ind]+shift)
-        ll <- trans(P$fit[mind] - P$se[mind]+shift)
+        ul <- trans(P$ul[ind,1] +shift)
+        ll <- trans(P$ll[mind,1] +shift)
         polygon(c(P$x,P$x[P$n:1]),c(ul,ll),col=kol[i],border=kol[i])
         yt <- approx(P$x,P$fit[ind],xt[i])$y
         ii <- P$x < xt[i] - dx/30
@@ -765,10 +766,10 @@ plot.sz.interaction <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=
 } ## end plot.sz.interaction
 
 
-plot.fs.interaction <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
+plot.fs.interaction <- function(x,P=NULL,data=NULL,label="",
                      partial.resids=FALSE,rug=TRUE,se=TRUE,scale=-1,n=100,n2=40,n3=3,
                      theta=30,phi=30,jit=FALSE,xlab=NULL,ylab=NULL,main=NULL,
-                     ylim=NULL,xlim=NULL,too.far=0.1,shade=FALSE,shade.col="gray80",
+                     ylim=NULL,xlim=NULL,too.far=0.1,shade.col="gray80",
                      shift=0,trans=I,by.resids=FALSE,scheme=0,...) {
 ## plot method for simple smooth factor interactions...
   if (is.null(P)) { ## get plotting info
@@ -799,12 +800,12 @@ plot.fs.interaction <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=
   }
 } ## end plot.fs.interaction
 
-plot.mgcv.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
+plot.mgcv.smooth <- function(x,P=NULL,data=NULL,label="",
                      partial.resids=FALSE,rug=TRUE,se=TRUE,scale=-1,n=100,n2=40,n3=3,
                      theta=30,phi=30,jit=FALSE,xlab=NULL,ylab=NULL,main=NULL,
-                     ylim=NULL,xlim=NULL,too.far=0.1,shade=FALSE,shade.col="gray80",
+                     ylim=NULL,xlim=NULL,too.far=0.1,shade.col="gray80",
                      shift=0,trans=I,by.resids=FALSE,scheme=0,hcolors=heat.colors(50),
-                     contour.col=4,...) {
+                     contour.col=4,deriv=FALSE,...) {
 ## default plot method for smooth objects `x' inheriting from "mgcv.smooth"
 ## `x' is a smooth object, usually part of a `gam' fit. It has an attribute
 ##     'coefficients' containing the coefs for the smooth, but usually these
@@ -820,7 +821,7 @@ plot.mgcv.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
 ##     * The values against which to plot.
 ##     * `exclude' indicates rows of X%*%p to set to NA for plotting -- NULL for none.
 ##     * se TRUE if plotting of the term can use standard error information.
-##     * se.mult - the multiplier of the standard error used to plot confidence bands
+##     * clev - the confidence level(s) of confidence bands
 ##     * scale TRUE if the term should be considered by plot.gam if a common
 ##             y scale is required.
 ##     * any raw data information.
@@ -831,7 +832,7 @@ plot.mgcv.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
 ##     Alternatively return P as NULL if x should not be plotted.
 ##     If P is not NULL (second call) it will contain the following...
 ##     * fit - the values for plotting 
-##     * se - standard errors of fit multiplied by se.mult
+##     * ll,ul - lower and upper confidence limits (earlier cols are higher levels)
 ##     * the values against which to plot
 ##     * any raw data information
 ##     * any partial.residuals 
@@ -841,14 +842,14 @@ plot.mgcv.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
 ## Note that if ylim is supplied it should not be transformed using trans and shift.
 #############################
 
-  sp.contour <- function(x,y,z,zse,xlab="",ylab="",zlab="",titleOnly=FALSE,
-               se.plot=TRUE,se.mult=1,trans=I,shift=0,...)   
+  sp.contour <- function(x,y,z,ll,ul,xlab="",ylab="",zlab="",titleOnly=FALSE,
+               se.plot=TRUE,clev,trans=I,shift=0,...) {
   ## function for contouring 2-d smooths with 1 s.e. limits
-  { gap<-median(zse,na.rm=TRUE)  
-    zr<-max(trans(z+zse+shift),na.rm=TRUE)-min(trans(z-zse+shift),na.rm=TRUE) # plotting range  
+    gap<-median((ul-ll)/2,na.rm=TRUE)  
+    zr<-max(trans(ul+shift),na.rm=TRUE)-min(trans(ll+shift),na.rm=TRUE) # plotting range  
     n<-10  
     while (n>1 && zr/n<2.5*gap) n<-n-1    
-    zrange<-c(min(trans(z-zse+shift),na.rm=TRUE),max(trans(z+zse+shift),na.rm=TRUE))  
+    zrange<-c(min(trans(ll+shift),na.rm=TRUE),max(trans(ul+shift),na.rm=TRUE))  
     zlev<-pretty(zrange,n)  ## ignore codetools on this one  
     yrange<-range(y);yr<-yrange[2]-yrange[1]  
     xrange<-range(x);xr<-xrange[2]-xrange[1]  
@@ -874,8 +875,8 @@ plot.mgcv.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
     do.call("contour",args)
   
     if (is.null(args$cex.main)) cm <- 1 else cm <- args$cex.main
-    if (titleOnly)  title(zlab,cex.main=cm) else 
-    { xpos<-xrange[1]+3*xr/10  
+    if (titleOnly)  title(zlab,cex.main=cm) else {
+      xpos<-xrange[1]+3*xr/10  
       xl<-c(xpos,xpos+xr/10); yl<-c(ypos,ypos)   
       lines(xl,yl,xpd=TRUE,lwd=args$lwd)  
       text(xpos+xr/10,ypos,zlab,xpd=TRUE,pos=4,cex=cs*cm,off=0.5*cs*cm)  
@@ -888,29 +889,39 @@ plot.mgcv.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
     if (!"lty"%in%n.args) args$lty<-2
     if (!"col"%in%n.args) args$col<-2
     if (!"labcex"%in%n.args) args$labcex<-cs*.5
-    zz <- trans(z+zse+shift)
+    #zz <- trans(z-zse+shift)
+    zz <- trans(ll+shift)
     args$z<-substitute(zz)
 
     do.call("contour",args)
+
+    alpha <- (1-clev)/2 
 
     if (!titleOnly) {
       xpos<-xrange[1]  
       xl<-c(xpos,xpos+xr/10)#;yl<-c(ypos,ypos)  
-      lines(xl,yl,xpd=TRUE,lty=args$lty,col=args$col)  
-      text(xpos+xr/10,ypos,paste("-",round(se.mult),"se",sep=""),xpd=TRUE,pos=4,cex=cs*cm,off=0.5*cs*cm)  
+      lines(xl,yl,xpd=TRUE,lty=args$lty,col=args$col)
+      txt <- paste(".",strsplit(paste(round(alpha,3)),".",fixed=TRUE)[[1]][2],sep="")
+      text(xpos+xr/10,ypos,txt,xpd=TRUE,pos=4,cex=cs*cm,off=0.5*cs*cm)  
+     # text(xpos+xr/10,ypos,paste("-",round(se.mult),"se",sep=""),xpd=TRUE,pos=4,cex=cs*cm,off=0.5*cs*cm)  
     }
 
     if (!"lty"%in%n.args) args$lty<-3
-    if (!"col"%in%n.args) args$col<-3
-    zz <- trans(z - zse+shift)
+    if (!"col"%in%n.args) args$col<-4
+    #zz <- trans(z + zse+shift)
+    zz <- trans(ul+shift)
     args$z<-substitute(zz)
     do.call("contour",args)
-    
+
+    alpha <- 1 - alpha
+
     if (!titleOnly) {
       xpos<-xrange[2]-xr/5  
       xl<-c(xpos,xpos+xr/10);  
-      lines(xl,yl,xpd=TRUE,lty=args$lty,col=args$col)  
-      text(xpos+xr/10,ypos,paste("+",round(se.mult),"se",sep=""),xpd=TRUE,pos=4,cex=cs*cm,off=0.5*cs*cm)  
+      lines(xl,yl,xpd=TRUE,lty=args$lty,col=args$col)
+      txt <- paste(".",strsplit(paste(round(alpha,3)),".",fixed=TRUE)[[1]][2],sep="")
+      text(xpos+xr/10,ypos,txt,xpd=TRUE,pos=4,cex=cs*cm,off=0.5*cs*cm)  
+      #text(xpos+xr/10,ypos,paste("+",round(se.mult),"se",sep=""),xpd=TRUE,pos=4,cex=cs*cm,off=0.5*cs*cm)  
     }
   }  ## end of sp.contour
 
@@ -920,18 +931,30 @@ plot.mgcv.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
       raw <- data[x$term][[1]]
       if (is.null(xlim)) xx <- seq(min(raw),max(raw),length=n) else # generate x sequence for prediction
       xx <- seq(xlim[1],xlim[2],length=n)
-      if (x$by!="NA")         # deal with any by variables
-      { by<-rep(1,n);dat<-data.frame(x=xx,by=by)
+      if (x$by!="NA") {        # deal with any by variables
+        by<-rep(1,n);dat<-data.frame(x=xx,by=by)
         names(dat)<-c(x$term,x$by)
       } else { 
         dat<-data.frame(x=xx);names(dat) <- x$term
       } ## prediction data.frame finished
       X <- PredictMat(x,dat)   # prediction matrix for this term
+      if (deriv) {
+        eps <- diff(range(xx))*1e-7
+	dat[[1]] <- dat[[1]] + eps
+	X <- (PredictMat(x,dat) - X)/eps
+	if (is.null(ylab)&&length(grep("(",label,fixed=TRUE))) {
+          label2 <- strsplit(label,"(",fixed=TRUE)[[1]]
+          label <- paste(label2[1],"'(",label2[-1],sep="")
+        }
+      }
       if (is.null(xlab)) xlabel<- x$term else xlabel <- xlab
       if (is.null(ylab)) ylabel <- label else ylabel <- ylab
       if (is.null(xlim)) xlim <- range(xx)
-      return(list(X=X,x=xx,scale=TRUE,se=TRUE,raw=raw,xlab=xlabel,ylab=ylabel,
-             main=main,se.mult=se1.mult,xlim=xlim))
+      clev <- if (is.numeric(se)) se else .95
+      if (scheme==2&&length(clev)<2) clev <- c(0.95,0.68)
+      if (scheme!=2) clev <- clev[1]
+      return(list(X=X,x=xx,scale=TRUE,se=as.logical(se[1]),raw=raw,xlab=xlabel,ylab=ylabel,
+             main=main,clev=clev,xlim=xlim))
     } else if (x$dim==2) { ## basic plot data for 2D terms
       xterm <- x$term[1]
       if (is.null(xlab)) xlabel <- xterm else xlabel <- xlab
@@ -960,9 +983,10 @@ plot.mgcv.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
         main <- label
       }
       if (is.null(ylim)) ylim <- range(ym) 
-      if (is.null(xlim)) xlim <- range(xm) 
+      if (is.null(xlim)) xlim <- range(xm)
+      clev <- if (is.numeric(se)) se else .68
       return(list(X=X,x=xm,y=ym,scale=FALSE,se=TRUE,raw=raw,xlab=xlabel,ylab=ylabel,
-             main=main,se.mult=se2.mult,ylim=ylim,xlim=xlim,exclude=exclude))
+             main=main,clev=clev,ylim=ylim,xlim=xlim,exclude=exclude))
     } else { ## basic plot data for 3 or 4 d terms
       vname <- x$term
       ## if the smooth has margins and one is 2D then set that as the 
@@ -1016,11 +1040,11 @@ plot.mgcv.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
              main=main,exclude=exclude))
     } ## end of 3/4 D case
   } else { ## produce plot
-    if (se) { ## produce CI's
+    if (P$plot.ci) { ## produce CI's
       if (x$dim==1) { 
-        if (scheme == 1) shade <- TRUE
-        ul <- P$fit + P$se ## upper CL
-        ll <- P$fit - P$se ## lower CL
+        #ul <- P$fit + P$se ## upper CL
+        #ll <- P$fit - P$se ## lower CL
+	ul <- P$ul[,1];ll <- P$ll[,1]
         if (scale==0&&is.null(ylim)) { ## get scale 
           ylimit<-c(min(ll),max(ul))
           if (partial.resids) { 
@@ -1041,13 +1065,15 @@ plot.mgcv.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
           xa <- axis(1);ya <- axis(2)
           rect(P$xlim[1]-dx*.1,ylimit[1]-dy*.1,P$xlim[2]+dx*.1,ylimit[2]+dy*.1,col="lightgrey")
           abline(v=xa,col="white");abline(h=ya,col="white")
-          rgb.col <- rgb(.3,.1,.4,alpha=.5);rgb.col1 <- rgb(0,.2,.8,alpha=.5)
+          #rgb.col <- rgb(0,.2,.8,alpha=.5)
+	  if (length(shade.col)<2) shade.col <- c(rgb(0,.2,.8,alpha=.5),"blue")
           polygon(c(P$x,P$x[n:1],P$x[1]),
-                    trans(c(ul,ll[n:1],ul[1])+shift),col = rgb.col1,border = NA) 
-          ul <- P$fit + P$se/2 ## upper CL
-          ll <- P$fit - P$se/2 ## lower CL  
+                    trans(c(ul,ll[n:1],ul[1])+shift),col = shade.col[1],border = NA) 
+          #ul <- P$fit + P$se/2 ## upper CL
+          #ll <- P$fit - P$se/2 ## lower CL
+	  ul <- P$ul[,2];ll <- P$ll[,2]
           polygon(c(P$x,P$x[n:1],P$x[1]),
-                    trans(c(ul,ll[n:1],ul[1])+shift),col = "blue",border = NA) 
+                    trans(c(ul,ll[n:1],ul[1])+shift),col = shade.col[2],border = NA) 
           lines(P$x,trans(P$fit+shift),...)
         } else if (scheme==1) { 
           plot(P$x,trans(P$fit+shift),type="n",xlab=P$xlab,ylim=ylimit,
@@ -1097,9 +1123,9 @@ plot.mgcv.smooth <- function(x,P=NULL,data=NULL,label="",se1.mult=2,se2.mult=1,
             points(P$raw$x,P$raw$y,...)
           }
         } else { ## contour plot with error contours
-          sp.contour(P$x,P$y,matrix(P$fit,n2,n2),matrix(P$se,n2,n2),
+          sp.contour(P$x,P$y,matrix(P$fit,n2,n2),matrix(P$ll,n2,n2),matrix(P$ul,n2,n2),
                      xlab=P$xlab,ylab=P$ylab,zlab=P$main,titleOnly=!is.null(main),
-                     se.mult=1,trans=trans,shift=shift,...)
+                     clev=P$clev,trans=trans,shift=shift,...)
           if (rug) { 
             if (is.null(list(...)[["pch"]]))
             points(P$raw$x,P$raw$y,pch=".",...) else
@@ -1202,7 +1228,7 @@ md.plot <- function(f,nr,nc,m,vname,lo,hi,hcolors,scheme,main,...) {
     lab <- format(x4,digits=2)
     for (i in 1:nc) mtext(lab[i],1,at=at[i],line=.5,cex=c1*c3)
     at=(1:nr-.5)/nr
-    lab <- format(x4,digits=2)
+    lab <- format(x3,digits=2)
     for (i in 1:nr) mtext(lab[i],2,at=at[i],line=.5,cex=c1*c3)
     ## now the 2d panel axes...
     xr <- axisTicks(c(lo[2],hi[2]),log=FALSE,nint=4)
@@ -1243,14 +1269,14 @@ md.plot <- function(f,nr,nc,m,vname,lo,hi,hcolors,scheme,main,...) {
 } ## md.plot
 
 plot.gam <- function(x,residuals=FALSE,rug=NULL,se=TRUE,pages=0,select=NULL,scale=-1,n=100,n2=40,n3=3,
-                     theta=30,phi=30,jit=FALSE,xlab=NULL,ylab=NULL,main=NULL,
-                     ylim=NULL,xlim=NULL,too.far=0.1,all.terms=FALSE,shade=FALSE,shade.col="gray80",
-                     shift=0,trans=I,seWithMean=FALSE,unconditional=FALSE,by.resids=FALSE,scheme=0,...)
+                     theta=30,phi=30,jit=FALSE,xlab=NULL,ylab=NULL,main=NULL,ylim=NULL,xlim=NULL,
+		     too.far=0.1,all.terms=FALSE,shade.col="gray80",shift=0,trans=I,seWithMean=FALSE,
+		     unconditional=FALSE,by.resids=FALSE,scheme=0,deriv=FALSE,...)
 
 # Create an appropriate plot for each smooth term of a GAM.....
 # x is a gam object
 # rug determines whether a rug plot should be added to each plot
-# se determines whether twice standard error bars are to be added
+# se determines whether CIs are to be added
 # pages is the number of pages over which to split output - 0 implies that 
 # graphic settings should not be changed for plotting
 # scale -1 for same y scale for each plot
@@ -1314,12 +1340,16 @@ plot.gam <- function(x,residuals=FALSE,rug=NULL,se=TRUE,pages=0,select=NULL,scal
   n.para <- sum(order==1) # plotable parametric terms   
   else n.para <- 0 
  
-  if (se) ## sort out CI widths for 1 and 2D
-  { if (is.numeric(se)) se2.mult <- se1.mult <- se else { se1.mult <- 2;se2.mult <- 1} 
-    if (se1.mult<0) se1.mult<-0;if (se2.mult < 0) se2.mult <- 0
-  } else se1.mult <- se2.mult <-1
-  
-  if (se && x$Vp[1,1] < 0) ## check that variances are actually available
+#  if (se) { ## sort out CI widths for 1 and 2D
+#    if (is.numeric(se)) se2.mult <- se1.mult <- se else { se1.mult <- 2;se2.mult <- 1} 
+#    if (se1.mult<0) se1.mult<-0;if (se2.mult < 0) se2.mult <- 0
+#  } else se1.mult <- se2.mult <-1
+  if (is.numeric(se)) {
+    se <- sort(se,decreasing = TRUE)
+    if (any(se>=1)) se <- TRUE else if (any(se<=0)) se <- FALSE
+  }
+
+  if (se[1] && x$Vp[1,1] < 0) ## check that variances are actually available
   { se <- FALSE
     warning("No variance estimates available")
   }
@@ -1351,9 +1381,8 @@ plot.gam <- function(x,residuals=FALSE,rug=NULL,se=TRUE,pages=0,select=NULL,scal
     attr(x$smooth[[i]],"coefficients") <- x$coefficients[first:last]   ## relevent coefficients
     P <- plot(x$smooth[[i]],P=NULL,data=x$model,partial.resids=partial.resids,rug=rug,se=se,scale=scale,n=n,n2=n2,n3=n3,
                      theta=theta,phi=phi,jit=jit,xlab=xlab,ylab=ylab,main=main,label=term.lab,
-                     ylim=ylim,xlim=xlim,too.far=too.far,shade=shade,shade.col=shade.col,
-                     se1.mult=se1.mult,se2.mult=se2.mult,shift=shift,trans=trans,
-                     by.resids=by.resids,scheme=scheme[i],...)
+                     ylim=ylim,xlim=xlim,too.far=too.far,shade.col=shade.col,shift=shift,trans=trans,
+                     by.resids=by.resids,scheme=scheme[i],deriv=deriv,...)
 
     if (is.null(P)) pd[[i]] <- list(plot.me=FALSE) else if (is.null(P$fit)) {
       p <- x$coefficients[first:last]   ## relevent coefficients 
@@ -1361,9 +1390,9 @@ plot.gam <- function(x,residuals=FALSE,rug=NULL,se=TRUE,pages=0,select=NULL,scal
       ## get fitted values ....
       if (is.null(offset)) P$fit <- P$X%*%p else P$fit <- P$X%*%p + offset 
       if (!is.null(P$exclude)) P$fit[P$exclude] <- NA
-      if (se && P$se) { ## get standard errors for fit
+      if (se[1] && P$se && is.null(x$bs)) { ## get standard errors for fit
         ## test whether mean variability to be added to variability (only for centred terms)
-        if (seWithMean && attr(x$smooth[[i]],"nCons")>0) {
+        if (seWithMean && !is.null( attr(x$smooth[[i]],"nCons")) && attr(x$smooth[[i]],"nCons")>0) {
           if (length(x$cmX) < ncol(x$Vp)) x$cmX <- c(x$cmX,rep(0,ncol(x$Vp)-length(x$cmX)))
           if (seWithMean==2) x$cmX[-(1:x$nsdf)] <- 0 ## variability of fixed effects mean only
           X1 <- matrix(x$cmX,nrow(P$X),ncol(x$Vp),byrow=TRUE)
@@ -1376,12 +1405,35 @@ plot.gam <- function(x,residuals=FALSE,rug=NULL,se=TRUE,pages=0,select=NULL,scal
             for (q in 1:length(lpi)) if (any(first:last%in%lpi[[q]])) ii <- c(ii,lpi[[q]])
             se.fit <- sqrt(pmax(0,rowSums(as(X1[,ii]%*%x$Vp[ii,ii],"matrix")*X1[,ii])))
           }
-        } else se.fit <- ## se in centred (or anyway unconstained) space only
-        sqrt(pmax(0,rowSums(as(P$X%*%x$Vp[first:last,first:last,drop=FALSE],"matrix")*P$X)))
+	} else { ## se in centred (or anyway unconstained) space only
+	  if (seWithMean && is.null( attr(x$smooth[[i]],"nCons"))) warning("seWithMean unavailable")
+	  se.fit <- sqrt(pmax(0,rowSums(as(P$X%*%x$Vp[first:last,first:last,drop=FALSE],"matrix")*P$X)))
+        }
         if (!is.null(P$exclude)) se.fit[P$exclude] <- NA
       } ## standard errors for fit completed
       if (partial.resids) { P$p.resid <- fv.terms[,length(order)+i] + w.resid }
-      if (se && P$se) P$se <- se.fit*P$se.mult  # Note multiplier
+      if (se[1] && P$se) {
+        se.mult <- if (is.null(P$clev)) P$se.mult else -qnorm((1-P$clev)/2)
+	if (!is.null(x$bs))  {
+	  ff <- P$X%*%x$bs[first:last,]
+	  delta <- if (is.null(attr(x$bs,"svar.only"))) 0 else
+	           mean(sqrt(pmax(0,rowSums(as(P$X%*%x$Vp[first:last,first:last,drop=FALSE],"matrix")*P$X)))-
+	           sqrt(pmax(0,rowSums(as(P$X%*%x$Ve[first:last,first:last,drop=FALSE],"matrix")*P$X))))
+	}
+	P$ll <- P$ul <- matrix(0,length(P$fit),length(se.mult))
+	for (j in 1:length(se.mult)) if (is.null(x$bs)) {
+           P$ll[,j] <- P$fit - se.fit * se.mult[j]
+	   P$ul[,j] <- P$fit + se.fit * se.mult[j]
+        } else {
+	   alpha <- (1-P$clev[j])/2
+           P$ll[,j] <- apply(ff,1,quantile,probs=alpha) - delta*se.mult[j]
+	   P$ul[,j] <- apply(ff,1,quantile,probs=1-alpha) + delta*se.mult[j]
+	   if  (!is.null(P$exclude)) P$ll[P$exclude,j] <- P$ul[P$exclude,j] <- NA
+        }
+	## for back compatibility...
+	P$plot.ci <- P$se
+        if (is.null(x$bs)) { P$se.mult <- se.mult;P$se <- se.fit*P$se.mult[1]}  # Note multiplier
+      } else P$plot.ci <- FALSE
       P$X <- NULL
       P$plot.me <- TRUE
       pd[[i]] <- P;rm(P) 
@@ -1416,7 +1468,7 @@ plot.gam <- function(x,residuals=FALSE,rug=NULL,se=TRUE,pages=0,select=NULL,scal
     if (c<1) r <- c <- 1
     if (c*r < ppp) c <- c + 1
     if (c*r < ppp) r <- r + 1  
-    oldpar<-par(mfrow=c(r,c),mar=c(5,5,2,1))
+    oldpar<-par(mfrow=c(r,c),mar=c(5,5,3,1))
   
   } else
   { ppp<-1;oldpar<-par()}
@@ -1429,16 +1481,16 @@ plot.gam <- function(x,residuals=FALSE,rug=NULL,se=TRUE,pages=0,select=NULL,scal
   if (scale==-1&&is.null(ylim)) {
     k <- 0
     if (m>0) for (i in 1:m) if (pd[[i]]$plot.me&&pd[[i]]$scale) { ## loop through plot data 
-      if (se&&length(pd[[i]]$se)>1) { ## require CIs on plots
-        ul<-pd[[i]]$fit+pd[[i]]$se
-        ll<-pd[[i]]$fit-pd[[i]]$se
+      if (se[1]&&length(pd[[i]]$ll)>1) { ## require CIs on plots
+        #ul<-pd[[i]]$fit+pd[[i]]$se
+        #ll<-pd[[i]]$fit-pd[[i]]$se
         if (k==0) { 
-          ylim <- c(min(ll,na.rm=TRUE),max(ul,na.rm=TRUE));k <- 1
+          ylim <- c(min(pd[[i]]$ll[,1],na.rm=TRUE),max(pd[[i]]$ul[,1],na.rm=TRUE));k <- 1
         } else {
-          if (min(ll,na.rm=TRUE)<ylim[1]) ylim[1] <- min(ll,na.rm=TRUE)
-	  if (max(ul,na.rm=TRUE)>ylim[2]) ylim[2] <- max(ul,na.rm=TRUE)
+          if (min(pd[[i]]$ll[,1],na.rm=TRUE)<ylim[1]) ylim[1] <- min(pd[[i]]$ll[,1],na.rm=TRUE)
+	  if (max(pd[[i]]$ul[,1],na.rm=TRUE)>ylim[2]) ylim[2] <- max(pd[[i]]$ul[,1],na.rm=TRUE)
         }
-      } else { ## no standard errors
+      } else { ## no confidence limits
         if (k==0) {
           ylim <- range(pd[[i]]$fit,na.rm=TRUE);k <- 1
         } else {
@@ -1475,7 +1527,7 @@ plot.gam <- function(x,residuals=FALSE,rug=NULL,se=TRUE,pages=0,select=NULL,scal
   if (m>0) for (i in 1:m) if (pd[[i]]$plot.me&&(is.null(select)||i==select)) {
     plot(x$smooth[[i]],P=pd[[i]],partial.resids=partial.resids,rug=rug,se=se,scale=scale,n=n,n2=n2,n3=n3,
                      theta=theta,phi=phi,jit=jit,xlab=xlab,ylab=ylab,main=main,
-                     ylim=ylim,xlim=xlim,too.far=too.far,shade=shade,shade.col=shade.col,
+                     ylim=ylim,xlim=xlim,too.far=too.far,shade.col=shade.col,
                      shift=shift,trans=trans,by.resids=by.resids,scheme=scheme[i],...)
    if (ask) { ## this is within loop so we don't get asked before it's necessary
      oask <- devAskNewPage(TRUE)

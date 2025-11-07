@@ -5,12 +5,13 @@
 \description{Evaluates the difference between two \eqn{N(0,1)}{N(0,1)} cumulative distribution functions avoiding cancellation error.  
 }
 \usage{
-dpnorm(x0,x1)
+dpnorm(x0,x1,log.p=FALSE)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
  \item{x0}{vector of lower values at which to evaluate standard normal distribution function.}
  \item{x1}{vector of upper values at which to evaluate standard normal distribution function.}
+ \item{log.p}{set to \code{TRUE} to compute on log scale, avoiding underflow.}
 }
 
 \details{ Equivalent to \code{pnorm(x1)-pnorm(x0)}, but stable when \code{x0} and \code{x1} values are very close, or in the upper tail of the standard normal.}

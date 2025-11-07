@@ -192,7 +192,6 @@ and Hall/CRC Press.
 
 Wang, Y. (1998) Mixed effects smoothing spline analysis of variance. J.R. Statist. Soc. B 60, 159-174
 
-\url{https://www.maths.ed.ac.uk/~swood34/}
 }
 \author{ Simon N. Wood \email{simon.wood@r-project.org}}
 

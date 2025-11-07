@@ -158,7 +158,7 @@ even with factor variables present. Can be vector when \code{formula} is a list.
 \item{discrete}{experimental option for setting up models for use with discrete methods employed in \code{\link{bam}}. Do not modify.}
 
 \item{...}{further arguments for 
-passing on e.g. to \code{gam.fit} (such as \code{mustart}). }
+passing on e.g. to \code{gam.fit3} (such as \code{mustart}). }
 
 }
 
@@ -217,7 +217,7 @@ coefficient matrices for each smooth term in the model formula, obtaining a mode
 the strictly parametric part of the model formula, and combining these to obtain a 
 complete model matrix (/design matrix) and a set of penalty matrices for the smooth terms. 
 The linear identifiability constraints are also obtained at this point. The model is 
-fit using \code{\link{gam.fit}}, \code{\link{gam.fit3}} or variants, which are modifications 
+fit using \code{\link{gam.fit3}} or variants, which are modifications 
 of \code{\link{glm.fit}}. The GAM 
 penalized likelihood maximization problem is solved by Penalized Iteratively 
 Re-weighted  Least Squares (P-IRLS) (see e.g. Wood 2000). 
@@ -229,8 +229,7 @@ parameter estimates converge. This option is available in \code{\link{bam}} and 
 (ii) Alternatively the P-IRLS scheme is iterated to convergence for each trial set of smoothing parameters,
 and GCV, UBRE or REML scores are only evaluated on convergence - optimization is then `outer' to the P-IRLS
 loop: in this case the P-IRLS iteration has to be differentiated, to
-facilitate optimization, and \code{\link{gam.fit3}} or one of its variants is used in place of
-\code{gam.fit}. (iii) The extended Fellner-Schall algorithm of Wood and Fasiolo (2017) alternates estimation of model coefficients with simple updates of smoothing parameters, eventually approximately maximizing the marginal likelihood of the model (REML). \code{gam} uses the second method, outer iteration, by default.
+facilitate optimization, and \code{\link{gam.fit3}} or one of its variants is used. (iii) The extended Fellner-Schall algorithm of Wood and Fasiolo (2017) alternates estimation of model coefficients with simple updates of smoothing parameters, eventually approximately maximizing the marginal likelihood of the model (REML). \code{gam} uses the second method, outer iteration, by default.
 
 
 Several alternative basis-penalty types  are built in for representing model
@@ -277,6 +276,10 @@ See package \code{gam}, for GAMs via the original Hastie and Tibshirani approach
 \references{
 
 Key References on this implementation:
+
+Wood, S.N. (2025) Generalized Additive Models. Annual Review of
+Statistics and Its Applications 12:497-526
+\doi{10.1146/annurev-statistics-112723-034249}
 
 Wood, S.N., N. Pya and B. Saefken (2016), Smoothing parameter and
 model selection for general smooth models (with discussion).
@@ -350,7 +353,7 @@ Wood (2001) mgcv:GAMs and Generalized Ridge Regression for R. R News 1(2):20-25
 Wood and Augustin (2002) GAMs with integrated model selection using penalized regression splines and applications 
 to environmental modelling. Ecological Modelling 157:157-177
 
-\url{https://www.maths.ed.ac.uk/~swood34/}
+\url{https://webhomes.maths.ed.ac.uk/~swood34/}
 }
 \author{ Simon N. Wood \email{simon.wood@r-project.org}
 
@@ -394,6 +397,12 @@ b <- gam(y~s(x0)+s(x1)+s(x2)+s(x3),data=dat)
 summary(b)
 plot(b,pages=1,residuals=TRUE)  ## show partial residuals
 plot(b,pages=1,seWithMean=TRUE) ## `with intercept' CIs
+
+## plot derivaives of smooths w.r.t. covariates - the
+## direct analogue of linear model regression coefficients
+## - also selecting a more colourful plotting scheme...
+plot(b,pages=1,scale=0,deriv=TRUE,scheme=2)
+
 ## run some basic model checks, including checking
 ## smoothing basis dimensions...
 gam.check(b)
