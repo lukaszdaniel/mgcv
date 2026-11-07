@@ -1965,9 +1965,9 @@ SEXP isa1p(SEXP L,SEXP S) {
    Recall matrix elements are in L@x, L@p[i] gives start location of col i.
    L@i gives row corresponding to each element of L@x.
 */
-  SEXP i_sym,x_sym,dim_sym,p_sym,kr;
-  int *Sp,*Si,i,j,k,q,*dim,n,tid,kjj,ki,kji,nx,*r,*d,*sin;
-  double *Sx,Lii,*Sj0,sls,xx,*iLd,invjj,invii;
+  SEXP i_sym,x_sym,dim_sym,p_sym;
+  int *Sp,*Si,i,j,k,q,*dim,n,kjj,ki,kji,nx,*r,*d,*sin;
+  double *Sx,sls,*iLd,invjj,invii;
   double * restrict Sj;
   const int * restrict Lp, * restrict Lip, * restrict Lip1, * restrict Li;
   const double * restrict Lx, * restrict Lxp;

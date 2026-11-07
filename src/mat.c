@@ -4196,7 +4196,7 @@ void partial_band_chol(double *A,int b,int n) {
    useful for general purpose pre-conditioning.
 */
   int i,k,k1,j,j0,b1;
-  double x,z,*Ap,Rii,*p,*p1;
+  double x,*Ap,Rii,*p,*p1;
   b1 = b + 1;
   Ap = A;
   for (i=0;i<n;i++) { /* loop down the rows (conceptually) */
@@ -4255,7 +4255,7 @@ void XWXband(double *X,double *w,double *B,int *kk,int *n,int *p,int *rb) {
    the leading diagonal. The first extracted band goes in
    the first row of B, which has rb rows. X is n by p. */
   int i,j,k,kb=0;
-  double *Xi, *Xj, x, *wp;
+  double *Xi, *Xj, x;
   for (k=kk[0];k<=kk[1];k++,kb++) {
     Xi = X; Xj = X + *n * k;
     for (j=0;j<*p-k;j++,Xi += *n,Xj += *n) {

@@ -10,14 +10,14 @@ e30f474b1041422848a5b51816cb231d *src/init.c
 76bbd4891c25f877e5e61714935affc5 *src/gdi.c
 73a60deb0dd98c32e321a77e6229e7e0 *src/matrix.c
 5532cd5efae62177810db2be8d121053 *src/magic.c
-a1ff30b0ebcfd3227b99b014756ca64a *src/discrete.c
+1c5dfad1a999bde9e37e6171b07f3263 *src/discrete.c
 a707d3cfeacef0a5cc322079076baa25 *src/general.h
 d5673b88f6f3d85c62a1337f49abba24 *src/soap.c
 a06f879ace39efc246697d6db7184d43 *src/davies.c
 799d4142300a778297a4eb2987ae69b7 *src/mgcv.c
-f63f8341a664e348bbd47c46b0b53a5b *src/mat.c
+1b716a7d12f95e80109eaa5856827604 *src/mat.c
 5bd85bf0319a7b7c755cf49c91a7cd94 *src/tprs.h
-940a34864bda3c3024030b85fc7667c5 *src/sparse.c
+52d240746fdc86ee4835f8cc4e956696 *src/sparse.c
 2eb47be59e851895475a2895c1b003bb *src/qp.c
 22979f01652bec989eb3065b1a432e04 *src/misc.c
 183ebf10901da3c9cf04e8c99d763a2f *src/mgcv.h

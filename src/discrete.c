@@ -389,7 +389,7 @@ void tensorXty2(double *Xy,double *work,double *work1,int *iwork, double *y,doub
    This version avoids re-computing partial products.   
 */
   int pb=1,i,j,l,pd,md,*c,kk,*off,*kp,*kd,one=1;
-  double *p1,*M,*Xyb,*Xyp,*xy,*xym,done=1.0,dzero=0.0;
+  double *M,*Xyb,*Xyp,*xy,*xym,done=1.0,dzero=0.0;
   char trans = 'T';
   if (*add) dzero=1.0;
   off = iwork;iwork += *dt;off[0]=0;
@@ -514,7 +514,7 @@ void tensorXb(double *f,double *X, double *C,double *work,int *worki, double *be
    If m is number of marginals then work is n*m, workp is n*(m-1) and worki 2m-1;
 */
   char trans='N';
-  int pb=1,md,*kp,*kd,pd,i,j,q,*c,l,kk,ii,ok,*off,k0;
+  int pb=1,md,*kp,*kd,pd,i,j,q,*c,l,kk,*off;
   double *M,done=1.0,dzero=0.0,*d,*dj,*djm,*cp;
   M = X;off = worki; worki += *dt-1;
   off[0]=0; /* marginal starts */
@@ -661,7 +661,7 @@ void Xbdspace0(ptrdiff_t *space,int *m,int *p, ptrdiff_t *n, int *nx, int *dt, i
 
 void Xbdspace(ptrdiff_t *space,int *m,int *p, ptrdiff_t *n, int *nx, int *dt, int *nt) {
   /* computes space needed by Xbd returning in 3 vector space [int,ptrdiff_t,double,*double] */
-  int nb,i,q,j,c1,dC=0,maxrow=0,maxp=0,pti=0,maxdt=0;
+  int i,q,j,c1,dC=0,maxrow=0,maxp=0,pti=0,maxdt=0;
   ptrdiff_t ii;
   
   for (q=i=0;i< *nt; i++) { /* work through the terms */
@@ -1416,7 +1416,7 @@ SEXP CXWyd(SEXP XWyr, SEXP yr, SEXP Xr, SEXP wr, SEXP kr, SEXP ksr, SEXP mr, SEX
 void XWydspace(ptrdiff_t *space,int *nx, int *nt,ptrdiff_t  *n, int *m, int *dt,int *p) {
 /* compute the space needed by one instance of XWyd space = (int pointer double double n multiplier) */
 
-  int i,j,q,pti,maxm=0,maxdt=0,maxp=0;
+  int i,j,q,pti=0,maxm=0,maxdt=0,maxp=0;
   for (q=i=0;i< *nt; i++) { /* work through the terms */
     for (j=0;j<dt[i];j++,q++) { /* work through components of each term */
       if (j==0) pti = p[q]; else pti *= p[q]; /* term dimension */
@@ -1475,7 +1475,7 @@ void XWyd(double *XWy,double *Wy,double *X,int *k,int *ks, int *m,int *p, ptrdif
    If ncs > 0 then cs contains the subset of terms (blocks of model matrix columns) to include.   */
   double *p0,*p1,*p2,*Xy0,*work,*work1,*work2;
   ptrdiff_t i,j,*off,*voff;
-  int *tps,maxm=0,maxp=0,one=1,zero=0,*pt,add,q,kk,n_XWy,maxdt=0;//,*iwork;
+  int *tps,maxm=0,maxp=0,one=1,*pt,add,q,kk,n_XWy,maxdt=0;//,*iwork;
   
   /* obtain various indices */
   pt = iwork; iwork += *nt; /* the term dimensions */
