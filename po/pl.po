@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.7-28\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-21 11:12+0200\n"
+"POT-Creation-Date: 2025-12-27 17:22+0100\n"
 "PO-Revision-Date: 2025-06-21 11:18+0200\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -73,7 +73,7 @@ msgstr "dostosowywanie %d alokacji pamięci\n"
 msgid "ERROR in addconQT."
 msgstr "BŁĄD w addconQT."
 
-#: qp.c:473
+#: qp.c:472
 msgid "QPCLS - Rank deficiency in model"
 msgstr "QPCLS - Niedobór rang w modelu"
 

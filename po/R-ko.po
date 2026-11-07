@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.1.3\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2025-06-24 18:54\n"
+"POT-Creation-Date: 2025-12-27 17:22\n"
 "PO-Revision-Date: 2015-02-21 16:01-0600\n"
 "Last-Translator:Chel Hee Lee  <chl948@mail.usask.ca>\n"
 "Language-Team: Chel Hee Lee  <chl948@mail.usask.ca>\n"
@@ -116,7 +116,8 @@ msgid "'by' variable must be same dimension as smooth arguments"
 msgstr ""
 
 #. R/bam.r: stop("'family' argument seems not to be a valid family object")
-#: R/bam.r:0
+#. R/scasm.r: stop("'family' argument seems not to be a valid family object",     call. = FALSE)
+#: R/bam.r:0 R/scasm.r:0
 msgid "'family' argument seems not to be a valid family object"
 msgstr "'family' 인자는 올바른 family 객체가 아닌 것 같이 보입니다."
 
@@ -154,9 +155,10 @@ msgstr "`sp'의 길이가 너무 짧습니다."
 msgid "'theta' must be specified"
 msgstr "'theta'의 값은 반드시 주어져야 합니다."
 
+#. R/deprecated.r: stop("0s in V(mu)")
 #. R/gam.fit3.r: stop("0s in V(mu)")
-#. R/mgcv.r: stop("0s in V(mu)")
-#: R/gam.fit3.r:0 R/mgcv.r:0
+#. R/scasm.r: stop("0s in V(mu)")
+#: R/deprecated.r:0 R/gam.fit3.r:0 R/scasm.r:0
 msgid "0s in V(mu)"
 msgstr "V(mu)에서 0이 발견되었습니다."
 
@@ -202,8 +204,13 @@ msgstr ""
 msgid "AR1 residuals not available with NCV, resetting rho=0"
 msgstr ""
 
-#. R/mgcv.r: warning("Algorithm stopped at boundary value")
-#: R/mgcv.r:0
+#. R/deprecated.r: warning("Algorithm did not converge")
+#: R/deprecated.r:0
+msgid "Algorithm did not converge"
+msgstr "알고리즘이 수렴하지 않았습니다."
+
+#. R/deprecated.r: warning("Algorithm stopped at boundary value")
+#: R/deprecated.r:0
 msgid "Algorithm stopped at boundary value"
 msgstr "알고리즘이 경계값(boundary value)에서 멈추었습니다."
 
@@ -248,9 +255,9 @@ msgstr ""
 msgid "Can't find by variable"
 msgstr "by 변수(variable)를 찾을 수 없습니다."
 
+#. R/deprecated.r: stop("Can't find valid starting values: please specify some")
 #. R/gam.fit3.r: stop("Can't find valid starting values: please specify some")
-#. R/mgcv.r: stop("Can't find valid starting values: please specify some")
-#: R/gam.fit3.r:0 R/mgcv.r:0
+#: R/deprecated.r:0 R/gam.fit3.r:0
 msgid "Can't find valid starting values: please specify some"
 msgstr "사용가능한 초기값을 찾을 수 없습니다.  값을 정해주시길 바랍니다."
 
@@ -280,14 +287,14 @@ msgid "Cannot extract the matrix with uninitialized dimensions"
 msgstr ""
 
 #. R/bam.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
+#. R/deprecated.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
 #. R/gam.fit3.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
-#. R/mgcv.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
-#: R/bam.r:0 R/gam.fit3.r:0 R/mgcv.r:0
+#: R/bam.r:0 R/deprecated.r:0 R/gam.fit3.r:0
 msgid "Deviance = %s Iterations - %d"
 msgstr "편차(deviance)= %s 반복(iterations) - %d"
 
-#. R/mgcv.r: warning("Discrete Theta search not available with performance iteration")
-#: R/mgcv.r:0
+#. R/deprecated.r: warning("Discrete Theta search not available with performance iteration")
+#: R/deprecated.r:0
 msgid "Discrete Theta search not available with performance iteration"
 msgstr ""
 
@@ -371,8 +378,8 @@ msgstr ""
 msgid "Length of start should equal %d and correspond to initial coefs for %s"
 msgstr "start의 길이는 %d와 같아야 하며 %s에 대응하는 계수의 초기값을 가지고 있어야 합니다."
 
-#. R/mgcv.r: gettextf("Length of start should equal %d and correspond to initial coefs.",     nvars)
-#: R/mgcv.r:0
+#. R/deprecated.r: gettextf("Length of start should equal %d and correspond to initial coefs.",     nvars)
+#: R/deprecated.r:0
 msgid "Length of start should equal %d and correspond to initial coefs."
 msgstr ""
 
@@ -411,8 +418,9 @@ msgstr ""
 msgid "Model matrix not full column rank"
 msgstr ""
 
+#. R/deprecated.r: stop("Model seems to contain no terms")
 #. R/mgcv.r: stop("Model seems to contain no terms")
-#: R/mgcv.r:0
+#: R/deprecated.r:0 R/mgcv.r:0
 msgid "Model seems to contain no terms"
 msgstr "모델이 아무런 항(term)도 포함하지 않는 것 같습니다."
 
@@ -456,15 +464,17 @@ msgstr "pdTens 행렬(matrix)내에서 NA가 발견되었습니다."
 msgid "NA's in supplied smoothing parameter vector - ignoring."
 msgstr "제공된 평활화 모수(smoothing parameter) 벡터내에서 NA가 발견되어 사용되지 않습니다."
 
+#. R/deprecated.r: stop("NAs in V(mu)")
 #. R/gam.fit3.r: stop("NAs in V(mu)")
-#. R/mgcv.r: stop("NAs in V(mu)")
-#: R/gam.fit3.r:0 R/mgcv.r:0
+#. R/scasm.r: stop("NAs in V(mu)")
+#: R/deprecated.r:0 R/gam.fit3.r:0 R/scasm.r:0
 msgid "NAs in V(mu)"
 msgstr "V(mu)에서 NA가 발견되었습니다."
 
+#. R/deprecated.r: stop("NAs in d(mu)/d(eta)")
 #. R/gam.fit3.r: stop("NAs in d(mu)/d(eta)")
-#. R/mgcv.r: stop("NAs in d(mu)/d(eta)")
-#: R/gam.fit3.r:0 R/mgcv.r:0
+#. R/scasm.r: stop("NAs in d(mu)/d(eta)")
+#: R/deprecated.r:0 R/gam.fit3.r:0 R/scasm.r:0
 msgid "NAs in d(mu)/d(eta)"
 msgstr "d(mu)/d(eta)로부터 NA가 발견되었습니다."
 
@@ -488,8 +498,8 @@ msgstr "gam.setup에 이용될 데이터가 없습니다."
 msgid "No data supplied to gamm.setup"
 msgstr "gamm.setup에 제공된 데이터가 없습니다."
 
-#. R/mgcv.r: gettextf("No observations informative at iteration %d", iter)
-#: R/mgcv.r:0
+#. R/deprecated.r: gettextf("No observations informative at iteration %d", iter)
+#: R/deprecated.r:0
 msgid "No observations informative at iteration %d"
 msgstr ""
 
@@ -518,8 +528,8 @@ msgstr ""
 msgid "Non-finite coefficients at iteration"
 msgstr "다음의 반복에서 얻어진 계수의 추정치가 유한(finite)한 값을 가지지 않습니다."
 
-#. R/mgcv.r: gettextf("Non-finite coefficients at iteration %d", iter)
-#: R/mgcv.r:0
+#. R/deprecated.r: gettextf("Non-finite coefficients at iteration %d", iter)
+#: R/deprecated.r:0
 msgid "Non-finite coefficients at iteration %d"
 msgstr "%d번째 반복에서 얻은 계수의 추정치가 유한(finite)하지 않습니다."
 
@@ -547,7 +557,8 @@ msgstr ""
 #. R/gamm.r: stop("Not enough (non-NA) data to do anything meaningful")
 #. R/jagam.r: stop("Not enough (non-NA) data to do anything meaningful")
 #. R/mgcv.r: stop("Not enough (non-NA) data to do anything meaningful")
-#: R/bam.r:0 R/gamm.r:0 R/jagam.r:0 R/mgcv.r:0
+#. R/scasm.r: stop("Not enough (non-NA) data to do anything meaningful")
+#: R/bam.r:0 R/gamm.r:0 R/jagam.r:0 R/mgcv.r:0 R/scasm.r:0
 msgid "Not enough (non-NA) data to do anything meaningful"
 msgstr "어떤 의미있는 작업을 하기에는 NA가 아닌 데이터의 개수가 충분하지 않습니다."
 
@@ -647,13 +658,13 @@ msgstr ""
 msgid "Step halved: new penalized deviance = %g"
 msgstr ""
 
-#. R/mgcv.r: warning("Step size truncated due to divergence", call. = FALSE)
-#: R/mgcv.r:0
+#. R/deprecated.r: warning("Step size truncated due to divergence", call. = FALSE)
+#: R/deprecated.r:0
 msgid "Step size truncated due to divergence"
 msgstr ""
 
-#. R/mgcv.r: warning("Step size truncated: out of bounds.", call. = FALSE)
-#: R/mgcv.r:0
+#. R/deprecated.r: warning("Step size truncated: out of bounds.", call. = FALSE)
+#: R/deprecated.r:0
 msgid "Step size truncated: out of bounds."
 msgstr ""
 
@@ -739,8 +750,7 @@ msgid "a parametric penalty has wrong dimension"
 msgstr ""
 
 #. R/bam.r: warning("algorithm did not converge")
-#. R/mgcv.r: warning("algorithm did not converge")
-#: R/bam.r:0 R/mgcv.r:0
+#: R/bam.r:0
 msgid "algorithm did not converge"
 msgstr "알고리즘이 수렴하지 않습니다."
 
@@ -871,6 +881,11 @@ msgstr ""
 msgid "by=. not allowed"
 msgstr "by=.는 사용할 수 없습니다."
 
+#. R/scasm.r: stop("can not handle negative weighting of log smoothing parameters")
+#: R/scasm.r:0
+msgid "can not handle negative weighting of log smoothing parameters"
+msgstr ""
+
 #. R/mgcv.r: stop("can't handle [[ in formula")
 #: R/mgcv.r:0
 msgid "can't handle [[ in formula"
@@ -882,7 +897,8 @@ msgid "can't soap smooth without a boundary"
 msgstr ""
 
 #. R/bam.r: stop("cannot find valid starting values: please specify some")
-#: R/bam.r:0
+#. R/scasm.r: stop("cannot find valid starting values: please specify some",     call. = FALSE)
+#: R/bam.r:0 R/scasm.r:0
 msgid "cannot find valid starting values: please specify some"
 msgstr "사용가능한 초기값을 찾을 수 없습니다.  값을 지정해 주시길 바랍니다."
 
@@ -914,6 +930,11 @@ msgstr ""
 #. R/bam.r: warning("constraints for sub blocked tensor products un-tested")
 #: R/bam.r:0
 msgid "constraints for sub blocked tensor products un-tested"
+msgstr ""
+
+#. R/scasm.r: stop("constraints overlap more than one term")
+#: R/scasm.r:0
+msgid "constraints overlap more than one term"
 msgstr ""
 
 #. R/sparse.r: stop("cubic spline only deals with 1D data")
@@ -1029,6 +1050,11 @@ msgstr ""
 msgid "factor 'by' variables can not be used with matrix arguments."
 msgstr ""
 
+#. R/scasm.r: stop("failed to find feasible starting values")
+#: R/scasm.r:0
+msgid "failed to find feasible starting values"
+msgstr ""
+
 #. R/mgcv.r: warning("failure of Davies method, falling back on Liu et al approximtion")
 #: R/mgcv.r:0
 msgid "failure of Davies method, falling back on Liu et al approximtion"
@@ -1076,7 +1102,8 @@ msgstr "family에 알 수 없는 값이 입력되었습니다."
 #. R/gfam.r: stop("family not recognized")
 #. R/jagam.r: stop("family not recognized")
 #. R/mgcv.r: stop("family not recognized")
-#: R/bam.r:0 R/gamm.r:0 R/gfam.r:0 R/jagam.r:0 R/mgcv.r:0
+#. R/scasm.r: stop("family not recognized")
+#: R/bam.r:0 R/gamm.r:0 R/gfam.r:0 R/jagam.r:0 R/mgcv.r:0 R/scasm.r:0
 msgid "family not recognized"
 msgstr "family에 대한 정보를 찾을 수 없습니다."
 
@@ -1085,22 +1112,52 @@ msgstr "family에 대한 정보를 찾을 수 없습니다."
 msgid "fast REML optimizer reached iteration limit"
 msgstr ""
 
-#. R/soap.r: stop("faulty bnd")
+#. R/soap.r: stop("faulty bnd 1")
 #: R/soap.r:0
-msgid "faulty bnd"
+msgid "faulty bnd 1"
+msgstr ""
+
+#. R/soap.r: stop("faulty bnd 2")
+#: R/soap.r:0
+msgid "faulty bnd 2"
+msgstr ""
+
+#. R/soap.r: stop("faulty bnd 3")
+#: R/soap.r:0
+msgid "faulty bnd 3"
+msgstr ""
+
+#. R/soap.r: stop("faulty bnd 4")
+#: R/soap.r:0
+msgid "faulty bnd 4"
+msgstr ""
+
+#. R/soap.r: stop("faulty bnd 5")
+#: R/soap.r:0
+msgid "faulty bnd 5"
+msgstr ""
+
+#. R/soap.r: stop("faulty bnd 6")
+#: R/soap.r:0
+msgid "faulty bnd 6"
 msgstr ""
 
 #. R/bam.r: warning("fitted probabilities numerically 0 or 1 occurred")
-#. R/mgcv.r: warning("fitted probabilities numerically 0 or 1 occurred")
-#: R/bam.r:0 R/mgcv.r:0
+#. R/deprecated.r: warning("fitted probabilities numerically 0 or 1 occurred")
+#: R/bam.r:0 R/deprecated.r:0
 msgid "fitted probabilities numerically 0 or 1 occurred"
 msgstr "적합된 확률값이 수치적으로 0 또는 1 입니다."
 
 #. R/bam.r: warning("fitted rates numerically 0 occurred")
-#. R/mgcv.r: warning("fitted rates numerically 0 occurred")
-#: R/bam.r:0 R/mgcv.r:0
+#. R/deprecated.r: warning("fitted rates numerically 0 occurred")
+#: R/bam.r:0 R/deprecated.r:0
 msgid "fitted rates numerically 0 occurred"
 msgstr "적합된 비율(rates)가 수치적으로 0입니다."
+
+#. R/scasm.r: stop("fixed constraints span multiple smooths")
+#: R/scasm.r:0
+msgid "fixed constraints span multiple smooths"
+msgstr ""
 
 #. R/mgcv.r: stop("for NCV number of dropped and predicted neighbourhoods must match")
 #: R/mgcv.r:0
@@ -1270,6 +1327,12 @@ msgstr ""
 msgid "if response is a matrix it must have 2 columns"
 msgstr ""
 
+#. R/deprecated.r: stop("illegal `family' argument")
+#: R/deprecated.r:0
+#, fuzzy
+msgid "illegal `family' argument"
+msgstr "`family' 인자의 값이 올바르지 않습니다."
+
 #. R/mgcv.r: stop("in.out incorrect: see documentation")
 #: R/mgcv.r:0
 msgid "in.out incorrect: see documentation"
@@ -1281,7 +1344,8 @@ msgid "incorrect arguments to GP smoother"
 msgstr ""
 
 #. R/mgcv.r: stop("incorrect number of linear predictors for family")
-#: R/mgcv.r:0
+#. R/scasm.r: stop("incorrect number of linear predictors for family")
+#: R/mgcv.r:0 R/scasm.r:0
 msgid "incorrect number of linear predictors for family"
 msgstr ""
 
@@ -1315,6 +1379,18 @@ msgstr "실행가능(feasible)한 초기모수값(initial parameters)이 아닙�
 msgid "initial parameters very close to inequality constraints"
 msgstr "부등식으로 표현된 제약조건에 매우 가까이 놓여 있는 초기값입니다."
 
+#. R/scasm.r: stop("initial point fails equality constraints")
+#: R/scasm.r:0
+#, fuzzy
+msgid "initial point fails equality constraints"
+msgstr "부등식으로 표현된 일부 제약조건에 매우 가까이 놓여 있는 초기값입니다."
+
+#. R/scasm.r: stop("initial point fails inequality constraints")
+#: R/scasm.r:0
+#, fuzzy
+msgid "initial point fails inequality constraints"
+msgstr "부등식으로 표현된 일부 제약조건에 매우 가까이 놓여 있는 초기값입니다."
+
 #. R/mgcv.r: warning("initial point very close to some inequality constraints")
 #: R/mgcv.r:0
 msgid "initial point very close to some inequality constraints"
@@ -1325,18 +1401,28 @@ msgstr "부등식으로 표현된 일부 제약조건에 매우 가까이 놓여
 msgid "inner groupings not nested in outer!!"
 msgstr ""
 
+#. R/deprecated.r: stop("inner loop 1; can't correct step size")
 #. R/gam.fit3.r: stop("inner loop 1; can't correct step size")
 #. R/gam.fit4.r: stop("inner loop 1; can't correct step size")
-#. R/mgcv.r: stop("inner loop 1; can't correct step size")
-#: R/gam.fit3.r:0 R/gam.fit4.r:0 R/mgcv.r:0
+#: R/deprecated.r:0 R/gam.fit3.r:0 R/gam.fit4.r:0
 msgid "inner loop 1; can't correct step size"
 msgstr ""
 
+#. R/scasm.r: stop("inner loop 1; cannot correct step size", call. = FALSE)
+#: R/scasm.r:0
+msgid "inner loop 1; cannot correct step size"
+msgstr ""
+
+#. R/deprecated.r: stop("inner loop 2; can't correct step size")
 #. R/gam.fit3.r: stop("inner loop 2; can't correct step size")
 #. R/gam.fit4.r: stop("inner loop 2; can't correct step size")
-#. R/mgcv.r: stop("inner loop 2; can't correct step size")
-#: R/gam.fit3.r:0 R/gam.fit4.r:0 R/mgcv.r:0
+#: R/deprecated.r:0 R/gam.fit3.r:0 R/gam.fit4.r:0
 msgid "inner loop 2; can't correct step size"
+msgstr ""
+
+#. R/scasm.r: stop("inner loop 2; cannot correct step size", call. = FALSE)
+#: R/scasm.r:0
+msgid "inner loop 2; cannot correct step size"
 msgstr ""
 
 #. R/gam.fit3.r: stop("inner loop 3; can't correct step size")
@@ -1356,8 +1442,7 @@ msgid "internal error in vcorr, please report to simon.wood@r-project.org"
 msgstr ""
 
 #. R/gam.fit3.r: stop("invalid 'family' argument")
-#. R/mgcv.r: stop("invalid 'family' argument")
-#: R/gam.fit3.r:0 R/mgcv.r:0
+#: R/gam.fit3.r:0
 #, fuzzy
 msgid "invalid 'family' argument"
 msgstr "`family' 인자의 값이 올바르지 않습니다."
@@ -1372,8 +1457,8 @@ msgstr ""
 msgid "iteration %d"
 msgstr "%d번째 반복입니다."
 
-#. R/mgcv.r: stop("iterative weights or data non-finite in gam.fit - regularization may help. See ?gam.control.")
-#: R/mgcv.r:0
+#. R/deprecated.r: stop("iterative weights or data non-finite in gam.fit - regularization may help. See ?gam.control.")
+#: R/deprecated.r:0
 msgid "iterative weights or data non-finite in gam.fit - regularization may help. See ?gam.control."
 msgstr ""
 
@@ -1418,6 +1503,12 @@ msgstr ""
 msgid "lambda and h should have the same length!"
 msgstr "lambda와 h 모두 같은 길이를 가져야 합니다."
 
+#. R/scasm.r: gettextf("length of 'start' should equal %d and correspond to initial coefs",     nvars)
+#: R/scasm.r:0
+#, fuzzy
+msgid "length of 'start' should equal %d and correspond to initial coefs"
+msgstr "start의 길이는 %d와 같아야 하며 %s에 대응하는 계수의 초기값을 가지고 있어야 합니다."
+
 #. R/mgcv.r: stop("length of min.sp is wrong.")
 #: R/mgcv.r:0
 msgid "length of min.sp is wrong."
@@ -1430,7 +1521,8 @@ msgstr ""
 
 #. R/bam.r: stop("length of sp must be number of free smoothing parameters in original model")
 #. R/mgcv.r: stop("length of sp must be number of free smoothing parameters in original model")
-#: R/bam.r:0 R/mgcv.r:0
+#. R/scasm.r: stop("length of sp must be number of free smoothing parameters in original model")
+#: R/bam.r:0 R/mgcv.r:0 R/scasm.r:0
 msgid "length of sp must be number of free smoothing parameters in original model"
 msgstr ""
 
@@ -1461,6 +1553,12 @@ msgstr "범위 외의 값을 가집니다."
 msgid "link \"%s\" not available for Tweedie family."
 msgstr "트위디 페밀리(tweedie family)에 링크(link) \"%s\"는 사용할 수 없습니다."
 
+#. R/efam.r: gettextf("link \"%s\" not available for bcg family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#: R/efam.r:0
+#, fuzzy
+msgid "link \"%s\" not available for bcg family; available links are %s"
+msgstr "coxph 페밀리(family)에 사용할 수 있는 링크(link)가 아닙니다.  사용가능한 링크(link)는 \"identity\"입니다."
+
 #. R/efam.r: gettextf("link \"%s\" not available for betar family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
 #: R/efam.r:0
 #, fuzzy
@@ -1477,6 +1575,12 @@ msgstr "coxph 페밀리(family)에 사용할 수 있는 링크(link)가 아닙�
 #: R/efam.r:0
 #, fuzzy
 msgid "link \"%s\" not available for cnorm family; available links are %s"
+msgstr "coxph 페밀리(family)에 사용할 수 있는 링크(link)가 아닙니다.  사용가능한 링크(link)는 \"identity\"입니다."
+
+#. R/efam.r: gettextf("link \"%s\" not available for cpois family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#: R/efam.r:0
+#, fuzzy
+msgid "link \"%s\" not available for cpois family; available links are %s"
 msgstr "coxph 페밀리(family)에 사용할 수 있는 링크(link)가 아닙니다.  사용가능한 링크(link)는 \"identity\"입니다."
 
 #. R/efam.r: gettextf("link \"%s\" not available for nb family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
@@ -1553,6 +1657,11 @@ msgstr "평균 mu는 음수일 수 없습니다."
 #: R/mgcv.r:0
 msgid "method not recognised."
 msgstr "알 수 없는 method입니다."
+
+#. R/scasm.r: paste("min(redf)=", min(redf))
+#: R/scasm.r:0
+msgid "min(redf)="
+msgstr ""
 
 #. R/bam.r: warning("min.sp not supported with fast REML and NCV computation, and ignored.")
 #: R/bam.r:0
@@ -1729,6 +1838,12 @@ msgstr ""
 msgid "no good data in iteration"
 msgstr ""
 
+#. R/scasm.r: gettextf("no observations informative at iteration %d", iter)
+#: R/scasm.r:0
+#, fuzzy
+msgid "no observations informative at iteration %d"
+msgstr "%d번째 반복에서 얻어진 계수(coefficients)가 유한(finite)한 값을 가지지 않습니다."
+
 #. R/mgcv.r: stop("no sandwich estimate available for this model")
 #: R/mgcv.r:0
 #, fuzzy
@@ -1745,10 +1860,15 @@ msgstr ""
 msgid "no spatial information provided!"
 msgstr ""
 
+#. R/scasm.r: stop("no valid set of coefficients has been found: please supply starting values",     call. = FALSE)
+#: R/scasm.r:0
+msgid "no valid set of coefficients has been found: please supply starting values"
+msgstr ""
+
+#. R/deprecated.r: stop("no valid set of coefficients has been found:please supply starting values",     call. = FALSE)
 #. R/gam.fit3.r: stop("no valid set of coefficients has been found:please supply starting values",     call. = FALSE)
 #. R/gam.fit4.r: stop("no valid set of coefficients has been found:please supply starting values",     call. = FALSE)
-#. R/mgcv.r: stop("no valid set of coefficients has been found:please supply starting values",     call. = FALSE)
-#: R/gam.fit3.r:0 R/gam.fit4.r:0 R/mgcv.r:0
+#: R/deprecated.r:0 R/gam.fit3.r:0 R/gam.fit4.r:0
 msgid "no valid set of coefficients has been found:please supply starting values"
 msgstr ""
 
@@ -1771,6 +1891,12 @@ msgstr ""
 #: R/bam.r:0
 msgid "non-finite coefficients at iteration %d"
 msgstr "%d번째 반복에서 얻어진 계수(coefficients)가 유한(finite)한 값을 가지지 않습니다."
+
+#. R/scasm.r: stop("non-finite initial deviance")
+#: R/scasm.r:0
+#, fuzzy
+msgid "non-finite initial deviance"
+msgstr "편차(deviance)가 유한(finite)한 값을 가지지 않습니다."
 
 #. R/plots.r: warning("non-integer binomial denominator: quantiles incorrect")
 #: R/plots.r:0
@@ -1818,6 +1944,11 @@ msgstr ""
 #. R/mcmc.r: stop("not usable with bam fits")
 #: R/mcmc.r:0
 msgid "not usable with bam fits"
+msgstr ""
+
+#. R/mgcv.r: message("note: bs not used for confidence limits")
+#: R/mgcv.r:0
+msgid "note: bs not used for confidence limits"
 msgstr ""
 
 #. R/mgcv.r: stop("nothing to do for this model")
@@ -2031,6 +2162,12 @@ msgstr "plot.gam에 전달되는 인자 residuals의 길이가 올바르지 않�
 msgid "residuals argument to plot.gam is wrong length: ignored"
 msgstr "plot.gam에 전달되는 인자 residuals의 길이가 올바르지 않아 무시되었습니다. "
 
+#. R/efam.r: stop("response must be non-negative")
+#: R/efam.r:0
+#, fuzzy
+msgid "response must be non-negative"
+msgstr "평균 mu는 음수일 수 없습니다."
+
 #. R/gamlss.r: stop("response not in 0 to number of predictors + 1")
 #: R/gamlss.r:0
 msgid "response not in 0 to number of predictors + 1"
@@ -2097,10 +2234,20 @@ msgstr ""
 msgid "saturated likelihood may be inaccurate"
 msgstr ""
 
+#. R/scasm.r: stop("scad is for 1D smoothing only")
+#: R/scasm.r:0
+msgid "scad is for 1D smoothing only"
+msgstr ""
+
 #. R/gam.fit3.r: stop("scale parameter must be positive")
 #: R/gam.fit3.r:0
 msgid "scale parameter must be positive"
 msgstr "척도모수(scale parameter)는 반드시 양수이어야 합니다."
+
+#. R/scasm.r: warning("scasm.newton failed to converge")
+#: R/scasm.r:0
+msgid "scasm.newton failed to converge"
+msgstr ""
 
 #. R/misc.r: stop("scattered XVX computation not yet implemented")
 #: R/misc.r:0
@@ -2110,6 +2257,11 @@ msgstr ""
 #. R/misc.r: stop("sd should have exactly one less entry than ld")
 #: R/misc.r:0
 msgid "sd should have exactly one less entry than ld"
+msgstr ""
+
+#. R/plots.r: warning("seWithMean unavailable")
+#: R/plots.r:0
+msgid "seWithMean unavailable"
 msgstr ""
 
 #. R/mgcv.r: stop("shared offsets not allowed")
@@ -2149,6 +2301,11 @@ msgstr ""
 msgid "size must be in [1,120]"
 msgstr "p는 반드시 구간 [1,2]내에 존재해야 합니다."
 
+#. R/smooth.r: warning("smooth model matrix not full rank")
+#: R/smooth.r:0
+msgid "smooth model matrix not full rank"
+msgstr ""
+
 #. R/smooth.r: warning("smooth objects should not have a qrc attribute.")
 #: R/smooth.r:0
 msgid "smooth objects should not have a qrc attribute."
@@ -2167,6 +2324,12 @@ msgstr ""
 #. R/soap.r: stop("soap films are bivariate only")
 #: R/soap.r:0
 msgid "soap films are bivariate only"
+msgstr ""
+
+#. R/efam.r: warning("some x0>=x1")
+#. R/misc.r: warning("some x0>=x1")
+#: R/efam.r:0 R/misc.r:0
+msgid "some x0>=x1"
 msgstr ""
 
 #. R/inla.r: stop("something wrong with A index vector")
@@ -2208,9 +2371,19 @@ msgstr ""
 msgid "sorry no option for contouring with errors: try plot.gam"
 msgstr ""
 
+#. R/scasm.r: stop("sp and smooth length not matching")
+#: R/scasm.r:0
+msgid "sp and smooth length not matching"
+msgstr ""
+
 #. R/misc.r: stop("sparse method for Kronecker product contrasts not implemented")
 #: R/misc.r:0
 msgid "sparse method for Kronecker product contrasts not implemented"
+msgstr ""
+
+#. R/scasm.r: warning("step failure")
+#: R/scasm.r:0
+msgid "step failure"
 msgstr ""
 
 #. R/efam.r: warning("step failure in theta estimation")
@@ -2274,6 +2447,17 @@ msgstr ""
 #: R/smooth.r:0
 msgid "there is *no* information about some basis coefficients"
 msgstr ""
+
+#. R/efam.r: stop("theta should be length 1")
+#: R/efam.r:0
+msgid "theta should be length 1"
+msgstr ""
+
+#. R/efam.r: stop("theta should be length 2")
+#: R/efam.r:0
+#, fuzzy
+msgid "theta should be length 2"
+msgstr "deriv의 값은 1 또는 2이어야 합니다."
 
 #. R/smooth.r: stop("too few knots")
 #: R/smooth.r:0
@@ -2459,8 +2643,9 @@ msgstr "Tweedie(p=1)의 경우 y는 반드시 phi의 배수(integer multiple)이
 msgid "y must be strictly positive for a Gamma density"
 msgstr "감마밀도(Gamma density)의 경우 y는 반드시 양수이어야 합니다."
 
+#. R/deprecated.r: stop("y must be univariate unless binomial")
 #. R/mgcv.r: stop("y must be univariate unless binomial")
-#: R/mgcv.r:0
+#: R/deprecated.r:0 R/mgcv.r:0
 msgid "y must be univariate unless binomial"
 msgstr ""
 
@@ -2485,9 +2670,6 @@ msgstr[0] ""
 
 #~ msgid "and correspond to initial coefs for"
 #~ msgstr "와 같아야 하며 다음에 상응하는 계수(coef)들에 대한 초기값을 가지고 있어야 합니다."
-
-#~ msgid "Algorithm did not converge"
-#~ msgstr "알고리즘이 수렴하지 않았습니다."
 
 #~ msgid "length(M$w) != length(M$y)"
 #~ msgstr "length(M$w)의 값이 length(M$y)와 일치하지 않습니다."

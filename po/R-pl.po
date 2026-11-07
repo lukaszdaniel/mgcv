@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mgcv 1.7-28\n"
 "Report-Msgid-Bugs-To: bugs@r-project.org\n"
-"POT-Creation-Date: 2025-06-23 16:39\n"
+"POT-Creation-Date: 2025-12-27 17:22\n"
 "PO-Revision-Date: 2025-06-23 16:53+0200\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -95,7 +95,8 @@ msgid "'by' variable must be same dimension as smooth arguments"
 msgstr "zmienna 'by' musi mieć ten sam wymiar co argumenty wygładzania"
 
 #. R/bam.r: stop("'family' argument seems not to be a valid family object")
-#: R/bam.r:0
+#. R/scasm.r: stop("'family' argument seems not to be a valid family object",     call. = FALSE)
+#: R/bam.r:0 R/scasm.r:0
 msgid "'family' argument seems not to be a valid family object"
 msgstr "argument 'family' wydaje się nie być poprawnym obiektem klasy \"family\""
 
@@ -129,9 +130,10 @@ msgstr "'sp' jest zbyt krótkie"
 msgid "'theta' must be specified"
 msgstr "argument 'theta' musi być określony"
 
+#. R/deprecated.r: stop("0s in V(mu)")
 #. R/gam.fit3.r: stop("0s in V(mu)")
-#. R/mgcv.r: stop("0s in V(mu)")
-#: R/gam.fit3.r:0 R/mgcv.r:0
+#. R/scasm.r: stop("0s in V(mu)")
+#: R/deprecated.r:0 R/gam.fit3.r:0 R/scasm.r:0
 msgid "0s in V(mu)"
 msgstr "zera w 'V(mu)'"
 
@@ -175,8 +177,13 @@ msgstr "parametr rho AR1 jest nieużywany z uogólnionym modelem"
 msgid "AR1 residuals not available with NCV, resetting rho=0"
 msgstr "Reszty AR1 niedostępne z NCV, resetowanie rho=0"
 
-#. R/mgcv.r: warning("Algorithm stopped at boundary value")
-#: R/mgcv.r:0
+#. R/deprecated.r: warning("Algorithm did not converge")
+#: R/deprecated.r:0
+msgid "Algorithm did not converge"
+msgstr "algorytm nie uzbieżnił się"
+
+#. R/deprecated.r: warning("Algorithm stopped at boundary value")
+#: R/deprecated.r:0
 msgid "Algorithm stopped at boundary value"
 msgstr "Algorytm zatrzymał się na wartości granicznej"
 
@@ -221,9 +228,9 @@ msgstr "można obsługiwać jedynie sferę"
 msgid "Can't find by variable"
 msgstr "Nie można znaleźć poprzez zmienną"
 
+#. R/deprecated.r: stop("Can't find valid starting values: please specify some")
 #. R/gam.fit3.r: stop("Can't find valid starting values: please specify some")
-#. R/mgcv.r: stop("Can't find valid starting values: please specify some")
-#: R/gam.fit3.r:0 R/mgcv.r:0
+#: R/deprecated.r:0 R/gam.fit3.r:0
 msgid "Can't find valid starting values: please specify some"
 msgstr "Nie można znaleźć poprawnych wartości startowych: proszę określić kilka"
 
@@ -253,14 +260,14 @@ msgid "Cannot extract the matrix with uninitialized dimensions"
 msgstr "Nie można wyodrębnić macierzy z niezainicjowanymi wymiarami"
 
 #. R/bam.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
+#. R/deprecated.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
 #. R/gam.fit3.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
-#. R/mgcv.r: gettextf("Deviance = %s Iterations - %d", dev, iter, domain = "R-mgcv")
-#: R/bam.r:0 R/gam.fit3.r:0 R/mgcv.r:0
+#: R/bam.r:0 R/deprecated.r:0 R/gam.fit3.r:0
 msgid "Deviance = %s Iterations - %d"
 msgstr "Odchylenie = %s Iteracje - %d"
 
-#. R/mgcv.r: warning("Discrete Theta search not available with performance iteration")
-#: R/mgcv.r:0
+#. R/deprecated.r: warning("Discrete Theta search not available with performance iteration")
+#: R/deprecated.r:0
 msgid "Discrete Theta search not available with performance iteration"
 msgstr "Poszukiwania dyskretnej thety nie są dostępne z wykonywaną iteracją"
 
@@ -343,8 +350,8 @@ msgstr "Dalsze człony współdzielące 'id' nie mogą mieć więcej parametrów
 msgid "Length of start should equal %d and correspond to initial coefs for %s"
 msgstr "długość 'start' powinna równać się %d i odnosić się do współczynników początkowych dla %s"
 
-#. R/mgcv.r: gettextf("Length of start should equal %d and correspond to initial coefs.",     nvars)
-#: R/mgcv.r:0
+#. R/deprecated.r: gettextf("Length of start should equal %d and correspond to initial coefs.",     nvars)
+#: R/deprecated.r:0
 msgid "Length of start should equal %d and correspond to initial coefs."
 msgstr "długość 'start' powinna równać się %d i odnosić się do współczynników początkowych."
 
@@ -383,8 +390,9 @@ msgstr "Model nie wydaje się mieć wystarczającej liczby członów aby zrobić
 msgid "Model matrix not full column rank"
 msgstr "Macierz modelu nie ma pełnej rangi kolumny"
 
+#. R/deprecated.r: stop("Model seems to contain no terms")
 #. R/mgcv.r: stop("Model seems to contain no terms")
-#: R/mgcv.r:0
+#: R/deprecated.r:0 R/mgcv.r:0
 msgid "Model seems to contain no terms"
 msgstr "Model wydaje się nie zawierać żadnych członów"
 
@@ -428,15 +436,17 @@ msgstr "wartości NA w macierzy klasy \"pdTens\""
 msgid "NA's in supplied smoothing parameter vector - ignoring."
 msgstr "Podano wartości NA w wektorze parametrów wygładzających - ignorowanie."
 
+#. R/deprecated.r: stop("NAs in V(mu)")
 #. R/gam.fit3.r: stop("NAs in V(mu)")
-#. R/mgcv.r: stop("NAs in V(mu)")
-#: R/gam.fit3.r:0 R/mgcv.r:0
+#. R/scasm.r: stop("NAs in V(mu)")
+#: R/deprecated.r:0 R/gam.fit3.r:0 R/scasm.r:0
 msgid "NAs in V(mu)"
 msgstr "wartości NA w 'V(mu)'"
 
+#. R/deprecated.r: stop("NAs in d(mu)/d(eta)")
 #. R/gam.fit3.r: stop("NAs in d(mu)/d(eta)")
-#. R/mgcv.r: stop("NAs in d(mu)/d(eta)")
-#: R/gam.fit3.r:0 R/mgcv.r:0
+#. R/scasm.r: stop("NAs in d(mu)/d(eta)")
+#: R/deprecated.r:0 R/gam.fit3.r:0 R/scasm.r:0
 msgid "NAs in d(mu)/d(eta)"
 msgstr "wartości NA w 'd(mu)/d(eta)'"
 
@@ -460,8 +470,8 @@ msgstr "Nie dostarczono danych do funkcji 'gam.setup()'"
 msgid "No data supplied to gamm.setup"
 msgstr "Nie dostarczono danych do funkcji 'gamm.setup()'"
 
-#. R/mgcv.r: gettextf("No observations informative at iteration %d", iter)
-#: R/mgcv.r:0
+#. R/deprecated.r: gettextf("No observations informative at iteration %d", iter)
+#: R/deprecated.r:0
 msgid "No observations informative at iteration %d"
 msgstr "brak obserwacji informacyjnych w %d iteracji"
 
@@ -490,8 +500,8 @@ msgstr "Nieskończone pochodne. Spróbuj zmniejszyć tolerancję dopasowania! Zo
 msgid "Non-finite coefficients at iteration"
 msgstr "Nieskończone współczynniki w iteracji"
 
-#. R/mgcv.r: gettextf("Non-finite coefficients at iteration %d", iter)
-#: R/mgcv.r:0
+#. R/deprecated.r: gettextf("Non-finite coefficients at iteration %d", iter)
+#: R/deprecated.r:0
 msgid "Non-finite coefficients at iteration %d"
 msgstr "nieskończone współczynniki w %d iteracji"
 
@@ -519,7 +529,8 @@ msgstr "Zmienne odpowiedzi inne niż liczby całkowite nie są dozwolone w zipls
 #. R/gamm.r: stop("Not enough (non-NA) data to do anything meaningful")
 #. R/jagam.r: stop("Not enough (non-NA) data to do anything meaningful")
 #. R/mgcv.r: stop("Not enough (non-NA) data to do anything meaningful")
-#: R/bam.r:0 R/gamm.r:0 R/jagam.r:0 R/mgcv.r:0
+#. R/scasm.r: stop("Not enough (non-NA) data to do anything meaningful")
+#: R/bam.r:0 R/gamm.r:0 R/jagam.r:0 R/mgcv.r:0 R/scasm.r:0
 msgid "Not enough (non-NA) data to do anything meaningful"
 msgstr "Brak wystarczającej (nie NA) liczby danych, aby wykonać cokolwiek sensownego"
 
@@ -619,13 +630,13 @@ msgstr "Przepraszamy, iloczyny tensorowe wygładzeń z wielokrotnymi karami nie 
 msgid "Step halved: new penalized deviance = %g"
 msgstr "Krok został skrócony o połowę: nowe karne odchylenie = %g"
 
-#. R/mgcv.r: warning("Step size truncated due to divergence", call. = FALSE)
-#: R/mgcv.r:0
+#. R/deprecated.r: warning("Step size truncated due to divergence", call. = FALSE)
+#: R/deprecated.r:0
 msgid "Step size truncated due to divergence"
 msgstr "Rozmiar kroku przycięty z uwagi na rozbieżność"
 
-#. R/mgcv.r: warning("Step size truncated: out of bounds.", call. = FALSE)
-#: R/mgcv.r:0
+#. R/deprecated.r: warning("Step size truncated: out of bounds.", call. = FALSE)
+#: R/deprecated.r:0
 msgid "Step size truncated: out of bounds."
 msgstr "Rozmiar kroku przycięty: poza granicami."
 
@@ -710,8 +721,7 @@ msgid "a parametric penalty has wrong dimension"
 msgstr "parametryczna kara ma niepoprawny wymiar"
 
 #. R/bam.r: warning("algorithm did not converge")
-#. R/mgcv.r: warning("algorithm did not converge")
-#: R/bam.r:0 R/mgcv.r:0
+#: R/bam.r:0
 msgid "algorithm did not converge"
 msgstr "algorytm nie uzbieżnił się"
 
@@ -840,6 +850,11 @@ msgstr "argument 'by.resids' nie jest obsługiwany"
 msgid "by=. not allowed"
 msgstr "'by=.' nie jest dozwolone"
 
+#. R/scasm.r: stop("can not handle negative weighting of log smoothing parameters")
+#: R/scasm.r:0
+msgid "can not handle negative weighting of log smoothing parameters"
+msgstr ""
+
 #. R/mgcv.r: stop("can't handle [[ in formula")
 #: R/mgcv.r:0
 msgid "can't handle [[ in formula"
@@ -851,7 +866,8 @@ msgid "can't soap smooth without a boundary"
 msgstr "nie można wygładzić 'soap' bez granicy"
 
 #. R/bam.r: stop("cannot find valid starting values: please specify some")
-#: R/bam.r:0
+#. R/scasm.r: stop("cannot find valid starting values: please specify some",     call. = FALSE)
+#: R/bam.r:0 R/scasm.r:0
 msgid "cannot find valid starting values: please specify some"
 msgstr "Nie można znaleźć poprawnych wartości startowych: proszę określić kilka"
 
@@ -884,6 +900,11 @@ msgstr "komponenty węzłów odwołujące się do pojedynczego wygładzenia musz
 #: R/bam.r:0
 msgid "constraints for sub blocked tensor products un-tested"
 msgstr "ograniczenia dla zblokowanych produktów tensorowych nie są przetestowane"
+
+#. R/scasm.r: stop("constraints overlap more than one term")
+#: R/scasm.r:0
+msgid "constraints overlap more than one term"
+msgstr ""
 
 #. R/sparse.r: stop("cubic spline only deals with 1D data")
 #: R/sparse.r:0
@@ -996,6 +1017,11 @@ msgstr "błędne wywołanie 'estimate.theta' - brak wolnych parametrów"
 msgid "factor 'by' variables can not be used with matrix arguments."
 msgstr "zmienne czynnikowe 'by' nie mogą być użyte z argumentami macierzy."
 
+#. R/scasm.r: stop("failed to find feasible starting values")
+#: R/scasm.r:0
+msgid "failed to find feasible starting values"
+msgstr ""
+
 #. R/mgcv.r: warning("failure of Davies method, falling back on Liu et al approximtion")
 #: R/mgcv.r:0
 msgid "failure of Davies method, falling back on Liu et al approximtion"
@@ -1042,7 +1068,8 @@ msgstr "rodzina nie została rozpoznana"
 #. R/gfam.r: stop("family not recognized")
 #. R/jagam.r: stop("family not recognized")
 #. R/mgcv.r: stop("family not recognized")
-#: R/bam.r:0 R/gamm.r:0 R/gfam.r:0 R/jagam.r:0 R/mgcv.r:0
+#. R/scasm.r: stop("family not recognized")
+#: R/bam.r:0 R/gamm.r:0 R/gfam.r:0 R/jagam.r:0 R/mgcv.r:0 R/scasm.r:0
 msgid "family not recognized"
 msgstr "'family' nie został rozpoznany"
 
@@ -1051,22 +1078,58 @@ msgstr "'family' nie został rozpoznany"
 msgid "fast REML optimizer reached iteration limit"
 msgstr "szybki optymalizator REML osiągnął granicę iteracji"
 
-#. R/soap.r: stop("faulty bnd")
+#. R/soap.r: stop("faulty bnd 1")
 #: R/soap.r:0
-msgid "faulty bnd"
+#, fuzzy
+msgid "faulty bnd 1"
+msgstr "błędne 'bnd'"
+
+#. R/soap.r: stop("faulty bnd 2")
+#: R/soap.r:0
+#, fuzzy
+msgid "faulty bnd 2"
+msgstr "błędne 'bnd'"
+
+#. R/soap.r: stop("faulty bnd 3")
+#: R/soap.r:0
+#, fuzzy
+msgid "faulty bnd 3"
+msgstr "błędne 'bnd'"
+
+#. R/soap.r: stop("faulty bnd 4")
+#: R/soap.r:0
+#, fuzzy
+msgid "faulty bnd 4"
+msgstr "błędne 'bnd'"
+
+#. R/soap.r: stop("faulty bnd 5")
+#: R/soap.r:0
+#, fuzzy
+msgid "faulty bnd 5"
+msgstr "błędne 'bnd'"
+
+#. R/soap.r: stop("faulty bnd 6")
+#: R/soap.r:0
+#, fuzzy
+msgid "faulty bnd 6"
 msgstr "błędne 'bnd'"
 
 #. R/bam.r: warning("fitted probabilities numerically 0 or 1 occurred")
-#. R/mgcv.r: warning("fitted probabilities numerically 0 or 1 occurred")
-#: R/bam.r:0 R/mgcv.r:0
+#. R/deprecated.r: warning("fitted probabilities numerically 0 or 1 occurred")
+#: R/bam.r:0 R/deprecated.r:0
 msgid "fitted probabilities numerically 0 or 1 occurred"
 msgstr "dopasowane prawdopodobieństwa okazały się być numerycznie równe 0 lub 1"
 
 #. R/bam.r: warning("fitted rates numerically 0 occurred")
-#. R/mgcv.r: warning("fitted rates numerically 0 occurred")
-#: R/bam.r:0 R/mgcv.r:0
+#. R/deprecated.r: warning("fitted rates numerically 0 occurred")
+#: R/bam.r:0 R/deprecated.r:0
 msgid "fitted rates numerically 0 occurred"
 msgstr "dopasowane wskaźniki numerycznie okazały się być równe 0"
+
+#. R/scasm.r: stop("fixed constraints span multiple smooths")
+#: R/scasm.r:0
+msgid "fixed constraints span multiple smooths"
+msgstr ""
 
 #. R/mgcv.r: stop("for NCV number of dropped and predicted neighbourhoods must match")
 #: R/mgcv.r:0
@@ -1223,6 +1286,12 @@ msgstr "obsługiwanie zmiennych 'by' w konstruktorach wygładzenia może nie dzi
 msgid "if response is a matrix it must have 2 columns"
 msgstr "jeśli odpowiedź jest macierzą, musi mieć 2 kolumny"
 
+#. R/deprecated.r: stop("illegal `family' argument")
+#: R/deprecated.r:0
+#, fuzzy
+msgid "illegal `family' argument"
+msgstr "niepoprawny argument 'family'"
+
 #. R/mgcv.r: stop("in.out incorrect: see documentation")
 #: R/mgcv.r:0
 msgid "in.out incorrect: see documentation"
@@ -1234,7 +1303,8 @@ msgid "incorrect arguments to GP smoother"
 msgstr "niepoprawne argumenty przekazane do GP smoother"
 
 #. R/mgcv.r: stop("incorrect number of linear predictors for family")
-#: R/mgcv.r:0
+#. R/scasm.r: stop("incorrect number of linear predictors for family")
+#: R/mgcv.r:0 R/scasm.r:0
 msgid "incorrect number of linear predictors for family"
 msgstr "nieprawidłowa liczba predyktorów liniowych dla rodziny"
 
@@ -1268,6 +1338,18 @@ msgstr "początkowe parametry nie są wykonalne"
 msgid "initial parameters very close to inequality constraints"
 msgstr "początkowe parametry bardzo blisko więzów nierówności"
 
+#. R/scasm.r: stop("initial point fails equality constraints")
+#: R/scasm.r:0
+#, fuzzy
+msgid "initial point fails equality constraints"
+msgstr "początkowy punkt jest bardzo blisko niektórych więzów nierówności"
+
+#. R/scasm.r: stop("initial point fails inequality constraints")
+#: R/scasm.r:0
+#, fuzzy
+msgid "initial point fails inequality constraints"
+msgstr "początkowy punkt jest bardzo blisko niektórych więzów nierówności"
+
 #. R/mgcv.r: warning("initial point very close to some inequality constraints")
 #: R/mgcv.r:0
 msgid "initial point very close to some inequality constraints"
@@ -1278,18 +1360,30 @@ msgstr "początkowy punkt jest bardzo blisko niektórych więzów nierówności"
 msgid "inner groupings not nested in outer!!"
 msgstr "wewnętrzne grupowanie nie jest zagnieżdżone w zewnętrznym grupowaniu!!"
 
+#. R/deprecated.r: stop("inner loop 1; can't correct step size")
 #. R/gam.fit3.r: stop("inner loop 1; can't correct step size")
 #. R/gam.fit4.r: stop("inner loop 1; can't correct step size")
-#. R/mgcv.r: stop("inner loop 1; can't correct step size")
-#: R/gam.fit3.r:0 R/gam.fit4.r:0 R/mgcv.r:0
+#: R/deprecated.r:0 R/gam.fit3.r:0 R/gam.fit4.r:0
 msgid "inner loop 1; can't correct step size"
 msgstr "wewnętrzna pętla 1; nie można poprawić rozmiaru kroku"
 
+#. R/scasm.r: stop("inner loop 1; cannot correct step size", call. = FALSE)
+#: R/scasm.r:0
+#, fuzzy
+msgid "inner loop 1; cannot correct step size"
+msgstr "wewnętrzna pętla 1; nie można poprawić rozmiaru kroku"
+
+#. R/deprecated.r: stop("inner loop 2; can't correct step size")
 #. R/gam.fit3.r: stop("inner loop 2; can't correct step size")
 #. R/gam.fit4.r: stop("inner loop 2; can't correct step size")
-#. R/mgcv.r: stop("inner loop 2; can't correct step size")
-#: R/gam.fit3.r:0 R/gam.fit4.r:0 R/mgcv.r:0
+#: R/deprecated.r:0 R/gam.fit3.r:0 R/gam.fit4.r:0
 msgid "inner loop 2; can't correct step size"
+msgstr "wewnętrzna pętla 2; nie można poprawić rozmiaru kroku"
+
+#. R/scasm.r: stop("inner loop 2; cannot correct step size", call. = FALSE)
+#: R/scasm.r:0
+#, fuzzy
+msgid "inner loop 2; cannot correct step size"
 msgstr "wewnętrzna pętla 2; nie można poprawić rozmiaru kroku"
 
 #. R/gam.fit3.r: stop("inner loop 3; can't correct step size")
@@ -1309,8 +1403,7 @@ msgid "internal error in vcorr, please report to simon.wood@r-project.org"
 msgstr "błąd wewnętrzny w vcorr, prosimy o zgłoszenie do simon.wood@r-project.org"
 
 #. R/gam.fit3.r: stop("invalid 'family' argument")
-#. R/mgcv.r: stop("invalid 'family' argument")
-#: R/gam.fit3.r:0 R/mgcv.r:0
+#: R/gam.fit3.r:0
 msgid "invalid 'family' argument"
 msgstr "niepoprawny argument 'family'"
 
@@ -1324,8 +1417,8 @@ msgstr "isa wymaga identyfikatora dg/tCMatrix"
 msgid "iteration %d"
 msgstr "iteracja %d"
 
-#. R/mgcv.r: stop("iterative weights or data non-finite in gam.fit - regularization may help. See ?gam.control.")
-#: R/mgcv.r:0
+#. R/deprecated.r: stop("iterative weights or data non-finite in gam.fit - regularization may help. See ?gam.control.")
+#: R/deprecated.r:0
 msgid "iterative weights or data non-finite in gam.fit - regularization may help. See ?gam.control."
 msgstr "iteracyjne wagi lub nieskończone dane w 'gam.fit' - regularyzacja może pomóc. Zobacz '?gam.control'."
 
@@ -1370,6 +1463,12 @@ msgstr "węzły muszą być określone dla 'soap'"
 msgid "lambda and h should have the same length!"
 msgstr "argumenty 'lambda' oraz 'h' powinny mieć tę samą długość!"
 
+#. R/scasm.r: gettextf("length of 'start' should equal %d and correspond to initial coefs",     nvars)
+#: R/scasm.r:0
+#, fuzzy
+msgid "length of 'start' should equal %d and correspond to initial coefs"
+msgstr "długość 'start' powinna równać się %d i odnosić się do współczynników początkowych."
+
 #. R/mgcv.r: stop("length of min.sp is wrong.")
 #: R/mgcv.r:0
 msgid "length of min.sp is wrong."
@@ -1382,7 +1481,8 @@ msgstr "długość 'sp' jest niepoprawna w 't2': zignorowano"
 
 #. R/bam.r: stop("length of sp must be number of free smoothing parameters in original model")
 #. R/mgcv.r: stop("length of sp must be number of free smoothing parameters in original model")
-#: R/bam.r:0 R/mgcv.r:0
+#. R/scasm.r: stop("length of sp must be number of free smoothing parameters in original model")
+#: R/bam.r:0 R/mgcv.r:0 R/scasm.r:0
 msgid "length of sp must be number of free smoothing parameters in original model"
 msgstr "długość 'sp' musi być równa liczbie swobodnych parametrów wygładzania w oryginalnym modelu"
 
@@ -1411,6 +1511,12 @@ msgstr "liniowe etykiety predyktorów poza zakresem"
 msgid "link \"%s\" not available for Tweedie family."
 msgstr "link \"%s\" nie jest dostępny dla rodziny Tweedie."
 
+#. R/efam.r: gettextf("link \"%s\" not available for bcg family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#: R/efam.r:0
+#, fuzzy
+msgid "link \"%s\" not available for bcg family; available links are %s"
+msgstr "połączenie \"%s\" nie jest dostępne dla rodziny 'clog'; dostępne połączenia to %s"
+
 #. R/efam.r: gettextf("link \"%s\" not available for betar family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
 #: R/efam.r:0
 msgid "link \"%s\" not available for betar family; available links are %s"
@@ -1425,6 +1531,12 @@ msgstr "połączenie \"%s\" nie jest dostępne dla rodziny 'clog'; dostępne po�
 #: R/efam.r:0
 msgid "link \"%s\" not available for cnorm family; available links are %s"
 msgstr "połączenie \"%s\" nie jest dostępne dla rodziny 'cnorm'; dostępne połączenia to %s"
+
+#. R/efam.r: gettextf("link \"%s\" not available for cpois family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
+#: R/efam.r:0
+#, fuzzy
+msgid "link \"%s\" not available for cpois family; available links are %s"
+msgstr "połączenie \"%s\" nie jest dostępne dla rodziny 'clog'; dostępne połączenia to %s"
 
 #. R/efam.r: gettextf("link \"%s\" not available for nb family; available links are %s",     linktemp, paste(sQuote(okLinks), collapse = ", "))
 #: R/efam.r:0
@@ -1495,6 +1607,11 @@ msgstr "średnia wartość 'mu' musi być nieujemna"
 #: R/mgcv.r:0
 msgid "method not recognised."
 msgstr "metoda nie została rozpoznana."
+
+#. R/scasm.r: paste("min(redf)=", min(redf))
+#: R/scasm.r:0
+msgid "min(redf)="
+msgstr ""
 
 #. R/bam.r: warning("min.sp not supported with fast REML and NCV computation, and ignored.")
 #: R/bam.r:0
@@ -1667,6 +1784,12 @@ msgstr "brak wolnych współczynników w wygładzaniu sf"
 msgid "no good data in iteration"
 msgstr "brak dobrych danych w iteracji"
 
+#. R/scasm.r: gettextf("no observations informative at iteration %d", iter)
+#: R/scasm.r:0
+#, fuzzy
+msgid "no observations informative at iteration %d"
+msgstr "brak obserwacji informacyjnych w %d iteracji"
+
 #. R/mgcv.r: stop("no sandwich estimate available for this model")
 #: R/mgcv.r:0
 msgid "no sandwich estimate available for this model"
@@ -1682,10 +1805,16 @@ msgstr "brak wygładzeń, ignorowanie 'discrete=TRUE'"
 msgid "no spatial information provided!"
 msgstr "nie dostarczono informacji przestrzennej!"
 
+#. R/scasm.r: stop("no valid set of coefficients has been found: please supply starting values",     call. = FALSE)
+#: R/scasm.r:0
+#, fuzzy
+msgid "no valid set of coefficients has been found: please supply starting values"
+msgstr "nie znaleziono poprawnego zestawu współczynników: proszę dostarczyć wartości startowe"
+
+#. R/deprecated.r: stop("no valid set of coefficients has been found:please supply starting values",     call. = FALSE)
 #. R/gam.fit3.r: stop("no valid set of coefficients has been found:please supply starting values",     call. = FALSE)
 #. R/gam.fit4.r: stop("no valid set of coefficients has been found:please supply starting values",     call. = FALSE)
-#. R/mgcv.r: stop("no valid set of coefficients has been found:please supply starting values",     call. = FALSE)
-#: R/gam.fit3.r:0 R/gam.fit4.r:0 R/mgcv.r:0
+#: R/deprecated.r:0 R/gam.fit3.r:0 R/gam.fit4.r:0
 msgid "no valid set of coefficients has been found:please supply starting values"
 msgstr "nie znaleziono poprawnego zestawu współczynników: proszę dostarczyć wartości startowe"
 
@@ -1708,6 +1837,12 @@ msgstr "zażądano nieistniejących członów - ignorowanie"
 #: R/bam.r:0
 msgid "non-finite coefficients at iteration %d"
 msgstr "nieskończone współczynniki w %d iteracji"
+
+#. R/scasm.r: stop("non-finite initial deviance")
+#: R/scasm.r:0
+#, fuzzy
+msgid "non-finite initial deviance"
+msgstr "Nieskończone odchylenie"
 
 #. R/plots.r: warning("non-integer binomial denominator: quantiles incorrect")
 #: R/plots.r:0
@@ -1753,6 +1888,11 @@ msgstr "nie jest dodatnio określone"
 #: R/mcmc.r:0
 msgid "not usable with bam fits"
 msgstr "nie nadaje się do użytku z dopasowaniem bam"
+
+#. R/mgcv.r: message("note: bs not used for confidence limits")
+#: R/mgcv.r:0
+msgid "note: bs not used for confidence limits"
+msgstr ""
 
 #. R/mgcv.r: stop("nothing to do for this model")
 #: R/mgcv.r:0
@@ -1959,6 +2099,12 @@ msgstr "argument 'residuals ' nie jest obsługiwany"
 msgid "residuals argument to plot.gam is wrong length: ignored"
 msgstr "argument reszt przekazywany do 'plot.gam' ma niepoprawną długość: zignorowano"
 
+#. R/efam.r: stop("response must be non-negative")
+#: R/efam.r:0
+#, fuzzy
+msgid "response must be non-negative"
+msgstr "średnia wartość 'mu' musi być nieujemna"
+
 #. R/gamlss.r: stop("response not in 0 to number of predictors + 1")
 #: R/gamlss.r:0
 msgid "response not in 0 to number of predictors + 1"
@@ -2024,10 +2170,20 @@ msgstr "zażądano estymatora kanapkowego ze strukturalnie zerowymi pierwszymi p
 msgid "saturated likelihood may be inaccurate"
 msgstr "nasycona funkcja wiarygodności może nie być dokładna"
 
+#. R/scasm.r: stop("scad is for 1D smoothing only")
+#: R/scasm.r:0
+msgid "scad is for 1D smoothing only"
+msgstr ""
+
 #. R/gam.fit3.r: stop("scale parameter must be positive")
 #: R/gam.fit3.r:0
 msgid "scale parameter must be positive"
 msgstr "parametr skali musi być dodatni"
+
+#. R/scasm.r: warning("scasm.newton failed to converge")
+#: R/scasm.r:0
+msgid "scasm.newton failed to converge"
+msgstr ""
 
 #. R/misc.r: stop("scattered XVX computation not yet implemented")
 #: R/misc.r:0
@@ -2038,6 +2194,11 @@ msgstr "rozproszone obliczenia XVX nie zostały jeszcze zaimplementowane"
 #: R/misc.r:0
 msgid "sd should have exactly one less entry than ld"
 msgstr "sd powinno mieć dokładnie o jeden wpis mniej niż ld"
+
+#. R/plots.r: warning("seWithMean unavailable")
+#: R/plots.r:0
+msgid "seWithMean unavailable"
+msgstr ""
 
 #. R/mgcv.r: stop("shared offsets not allowed")
 #: R/mgcv.r:0
@@ -2074,6 +2235,12 @@ msgstr "pojedyncze liniowe indeksy predyktorów są ignorowane"
 msgid "size must be in [1,120]"
 msgstr "rozmiar musi być w przedziale [1, 120]"
 
+#. R/smooth.r: warning("smooth model matrix not full rank")
+#: R/smooth.r:0
+#, fuzzy
+msgid "smooth model matrix not full rank"
+msgstr "Macierz modelu nie ma pełnej rangi kolumny"
+
 #. R/smooth.r: warning("smooth objects should not have a qrc attribute.")
 #: R/smooth.r:0
 msgid "smooth objects should not have a qrc attribute."
@@ -2093,6 +2260,12 @@ msgstr "baza soap jest źle uwarunkowana - zmiana 'XT$nmax' może pomóc"
 #: R/soap.r:0
 msgid "soap films are bivariate only"
 msgstr "filmy 'soap' są tylko dwuwymiarowe"
+
+#. R/efam.r: warning("some x0>=x1")
+#. R/misc.r: warning("some x0>=x1")
+#: R/efam.r:0 R/misc.r:0
+msgid "some x0>=x1"
+msgstr ""
 
 #. R/inla.r: stop("something wrong with A index vector")
 #: R/inla.r:0
@@ -2129,10 +2302,21 @@ msgstr "przepraszamy, połączenie nie jest jeszcze obsługiwane"
 msgid "sorry no option for contouring with errors: try plot.gam"
 msgstr "przykro mi, brak opcji rysowania konturu z błędami: spróbuj 'plot.gam'"
 
+#. R/scasm.r: stop("sp and smooth length not matching")
+#: R/scasm.r:0
+msgid "sp and smooth length not matching"
+msgstr ""
+
 #. R/misc.r: stop("sparse method for Kronecker product contrasts not implemented")
 #: R/misc.r:0
 msgid "sparse method for Kronecker product contrasts not implemented"
 msgstr "metoda rozrzedzona dla kontrastów produktów Kroneckera nie została zaimplementowana"
+
+#. R/scasm.r: warning("step failure")
+#: R/scasm.r:0
+#, fuzzy
+msgid "step failure"
+msgstr "krok nie powiódł się"
 
 #. R/efam.r: warning("step failure in theta estimation")
 #: R/efam.r:0
@@ -2193,6 +2377,18 @@ msgstr "adaptacyjna klasa wygładzania jest ograniczona do 1 lub 2 współzmienn
 #: R/smooth.r:0
 msgid "there is *no* information about some basis coefficients"
 msgstr "*brak* informacji o niektórych podstawowych współczynnikach"
+
+#. R/efam.r: stop("theta should be length 1")
+#: R/efam.r:0
+#, fuzzy
+msgid "theta should be length 1"
+msgstr "powinien być dostarczony %d węzeł"
+
+#. R/efam.r: stop("theta should be length 2")
+#: R/efam.r:0
+#, fuzzy
+msgid "theta should be length 2"
+msgstr "'deriv' powinien wynosić 1 lub 2"
 
 #. R/smooth.r: stop("too few knots")
 #: R/smooth.r:0
@@ -2375,8 +2571,9 @@ msgstr "argument 'y' musi być całkowitą wielokrotnością argumentu 'phi' dla
 msgid "y must be strictly positive for a Gamma density"
 msgstr "argument 'y' musi być ściśle dodatni dla gęstości Gamma"
 
+#. R/deprecated.r: stop("y must be univariate unless binomial")
 #. R/mgcv.r: stop("y must be univariate unless binomial")
-#: R/mgcv.r:0
+#: R/deprecated.r:0 R/mgcv.r:0
 msgid "y must be univariate unless binomial"
 msgstr "'y' musi zawierać jedną zmienną jeśli nie zawiera dwóch"
 
@@ -2400,9 +2597,6 @@ msgstr[2] "powinno być dostarczonych %d węzłów"
 
 #~ msgid "and correspond to initial coefs for"
 #~ msgstr "oraz odpowiadać początkowym współczynnikom dla"
-
-#~ msgid "Algorithm did not converge"
-#~ msgstr "algorytm nie uzbieżnił się"
 
 #~ msgid "length(M$w) != length(M$y)"
 #~ msgstr "length(M$w) != length(M$y)"
@@ -2560,9 +2754,6 @@ msgstr[2] "powinno być dostarczonych %d węzłów"
 
 #~ msgid "Fit complete. Finishing gam object."
 #~ msgstr "Dopasowanie jest kompletne. Kończenie obiektu klasy \"gam\"."
-
-#~ msgid "step failed"
-#~ msgstr "krok nie powiódł się"
 
 #~ msgid "no convergence in 200 iterations"
 #~ msgstr "brak zbieżności w 200 iteracjach"
